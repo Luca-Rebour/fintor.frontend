@@ -1,16 +1,18 @@
 import { useEffect, useMemo, useState } from "react";
-import {
-  ActivityIndicator,
-  Pressable,
-  ScrollView,
-  Text,
-  View,
-} from "react-native";
-import { Feather } from "@expo/vector-icons";
+import { ActivityIndicator, ScrollView, Text, View } from "react-native";
 import { getTransactionsData } from "../../services/transactions.service";
 import { TransactionDTO } from "../../types/transaction";
-import { APP_COLORS, APP_GRADIENTS } from "../../constants/colors";
-import { LinearGradient } from "expo-linear-gradient";
+import {
+  CreateExpenseModal,
+  CreateExpensePayload,
+} from "../../components/transactions/CreateExpenseModal";
+import { TransactionActionButtons } from "../../components/transactions/TransactionActionButtons";
+import {
+  CreateIncomeModal,
+  CreateIncomePayload,
+} from "../../components/transactions/CreateIncomeModal";
+import { TransactionListItem } from "../../components/transactions/TransactionListItem";
+import { TransactionSummaryCards } from "../../components/transactions/TransactionSummaryCards";
 
 type TransactionGroup = {
   dateKey: string;
@@ -32,9 +34,12 @@ export default function TransactionsScreen() {
   );
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
-  const [expandedTransactionId, setExpandedTransactionId] = useState<
-    string | null
-  >(null);
+  const [expandedTransactionId, setExpandedTransactionId] = useState<string | null>(null);
+  const [monthlySummary, setMonthlySummary] = useState({ totalSpending: 0, totalIncome: 0 });
+  const [isCreateExpenseModalVisible, setIsCreateExpenseModalVisible] =
+    useState(false);
+  const [isCreateIncomeModalVisible, setIsCreateIncomeModalVisible] =
+    useState(false);
 
   async function loadTransactions() {
     try {
@@ -42,6 +47,7 @@ export default function TransactionsScreen() {
       setError("");
       const data = await getTransactionsData();
       setTransactionsData(data);
+      setMonthlySummary(calculateMonthlySummary(data));
     } catch (loadError) {
       const message =
         loadError instanceof Error
@@ -85,69 +91,96 @@ export default function TransactionsScreen() {
     setExpandedTransactionId((prev) => (prev === id ? null : id));
   };
 
+  const categoryColorByName: Record<string, string> = {
+    Salary: "#4ECDC4",
+    Freelance: "#18C8FF",
+    Investments: "#B63BFF",
+    Bonus: "#22C55E",
+    Refund: "#F59E0B",
+    "Food & Dining": "#FF6B6B",
+    Transport: "#F97316",
+    Shopping: "#A855F7",
+    Bills: "#0EA5E9",
+    Entertainment: "#EC4899",
+  };
+
+  function handleCreateExpense(payload: CreateExpensePayload) {
+    const createdExpense: TransactionDTO = {
+      id: `txn_${Date.now()}`,
+      date: new Date().toISOString(),
+      amount: payload.amount,
+      description: payload.description,
+      category: payload.category,
+      type: "expense",
+      icon: payload.icon,
+      account: payload.account,
+      categoryColor: categoryColorByName[payload.category] ?? "#FF6B6B",
+    };
+
+    setTransactionsData((prev) => {
+      const next = [createdExpense, ...prev];
+      setMonthlySummary(calculateMonthlySummary(next));
+      return next;
+    });
+  }
+
+  function handleCreateIncome(payload: CreateIncomePayload) {
+    const createdIncome: TransactionDTO = {
+      id: `txn_${Date.now()}`,
+      date: new Date().toISOString(),
+      amount: payload.amount,
+      description: payload.description,
+      category: payload.category,
+      type: "income",
+      icon: payload.icon,
+      account: payload.account,
+      categoryColor: categoryColorByName[payload.category] ?? "#18C8FF",
+    };
+
+    setTransactionsData((prev) => {
+      const next = [createdIncome, ...prev];
+      setMonthlySummary(calculateMonthlySummary(next));
+      return next;
+    });
+  }
+
+  function calculateMonthlySummary(transactions: TransactionDTO[]) {
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+    let totalSpending = 0;
+    let totalIncome = 0;
+  
+    for (const txn of transactions) {
+        const txnDate = new Date(txn.date);
+        if (txnDate.getMonth() === currentMonth && txnDate.getFullYear() === currentYear) {
+            if (txn.type === "expense") {
+                totalSpending += txn.amount;
+            } else if (txn.type === "income") {
+                totalIncome += txn.amount;
+            }
+        }
+    }
+  
+    return { totalSpending, totalIncome };
+  }
+
   return (
     <View className="flex-1 bg-[#060F24]">
-      <View className="px-4 py-3 border-b border-[#1E2A47]">
-        <Text className="text-lg font-semibold text-app-textPrimary">
-          Transactions
-        </Text>
-      </View>
-
-      <View className="flex-row px-4 mt-4 gap-3">
-        <View className="flex-1 bg-[#111C33] rounded-xl p-4">
-          <View className="flex-row items-center justify-between mb-2">
-            <Text className="text-app-textSecondary text-xs uppercase">
-              Monthly Spending
-            </Text>
-            <Feather name="arrow-down" size={16} color="#EF4444" />
-          </View>
-
-          <Text className="text-app-textPrimary text-xl font-semibold">
-            $1,250.00
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View className="px-4 py-3 border-b border-[#1E2A47]">
+          <Text className="text-lg font-semibold text-app-textPrimary">
+            Transactions
           </Text>
         </View>
 
-        <View className="flex-1 bg-[#111C33] rounded-xl p-4">
-          <View className="flex-row items-center justify-between mb-2">
-            <Text className="text-app-textSecondary text-xs uppercase">
-              Monthly Income
-            </Text>
-            <Feather name="arrow-up" size={16} color="#22C55E" />
-          </View>
+        <TransactionSummaryCards monthlySpending={monthlySummary.totalSpending} monthlyIncome={monthlySummary.totalIncome} />
 
-          <Text className="text-app-textPrimary text-xl font-semibold">
-            $3,400.00
-          </Text>
-        </View>
-      </View>
+        <TransactionActionButtons
+          onAddExpense={() => setIsCreateExpenseModalVisible(true)}
+          onAddIncome={() => setIsCreateIncomeModalVisible(true)}
+        />
 
-      <View className="flex-row items-center mt-4 px-4 gap-3">
-        <Pressable
-          style={{ backgroundColor: APP_COLORS.actionPrimary }}
-          className="flex-1 flex-row items-center justify-center px-4 py-3.5 rounded-xl border border-[#1E2A47]"
-        >
-          <Feather name="plus-circle" size={16} color="#FFFFFF" />
-          <Text className="text-sm text-white font-semibold ml-2">
-            Add Expense
-          </Text>
-        </Pressable>
-
-        <Pressable className="flex-1 flex-row items-center justify-center px-4 py-3.5 rounded-xl border border-[#1E2A47]">
-          <Feather
-            name="dollar-sign"
-            size={16}
-            color={APP_COLORS.actionPrimary}
-          />
-          <Text className="text-sm text-app-primary font-semibold ml-2">
-            Add Income
-          </Text>
-        </Pressable>
-      </View>
-
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerClassName="pb-20 pt-2 px-4"
-      >
         {isLoading ? (
           <View className="flex-1 items-center justify-center">
             <ActivityIndicator size="large" color="#18C8FF" />
@@ -166,76 +199,31 @@ export default function TransactionsScreen() {
               </Text>
 
               {group.items.map((txn) => {
-                const isExpanded = expandedTransactionId === txn.id;
-                const txnDate = new Date(txn.date);
-
                 return (
-                  <View
+                  <TransactionListItem
                     key={txn.id}
-                    className="bg-[#111C33] rounded-lg mb-3 overflow-hidden"
-                  >
-                    <Pressable
-                      onPress={() => toggleExpanded(txn.id)}
-                      className="py-5 px-4 flex-row items-center"
-                    >
-                      <View style={{ width: 26, alignItems: "center" }}>
-                        <Feather
-                          name={txn.icon as any}
-                          color="#18C8FF"
-                          size={16}
-                        />
-                      </View>
-
-                      <View style={{ flex: 1, paddingRight: 10 }}>
-                        <Text
-                          numberOfLines={1}
-                          className="text-base font-semibold text-app-textPrimary"
-                        >
-                          {txn.category}
-                        </Text>
-                      </View>
-
-                      <View style={{ width: 90, alignItems: "flex-end" }}>
-                        <Text
-                          className={`text-base font-semibold ${
-                            txn.type === "expense"
-                              ? "text-red-500"
-                              : "text-green-500"
-                          }`}
-                        >
-                          {txn.type === "expense" ? "-" : "+"}$
-                          {txn.amount.toFixed(2)}
-                        </Text>
-                      </View>
-                    </Pressable>
-
-                    {isExpanded && (
-                      <View className="px-4 pb-4 pt-1 border-t border-[#1E2A47]">
-                        <Text className="text-app-textSecondary text-sm">
-                          Fecha:{" "}
-                          {txnDate.toLocaleDateString("es-ES", {
-                            day: "2-digit",
-                            month: "2-digit",
-                            year: "numeric",
-                          })}
-                        </Text>
-                        <Text className="text-app-textSecondary text-sm mt-1">
-                          Hora:{" "}
-                          {txnDate.toLocaleTimeString("es-ES", {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                            second: "2-digit",
-                          })}
-                        </Text>
-                      </View>
-                    )}
-                  </View>
+                    transaction={txn}
+                    isExpanded={expandedTransactionId === txn.id}
+                    onToggle={toggleExpanded}
+                  />
                 );
               })}
             </View>
           ))
         )}
       </ScrollView>
+
+      <CreateExpenseModal
+        visible={isCreateExpenseModalVisible}
+        onClose={() => setIsCreateExpenseModalVisible(false)}
+        onCreateExpense={handleCreateExpense}
+      />
+
+      <CreateIncomeModal
+        visible={isCreateIncomeModalVisible}
+        onClose={() => setIsCreateIncomeModalVisible(false)}
+        onCreateIncome={handleCreateIncome}
+      />
     </View>
   );
 }
