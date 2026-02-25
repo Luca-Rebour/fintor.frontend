@@ -6,7 +6,7 @@ type TransactionApiResponse = TransactionDTO;
 let MOCK_TRANSACTIONS_RESPONSE: TransactionApiResponse[] = [
     {
         id: "txn_12345",
-        date: "2026-02-13T14:30:00Z",
+        date: "2026-02-25T14:30:00Z",
         amount: 75.50,
         description: "Grocery Store",
         category: "Food & Dining",
@@ -17,7 +17,7 @@ let MOCK_TRANSACTIONS_RESPONSE: TransactionApiResponse[] = [
     },
     {
         id: "txn_12346",
-        date: "2026-02-14T09:00:00Z",
+        date: "2026-02-24T09:00:00Z",
         amount: 1500.00,
         description: "Salary",
         category: "Income",

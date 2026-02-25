@@ -1,4 +1,5 @@
 import { Stack, usePathname } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context";
 import { View } from "react-native";
 import "../global.css";
@@ -33,6 +34,7 @@ function LayoutWithInsets() {
         paddingTop: insets.top,
       }}
     >
+      <StatusBar style="light" translucent backgroundColor="transparent" />
       <Stack screenOptions={{ headerShown: false }} />
     </View>
   );
