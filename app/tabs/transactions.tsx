@@ -1,22 +1,28 @@
-import { useEffect, useState } from "react";
-import {
-  ActivityIndicator,
-  Alert,
-  Pressable,
-  ScrollView,
-  Text,
-  View,
-} from "react-native";
-import { useRouter } from "expo-router";
-import { LinearGradient } from "expo-linear-gradient";
-import { getTransactionsData } from "../../services/transactions.service";
+import { useEffect, useMemo, useState } from "react";
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
 import { Feather } from "@expo/vector-icons";
+import { getTransactionsData } from "../../services/transactions.service";
+import { TransactionDTO } from "../../types/transaction";
+
+type TransactionGroup = {
+  dateKey: string;
+  title: string;
+  items: TransactionDTO[];
+};
+
+function getLocalDateKey(input: string) {
+  const d = new Date(input);
+  const y = d.getFullYear();
+  const m = `${d.getMonth() + 1}`.padStart(2, "0");
+  const day = `${d.getDate()}`.padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
 
 export default function TransactionsScreen() {
-  const router = useRouter();
-  const [transactionsData, setTransactionsData] = useState([]);
+  const [transactionsData, setTransactionsData] = useState<TransactionDTO[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
+  const [expandedTransactionId, setExpandedTransactionId] = useState<string | null>(null);
 
   async function loadTransactions() {
     try {
@@ -26,9 +32,7 @@ export default function TransactionsScreen() {
       setTransactionsData(data);
     } catch (loadError) {
       const message =
-        loadError instanceof Error
-          ? loadError.message
-          : "Failed to load transactions";
+        loadError instanceof Error ? loadError.message : "Failed to load transactions";
       setError(message);
     } finally {
       setIsLoading(false);
@@ -39,59 +43,114 @@ export default function TransactionsScreen() {
     loadTransactions();
   }, []);
 
+  const groupedTransactions = useMemo<TransactionGroup[]>(() => {
+    const map = new Map<string, TransactionDTO[]>();
+
+    for (const txn of transactionsData) {
+      const key = getLocalDateKey(txn.date);
+      const current = map.get(key) ?? [];
+      current.push(txn);
+      map.set(key, current);
+    }
+
+    return [...map.entries()]
+      .sort((a, b) => (a[0] < b[0] ? 1 : -1)) // fecha descendente
+      .map(([dateKey, items]) => ({
+        dateKey,
+        title: new Date(`${dateKey}T00:00:00`).toLocaleDateString("es-ES", {
+          weekday: "long",
+          day: "2-digit",
+          month: "long",
+          year: "numeric",
+        }),
+        items: items.sort((a, b) => +new Date(b.date) - +new Date(a.date)),
+      }));
+  }, [transactionsData]);
+
+  const toggleExpanded = (id: string) => {
+    setExpandedTransactionId((prev) => (prev === id ? null : id));
+  };
+
   return (
     <View className="flex-1 bg-[#060F24]">
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerClassName="pb-20 pt-2 px-4 "
+        contentContainerClassName="pb-20 pt-2 px-4"
       >
-        <Text className="text-2xl font-bold text-app-textPrimary mb-4">
-          Transactions
-        </Text>
+        <Text className="text-2xl font-bold text-app-textPrimary mb-4">Transactions</Text>
+
         {isLoading ? (
           <View className="flex-1 items-center justify-center">
             <ActivityIndicator size="large" color="#18C8FF" />
           </View>
         ) : error ? (
           <View className="flex-1 items-center justify-center px-6">
-            <Text className="text-center text-base text-app-textPrimary">
-              {error}
-            </Text>
+            <Text className="text-center text-base text-app-textPrimary">{error}</Text>
           </View>
         ) : (
-          transactionsData.map((txn) => (
-            <View
-              key={txn.id}
-              className="bg-[#111C33] rounded-lg py-6 px-4 mb-3 flex-row items-center"
-            >
-              <View style={{ width: 26, alignItems: "center" }}>
-                <Feather name={txn.icon} color="#18C8FF" size={16} />
-              </View>
+          groupedTransactions.map((group) => (
+            <View key={group.dateKey} className="mb-3">
+              <Text className="text-app-textSecondary text-xs uppercase mb-2 px-1">
+                {group.title}
+              </Text>
 
-              <View style={{ flex: 1, paddingRight: 10 }}>
-                <Text
-                  numberOfLines={1}
-                  className="text-base font-semibold text-app-textPrimary"
-                >
-                  {txn.category}
-                </Text>
-              </View>
+              {group.items.map((txn) => {
+                const isExpanded = expandedTransactionId === txn.id;
+                const txnDate = new Date(txn.date);
 
-              <View style={{ width: 92 }}>
-                <Text className="text-xs text-app-textSecondary">
-                  {new Date(txn.date).toLocaleDateString()}
-                </Text>
-              </View>
+                return (
+                  <View key={txn.id} className="bg-[#111C33] rounded-lg mb-3 overflow-hidden">
+                    <Pressable
+                      onPress={() => toggleExpanded(txn.id)}
+                      className="py-5 px-4 flex-row items-center"
+                    >
+                      <View style={{ width: 26, alignItems: "center" }}>
+                        <Feather name={txn.icon as any} color="#18C8FF" size={16} />
+                      </View>
 
-              <View style={{ width: 90, alignItems: "flex-end" }}>
-                <Text
-                  className={`text-base font-semibold ${
-                    txn.type === "expense" ? "text-red-500" : "text-green-500"
-                  }`}
-                >
-                  {txn.type === "expense" ? "-" : "+"}${txn.amount.toFixed(2)}
-                </Text>
-              </View>
+                      <View style={{ flex: 1, paddingRight: 10 }}>
+                        <Text
+                          numberOfLines={1}
+                          className="text-base font-semibold text-app-textPrimary"
+                        >
+                          {txn.category}
+                        </Text>
+                      </View>
+
+                      <View style={{ width: 90, alignItems: "flex-end" }}>
+                        <Text
+                          className={`text-base font-semibold ${
+                            txn.type === "expense" ? "text-red-500" : "text-green-500"
+                          }`}
+                        >
+                          {txn.type === "expense" ? "-" : "+"}${txn.amount.toFixed(2)}
+                        </Text>
+                      </View>
+                    </Pressable>
+
+                    {isExpanded && (
+                      <View className="px-4 pb-4 pt-1 border-t border-[#1E2A47]">
+                        <Text className="text-app-textSecondary text-sm">
+                          Fecha:{" "}
+                          {txnDate.toLocaleDateString("es-ES", {
+                            day: "2-digit",
+                            month: "2-digit",
+                            year: "numeric",
+                          })}
+                        </Text>
+                        <Text className="text-app-textSecondary text-sm mt-1">
+                          Hora:{" "}
+                          {txnDate.toLocaleTimeString("es-ES", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            second: "2-digit",
+                          })}
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+                );
+              })}
             </View>
           ))
         )}

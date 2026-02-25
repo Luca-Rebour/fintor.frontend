@@ -6,12 +6,13 @@ type TransactionApiResponse = TransactionDTO;
 const MOCK_TRANSACTIONS_RESPONSE: TransactionApiResponse[] = [
     {
         id: "txn_12345",
-        date: "2024-06-15T14:30:00Z",
+        date: "2024-06-1T14:30:00Z",
         amount: 75.50,
         description: "Grocery Store",
         category: "Food & Dining",
         type: "expense",
         icon: "shopping-cart",
+        account: "Checking Account",
     },
     {
         id: "txn_12346",
@@ -21,6 +22,7 @@ const MOCK_TRANSACTIONS_RESPONSE: TransactionApiResponse[] = [
         category: "Income",
         type: "income",
         icon: "dollar-sign",
+        account: "Checking Account",
     },
     {   
         id: "txn_12347",
@@ -30,6 +32,7 @@ const MOCK_TRANSACTIONS_RESPONSE: TransactionApiResponse[] = [
         category: "Food & Dining",
         type: "expense",
         icon: "coffee",
+        account: "Credit Card",
     }
 ];
 
