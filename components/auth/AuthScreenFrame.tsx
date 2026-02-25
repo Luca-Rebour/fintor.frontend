@@ -17,7 +17,6 @@ export function AuthScreenFrame({ variant, children }: AuthScreenFrameProps) {
   return (
     <View className="flex-1">
       <LinearGradient colors={backgroundColors} style={StyleSheet.absoluteFill} />
-      <SafeAreaView className="flex-1">
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : undefined}
           className="flex-1"
@@ -30,7 +29,6 @@ export function AuthScreenFrame({ variant, children }: AuthScreenFrameProps) {
             {children}
           </ScrollView>
         </KeyboardAvoidingView>
-      </SafeAreaView>
     </View>
   );
 }

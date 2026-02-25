@@ -23,21 +23,9 @@ export default function Index() {
 
     try {
       const session = await signInWithEmail(email, password);
+
+      router.replace("/tabs/home");
       
-      // Success - show welcome message and redirect
-      Alert.alert(
-        "Welcome back!",
-        `Logged in as ${session.user.name}`,
-        [
-          {
-            text: "Continue",
-            onPress: () => {
-              setAuthMessage(`Welcome ${session.user.name}!`);
-              router.replace("/tabs/home");
-            },
-          },
-        ]
-      );
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unable to sign in";
       setAuthMessage(`❌ ${message}`);

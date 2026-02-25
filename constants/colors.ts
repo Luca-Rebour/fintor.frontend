@@ -13,3 +13,16 @@ export const APP_COLORS = {
   actionPrimary: "#18C8FF",
   actionNeutral: "#1A243B",
 };
+
+export const CATEGORY_COLOR_BY_NAME: Record<string, string> = {
+  Salary: "#4ECDC4",
+  Freelance: "#18C8FF",
+  Investments: "#B63BFF",
+  Bonus: "#22C55E",
+  Refund: "#F59E0B",
+  "Food & Dining": "#FF6B6B",
+  Transport: "#F97316",
+  Shopping: "#A855F7",
+  Bills: "#0EA5E9",
+  Entertainment: "#EC4899",
+};
