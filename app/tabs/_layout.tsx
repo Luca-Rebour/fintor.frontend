@@ -73,6 +73,16 @@ export default function ProtectedTabsLayout() {
       />
 
       <Tabs.Screen
+        name="goals"
+        options={{
+          title: "Goals",
+          tabBarIcon: ({ color, size }) => (
+            <Feather name="target" color={color} size={size} />
+          ),
+        }}
+      />
+
+      <Tabs.Screen
         name="profile"
         options={{
           title: "Profile",
