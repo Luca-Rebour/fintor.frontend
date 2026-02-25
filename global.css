@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --app-login-bg-start: 196 89% 13%;
+  --app-login-bg-end: 222 57% 10%;
+  --app-signup-bg-start: 272 66% 9%;
+  --app-signup-bg-end: 281 70% 8%;
+  --app-card: 266 45% 15%;
+  --app-card-soft: 264 40% 20%;
+  --app-border: 260 35% 28%;
+  --app-text-primary: 0 0% 100%;
+  --app-text-secondary: 234 35% 73%;
+  --app-primary: 196 100% 54%;
+  --app-primary-strong: 273 89% 55%;
+  --app-accent: 191 100% 47%;
+  --app-success: 159 100% 49%;
+}
