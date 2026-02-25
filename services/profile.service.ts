@@ -2,7 +2,7 @@ import { ProfileData } from "../types/profile";
 
 type ProfileApiResponse = ProfileData;
 
-const MOCK_PROFILE_RESPONSE: ProfileApiResponse = {
+const MOCK_PROFILE_RESPONSE: ProfileData = {
   fullName: "Alex Rivera",
   membershipLabel: "Premium Member",
   appVersion: "Version 2.4.0",
@@ -26,7 +26,12 @@ const MOCK_PROFILE_RESPONSE: ProfileApiResponse = {
 };
 
 function mapProfileResponse(response: ProfileApiResponse): ProfileData {
-  return response;
+  return {
+    fullName: response.fullName,
+    membershipLabel: response.membershipLabel,
+    appVersion: response.appVersion,
+    sections: response.sections,
+  };
 }
 
 export async function getProfileData(): Promise<ProfileData> {

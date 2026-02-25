@@ -9,7 +9,7 @@ import { getStoredJwt } from "../../services/auth.service";
 export default function ProtectedTabsLayout() {
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  
+
   useEffect(() => {
     async function checkAuth() {
       try {
@@ -56,17 +56,31 @@ export default function ProtectedTabsLayout() {
         name="home"
         options={{
           title: "Home",
-          tabBarIcon: ({ color, size }) => <Feather name="home" color={color} size={size} />,
+          tabBarIcon: ({ color, size }) => (
+            <Feather name="home" color={color} size={size} />
+          ),
         }}
       />
+
+      <Tabs.Screen
+        name="transactions"
+        options={{
+          title: "Transactions",
+          tabBarIcon: ({ color, size }) => (
+            <Feather name="dollar-sign" color={color} size={size} />
+          ),
+        }}
+      />
+
       <Tabs.Screen
         name="profile"
         options={{
           title: "Profile",
-          tabBarIcon: ({ color, size }) => <Feather name="user" color={color} size={size} />,
+          tabBarIcon: ({ color, size }) => (
+            <Feather name="user" color={color} size={size} />
+          ),
         }}
       />
     </Tabs>
   );
 }
-
