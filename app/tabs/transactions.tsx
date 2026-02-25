@@ -1,8 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+} from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { getTransactionsData } from "../../services/transactions.service";
 import { TransactionDTO } from "../../types/transaction";
+import { APP_COLORS, APP_GRADIENTS } from "../../constants/colors";
+import { LinearGradient } from "expo-linear-gradient";
 
 type TransactionGroup = {
   dateKey: string;
@@ -19,10 +27,14 @@ function getLocalDateKey(input: string) {
 }
 
 export default function TransactionsScreen() {
-  const [transactionsData, setTransactionsData] = useState<TransactionDTO[]>([]);
+  const [transactionsData, setTransactionsData] = useState<TransactionDTO[]>(
+    [],
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
-  const [expandedTransactionId, setExpandedTransactionId] = useState<string | null>(null);
+  const [expandedTransactionId, setExpandedTransactionId] = useState<
+    string | null
+  >(null);
 
   async function loadTransactions() {
     try {
@@ -32,7 +44,9 @@ export default function TransactionsScreen() {
       setTransactionsData(data);
     } catch (loadError) {
       const message =
-        loadError instanceof Error ? loadError.message : "Failed to load transactions";
+        loadError instanceof Error
+          ? loadError.message
+          : "Failed to load transactions";
       setError(message);
     } finally {
       setIsLoading(false);
@@ -73,19 +87,76 @@ export default function TransactionsScreen() {
 
   return (
     <View className="flex-1 bg-[#060F24]">
+      <View className="px-4 py-3 border-b border-[#1E2A47]">
+        <Text className="text-lg font-semibold text-app-textPrimary">
+          Transactions
+        </Text>
+      </View>
+
+      <View className="flex-row px-4 mt-4 gap-3">
+        <View className="flex-1 bg-[#111C33] rounded-xl p-4">
+          <View className="flex-row items-center justify-between mb-2">
+            <Text className="text-app-textSecondary text-xs uppercase">
+              Monthly Spending
+            </Text>
+            <Feather name="arrow-down" size={16} color="#EF4444" />
+          </View>
+
+          <Text className="text-app-textPrimary text-xl font-semibold">
+            $1,250.00
+          </Text>
+        </View>
+
+        <View className="flex-1 bg-[#111C33] rounded-xl p-4">
+          <View className="flex-row items-center justify-between mb-2">
+            <Text className="text-app-textSecondary text-xs uppercase">
+              Monthly Income
+            </Text>
+            <Feather name="arrow-up" size={16} color="#22C55E" />
+          </View>
+
+          <Text className="text-app-textPrimary text-xl font-semibold">
+            $3,400.00
+          </Text>
+        </View>
+      </View>
+
+      <View className="flex-row items-center mt-4 px-4 gap-3">
+        <Pressable
+          style={{ backgroundColor: APP_COLORS.actionPrimary }}
+          className="flex-1 flex-row items-center justify-center px-4 py-3.5 rounded-xl border border-[#1E2A47]"
+        >
+          <Feather name="plus-circle" size={16} color="#FFFFFF" />
+          <Text className="text-sm text-white font-semibold ml-2">
+            Add Expense
+          </Text>
+        </Pressable>
+
+        <Pressable className="flex-1 flex-row items-center justify-center px-4 py-3.5 rounded-xl border border-[#1E2A47]">
+          <Feather
+            name="dollar-sign"
+            size={16}
+            color={APP_COLORS.actionPrimary}
+          />
+          <Text className="text-sm text-app-primary font-semibold ml-2">
+            Add Income
+          </Text>
+        </Pressable>
+      </View>
+
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerClassName="pb-20 pt-2 px-4"
       >
-        <Text className="text-2xl font-bold text-app-textPrimary mb-4">Transactions</Text>
-
         {isLoading ? (
           <View className="flex-1 items-center justify-center">
             <ActivityIndicator size="large" color="#18C8FF" />
           </View>
         ) : error ? (
           <View className="flex-1 items-center justify-center px-6">
-            <Text className="text-center text-base text-app-textPrimary">{error}</Text>
+            <Text className="text-center text-base text-app-textPrimary">
+              {error}
+            </Text>
           </View>
         ) : (
           groupedTransactions.map((group) => (
@@ -99,13 +170,20 @@ export default function TransactionsScreen() {
                 const txnDate = new Date(txn.date);
 
                 return (
-                  <View key={txn.id} className="bg-[#111C33] rounded-lg mb-3 overflow-hidden">
+                  <View
+                    key={txn.id}
+                    className="bg-[#111C33] rounded-lg mb-3 overflow-hidden"
+                  >
                     <Pressable
                       onPress={() => toggleExpanded(txn.id)}
                       className="py-5 px-4 flex-row items-center"
                     >
                       <View style={{ width: 26, alignItems: "center" }}>
-                        <Feather name={txn.icon as any} color="#18C8FF" size={16} />
+                        <Feather
+                          name={txn.icon as any}
+                          color="#18C8FF"
+                          size={16}
+                        />
                       </View>
 
                       <View style={{ flex: 1, paddingRight: 10 }}>
@@ -120,10 +198,13 @@ export default function TransactionsScreen() {
                       <View style={{ width: 90, alignItems: "flex-end" }}>
                         <Text
                           className={`text-base font-semibold ${
-                            txn.type === "expense" ? "text-red-500" : "text-green-500"
+                            txn.type === "expense"
+                              ? "text-red-500"
+                              : "text-green-500"
                           }`}
                         >
-                          {txn.type === "expense" ? "-" : "+"}${txn.amount.toFixed(2)}
+                          {txn.type === "expense" ? "-" : "+"}$
+                          {txn.amount.toFixed(2)}
                         </Text>
                       </View>
                     </Pressable>
