@@ -1,5 +1,5 @@
 import { Feather } from "@expo/vector-icons";
-import { RefObject, useRef, useState } from "react";
+import { RefObject, useEffect, useRef, useState } from "react";
 import {
   Modal,
   Pressable,
@@ -8,40 +8,17 @@ import {
   TextInput,
   View,
 } from "react-native";
-
-type SelectOption = {
-  label: string;
-  value: string;
-};
-
-type CreateIncomePayload = {
-  amount: number;
-  description: string;
-  category: string;
-  icon: string;
-  account: string;
-};
+import { getAccountsData } from "../../services/account.service";
+import { getCategoriesData } from "../../services/categories.service";
+import { AccountOption } from "../../types/account";
+import { CategoryOption } from "../../types/category";
+import { CreateTransactionDTO } from "../../types/transaction";
 
 type CreateIncomeModalProps = {
   visible: boolean;
   onClose: () => void;
-  onCreateIncome: (payload: CreateIncomePayload) => void;
+  onCreateIncome: (payload: CreateTransactionDTO) => void;
 };
-
-const CATEGORY_OPTIONS: SelectOption[] = [
-  { label: "Salary", value: "Salary" },
-  { label: "Freelance", value: "Freelance" },
-  { label: "Investments", value: "Investments" },
-  { label: "Bonus", value: "Bonus" },
-  { label: "Refund", value: "Refund" },
-];
-
-const ACCOUNT_OPTIONS: SelectOption[] = [
-  { label: "Checking Account", value: "Checking Account" },
-  { label: "Savings Account", value: "Savings Account" },
-  { label: "Credit Card", value: "Credit Card" },
-  { label: "Cash", value: "Cash" },
-];
 
 const ICON_OPTIONS = [
   "dollar-sign",
@@ -55,6 +32,13 @@ const ICON_OPTIONS = [
   "repeat",
   "award",
 ] as const;
+
+function getOptionLabel(
+  options: Array<{ label: string; value: string }>,
+  value: string,
+): string {
+  return options.find((option) => option.value === value)?.label ?? value;
+}
 
 function SelectField({
   label,
@@ -89,11 +73,13 @@ export function CreateIncomeModal({
   onClose,
   onCreateIncome,
 }: CreateIncomeModalProps) {
+  const [accountOptions, setAccountOptions] = useState<AccountOption[]>([]);
+  const [categoryOptions, setCategoryOptions] = useState<CategoryOption[]>([]);
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
-  const [category, setCategory] = useState(CATEGORY_OPTIONS[0].value);
+  const [category, setCategory] = useState("");
   const [icon, setIcon] = useState<(typeof ICON_OPTIONS)[number]>(ICON_OPTIONS[0]);
-  const [account, setAccount] = useState(ACCOUNT_OPTIONS[0].value);
+  const [account, setAccount] = useState("");
   const [amountError, setAmountError] = useState("");
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [isAccountOpen, setIsAccountOpen] = useState(false);
@@ -112,11 +98,50 @@ export function CreateIncomeModal({
       : null;
 
   const activeSelectOptions =
-    activeSelectType === "category" ? CATEGORY_OPTIONS : ACCOUNT_OPTIONS;
+    activeSelectType === "category" ? categoryOptions : accountOptions;
 
   const activeSelectValue = activeSelectType === "category" ? category : account;
 
   const activeSelectLabel = activeSelectType === "category" ? "Category" : "Account";
+
+  useEffect(() => {
+    if (!visible) {
+      return;
+    }
+
+    let isActive = true;
+
+    async function loadSelectData() {
+      const [categoriesData, accountsData] = await Promise.all([
+        getCategoriesData(),
+        getAccountsData(),
+      ]);
+
+      if (!isActive) {
+        return;
+      }
+
+      setCategoryOptions(categoriesData);
+      setCategory((previous) =>
+        categoriesData.some((option) => option.value === previous)
+          ? previous
+          : categoriesData[0]?.value ?? "",
+      );
+
+      setAccountOptions(accountsData);
+      setAccount((previous) =>
+        accountsData.some((option) => option.value === previous)
+          ? previous
+          : accountsData[0]?.value ?? "",
+      );
+    }
+
+    loadSelectData();
+
+    return () => {
+      isActive = false;
+    };
+  }, [visible]);
 
   function openCategorySelect() {
     setIsAccountOpen(false);
@@ -137,9 +162,9 @@ export function CreateIncomeModal({
   function resetForm() {
     setAmount("");
     setDescription("");
-    setCategory(CATEGORY_OPTIONS[0].value);
+    setCategory(categoryOptions[0]?.value ?? "");
     setIcon(ICON_OPTIONS[0]);
-    setAccount(ACCOUNT_OPTIONS[0].value);
+    setAccount(accountOptions[0]?.value ?? "");
     setAmountError("");
     setIsCategoryOpen(false);
     setIsAccountOpen(false);
@@ -160,9 +185,10 @@ export function CreateIncomeModal({
     onCreateIncome({
       amount: parsedAmount,
       description: description.trim(),
-      category,
+      transactionType: 0,
+      categoryId: category,
       icon,
-      account,
+      accountId: account,
     });
 
     resetForm();
@@ -210,7 +236,7 @@ export function CreateIncomeModal({
 
             <SelectField
               label="Category"
-              value={category}
+              value={getOptionLabel(categoryOptions, category)}
               isOpen={isCategoryOpen}
               onToggle={openCategorySelect}
               triggerRef={categoryTriggerRef}
@@ -242,7 +268,7 @@ export function CreateIncomeModal({
 
             <SelectField
               label="Account"
-              value={account}
+              value={getOptionLabel(accountOptions, account)}
               isOpen={isAccountOpen}
               onToggle={openAccountSelect}
               triggerRef={accountTriggerRef}
@@ -330,5 +356,3 @@ export function CreateIncomeModal({
     </Modal>
   );
 }
-
-export type { CreateIncomePayload };

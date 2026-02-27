@@ -1,4 +1,5 @@
 import { GoalsData } from "../types/goals.types";
+import { apiGet } from "./api.client";
 
 const MOCK_GOALS_DATA: GoalsData = {
   overview: {
@@ -14,8 +15,7 @@ const MOCK_GOALS_DATA: GoalsData = {
       subtitle: "Tesla Model 3",
       currentAmount: 13000,
       targetAmount: 20000,
-      progressPercent: 65,
-      targetLabel: "Dec 2024",
+      targetDate: "Dec 2024",
       icon: "truck",
       accentColor: "#8B5CF6",
     },
@@ -25,8 +25,7 @@ const MOCK_GOALS_DATA: GoalsData = {
       subtitle: "Down payment",
       currentAmount: 28000,
       targetAmount: 100000,
-      progressPercent: 28,
-      targetLabel: "Aug 2026",
+      targetDate: "Aug 2026",
       icon: "home",
       accentColor: "#EC4899",
     },
@@ -40,6 +39,11 @@ function wait(ms: number) {
 }
 
 export async function getGoalsData(): Promise<GoalsData> {
-  await wait(650);
-  return MOCK_GOALS_DATA;
+  try {
+    const response = await apiGet<GoalsData>("/goals");
+    return response;
+  } catch {
+    await wait(650);
+    return MOCK_GOALS_DATA;
+  }
 }

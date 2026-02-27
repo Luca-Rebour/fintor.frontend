@@ -35,7 +35,7 @@ export function GoalTargetCard({ goal }: GoalTargetCardProps) {
           style={{ backgroundColor: `${goal.accentColor}33` }}
         >
           <Text className="text-xs font-semibold" style={{ color: goal.accentColor }}>
-            {goal.progressPercent}%
+            {Math.round((goal.currentAmount / goal.targetAmount) * 100)}%
           </Text>
         </View>
       </View>
@@ -55,7 +55,7 @@ export function GoalTargetCard({ goal }: GoalTargetCardProps) {
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
           style={{
-            width: `${Math.min(100, Math.max(0, goal.progressPercent))}%`,
+            width: `${Math.min(100, Math.max(0, (goal.currentAmount / goal.targetAmount) * 100))}%`,
             height: "100%",
             borderRadius: 999,
           }}
@@ -63,7 +63,7 @@ export function GoalTargetCard({ goal }: GoalTargetCardProps) {
       </View>
 
       <Text className="mt-2 text-right text-xs text-app-textSecondary">
-        Target: {goal.targetLabel}
+        Target: {goal.targetDate}
       </Text>
     </View>
   );

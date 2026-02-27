@@ -1,7 +1,7 @@
 export type ProfileMenuItem = {
   id: string;
   title: string;
-  icon: "user" | "fingerprint" | "bell" | "credit-card" | "help-circle";
+  icon: "user" | "key" | "bell" | "credit-card" | "help-circle";
   badgeText?: string;
 };
 

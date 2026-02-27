@@ -1,16 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, FlatList, Text, View } from "react-native";
-import { getTransactionsData } from "../../services/transactions.service";
-import { TransactionDTO } from "../../types/transaction";
+import { getTransactionsData, addNewTransaction } from "../../services/transactions.service";
+import { CreateTransactionDTO, TransactionDTO } from "../../types/transaction";
 import {
   CreateExpenseModal,
-  CreateExpensePayload,
 } from "../../components/transactions/CreateExpenseModal";
 import { TransactionActionButtons } from "../../components/transactions/TransactionActionButtons";
-import {
-  CreateIncomeModal,
-  CreateIncomePayload,
-} from "../../components/transactions/CreateIncomeModal";
+import { CreateIncomeModal} from "../../components/transactions/CreateIncomeModal";
 import { TransactionListItem } from "../../components/transactions/TransactionListItem";
 import { TransactionSummaryCards } from "../../components/transactions/TransactionSummaryCards";
 import { CATEGORY_COLOR_BY_NAME } from "../../constants/colors";
@@ -68,6 +64,7 @@ export default function TransactionsScreen() {
     [],
   );
   const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState("");
   const [expandedTransactionId, setExpandedTransactionId] = useState<
     string | null
@@ -81,9 +78,11 @@ export default function TransactionsScreen() {
   const [isCreateIncomeModalVisible, setIsCreateIncomeModalVisible] =
     useState(false);
 
-  async function loadTransactions() {
+  async function loadTransactions(showInitialLoader = true) {
     try {
-      setIsLoading(true);
+      if (showInitialLoader) {
+        setIsLoading(true);
+      }
       setError("");
       const data = await getTransactionsData();
       setTransactionsData(data);
@@ -95,8 +94,16 @@ export default function TransactionsScreen() {
           : "Failed to load transactions";
       setError(message);
     } finally {
-      setIsLoading(false);
+      if (showInitialLoader) {
+        setIsLoading(false);
+      }
     }
+  }
+
+  async function handleRefresh() {
+    setIsRefreshing(true);
+    await loadTransactions(false);
+    setIsRefreshing(false);
   }
 
   useEffect(() => {
@@ -144,44 +151,42 @@ export default function TransactionsScreen() {
     setExpandedTransactionId((prev) => (prev === id ? null : id));
   };
 
-  function handleCreateExpense(payload: CreateExpensePayload) {
-    const createdExpense: TransactionDTO = {
-      id: `txn_${Date.now()}`,
-      date: new Date().toISOString(),
+  async function handleCreateExpense(payload: CreateTransactionDTO) {
+    const toCreate: CreateTransactionDTO = {
       amount: payload.amount,
       description: payload.description,
-      category: payload.category,
-      type: "expense",
+      categoryId: payload.categoryId,
+      transactionType: 1,
       icon: payload.icon,
-      account: payload.account,
-      categoryColor: CATEGORY_COLOR_BY_NAME[payload.category] ?? "#FF6B6B",
+      accountId: payload.accountId
     };
 
-    setTransactionsData((prev) => {
-      const next = [createdExpense, ...prev];
-      setMonthlySummary(calculateMonthlySummary(next));
-      return next;
-    });
+  const created = await addNewTransaction(toCreate);
+
+  setTransactionsData(prev => {
+    const next = [created, ...prev];
+    setMonthlySummary(calculateMonthlySummary(next));
+    return next;
+  });
   }
 
-  function handleCreateIncome(payload: CreateIncomePayload) {
-    const createdIncome: TransactionDTO = {
-      id: `txn_${Date.now()}`,
-      date: new Date().toISOString(),
+  async function handleCreateIncome(payload: CreateTransactionDTO) {
+    const toCreate: CreateTransactionDTO = {
       amount: payload.amount,
       description: payload.description,
-      category: payload.category,
-      type: "income",
+      categoryId: payload.categoryId,
+      transactionType: 0,
       icon: payload.icon,
-      account: payload.account,
-      categoryColor: CATEGORY_COLOR_BY_NAME[payload.category] ?? "#18C8FF",
+      accountId: payload.accountId
     };
 
-    setTransactionsData((prev) => {
-      const next = [createdIncome, ...prev];
-      setMonthlySummary(calculateMonthlySummary(next));
-      return next;
-    });
+  const created = await addNewTransaction(toCreate);
+
+  setTransactionsData(prev => {
+    const next = [created, ...prev];
+    setMonthlySummary(calculateMonthlySummary(next));
+    return next;
+  });
   }
 
   function calculateMonthlySummary(transactions: TransactionDTO[]) {
@@ -197,9 +202,9 @@ export default function TransactionsScreen() {
         txnDate.getMonth() === currentMonth &&
         txnDate.getFullYear() === currentYear
       ) {
-        if (txn.type === "expense") {
+        if (txn.transactionType == 1) {
           totalSpending += txn.amount;
-        } else if (txn.type === "income") {
+        } else if (txn.transactionType == 0) {
           totalIncome += txn.amount;
         }
       }
@@ -212,6 +217,8 @@ export default function TransactionsScreen() {
     <View className="flex-1 bg-[#060F24]">
       <FlatList
         data={!isLoading && !error ? transactionRows : []}
+        refreshing={isRefreshing}
+        onRefresh={handleRefresh}
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
         initialNumToRender={10}

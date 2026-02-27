@@ -1,4 +1,5 @@
 import { DashboardData } from "../types/dashboard";
+import { apiGet } from "./api.client";
 
 type DashboardApiResponse = DashboardData;
 
@@ -31,5 +32,10 @@ function mapDashboardResponse(response: DashboardApiResponse): DashboardData {
 }
 
 export async function getDashboardData(): Promise<DashboardData> {
-  return mapDashboardResponse(MOCK_DASHBOARD_RESPONSE);
+  try {
+    const response = await apiGet<DashboardApiResponse>("/dashboard");
+    return mapDashboardResponse(response);
+  } catch {
+    return mapDashboardResponse(MOCK_DASHBOARD_RESPONSE);
+  }
 }
