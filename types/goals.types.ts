@@ -4,8 +4,7 @@ export type GoalTarget = {
   subtitle: string;
   currentAmount: number;
   targetAmount: number;
-  progressPercent: number;
-  targetLabel: string;
+  targetDate: string;
   icon: "truck" | "home";
   accentColor: string;
 };

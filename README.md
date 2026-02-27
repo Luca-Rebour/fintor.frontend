@@ -28,3 +28,24 @@
     long-term financial organization.
   </p>
 </section>
+
+## Environment setup
+
+1. Duplicate `.env.example` as `.env`.
+2. Update `EXPO_PUBLIC_API_BASE_URL` with your backend URL.
+3. Restart Expo (`npm run start`) to load the new value.
+
+Current API calls in `services/auth.service.ts` now use this env variable.
+
+## API endpoints used
+
+With `EXPO_PUBLIC_API_BASE_URL`, services call these routes:
+
+- `POST /auth/login`
+- `POST /users/add`
+- `GET /dashboard`
+- `GET /goals`
+- `GET /profile`
+- `GET /transactions`
+
+If `dashboard`, `goals`, `profile`, or `transactions` endpoints are not available yet, the app uses local fallback mock data so screens keep working while backend is being integrated.

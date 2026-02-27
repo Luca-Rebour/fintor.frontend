@@ -1,15 +1,20 @@
-import * as SecureStore from "expo-secure-store";
+import { apiPost } from "./api.client";
+import { clearAuthToken, getAuthToken, saveAuthToken } from "./token.storage";
+import { LoginResponse } from "../types/api/loginResponse";
+import { SignUpResponse } from "../types/api/signUpResponse";
 
-import { User } from "../types/user";
+async function persistAuthToken(token: unknown): Promise<string> {
+    if (typeof token !== "string" || !token.trim()) {
+        throw new Error("Invalid authentication token from API");
+    }
 
-const AUTH_TOKEN_KEY = "auth.jwt";
+    const normalizedToken = token.trim();
+    await saveAuthToken(normalizedToken);
+    return normalizedToken;
+}
 
-export type AuthSession = {
-    user: User;
-    token: string;
-};
-
-export async function signInWithEmail(email: string, password: string): Promise<AuthSession> {
+export async function signInWithEmail(email: string, password: string): Promise<LoginResponse> {
+    
     const normalizedEmail = email.trim().toLowerCase();
 
     if (!normalizedEmail || !password.trim()) {
@@ -17,43 +22,21 @@ export async function signInWithEmail(email: string, password: string): Promise<
     }
 
     try {
-        const response = await fetch('https://dummyjson.com/auth/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                username: normalizedEmail,
-                password: password,
-                expiresInMins: 30,
-            }),
+        const data = await apiPost<LoginResponse>("/auth/login", {
+            email: normalizedEmail,
+            password: password
         });
-
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            throw new Error(errorData.message || `Login failed: ${response.status}`);
-        }
-
-        const data = await response.json();
+        console.log(data);
         
-        if (!data.accessToken) {
-            throw new Error("Invalid authentication response");
-        }
-
-        // Save the real JWT token
-        await SecureStore.setItemAsync(AUTH_TOKEN_KEY, data.accessToken);
-
-        // Map the API response to our User type
-        const user: User = {
-            id: data.id?.toString() || "unknown",
-            name: `${data.firstName || ""} ${data.lastName || ""}`.trim() || data.username,
-            email: data.email || normalizedEmail,
-            avatarUrl: data.image || `https://i.pravatar.cc/200?img=${data.id || 12}`,
-        };
+        const token = await persistAuthToken(data.token);
 
         return {
-            user,
-            token: data.accessToken,
+            user: data.user,
+            token,
         };
     } catch (error) {
+        console.log(error);
+        
         if (error instanceof Error) {
             throw error;
         }
@@ -62,14 +45,14 @@ export async function signInWithEmail(email: string, password: string): Promise<
 }
 
 export async function getStoredJwt(): Promise<string | null> {
-    return SecureStore.getItemAsync(AUTH_TOKEN_KEY);
+    return getAuthToken();
 }
 
 export async function clearStoredJwt(): Promise<void> {
-    await SecureStore.deleteItemAsync(AUTH_TOKEN_KEY);
+    await clearAuthToken();
 }
 
-export async function signUpWithEmail(fullName: string, email: string, password: string): Promise<AuthSession> {
+export async function signUpWithEmail(fullName: string, email: string, password: string): Promise<SignUpResponse> {
     const normalizedEmail = email.trim().toLowerCase();
 
     if (!fullName.trim() || !normalizedEmail || !password.trim()) {
@@ -85,65 +68,24 @@ export async function signUpWithEmail(fullName: string, email: string, password:
     }
 
     try {
-        const response = await fetch('https://dummyjson.com/users/add', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                firstName: fullName.split(' ')[0],
-                lastName: fullName.split(' ').slice(1).join(' ') || '',
-                email: normalizedEmail,
-                password: password,
-                username: normalizedEmail,
-            }),
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            throw new Error(errorData.message || `Signup failed: ${response.status}`);
-        }
-
-        const data = await response.json();
-        
-        // For signup, create a mock session since DummyJSON doesn't return a token for new users
-        const mockToken = `signup_${Date.now()}_${data.id}`;
-        await SecureStore.setItemAsync(AUTH_TOKEN_KEY, mockToken);
-
-        const user: User = {
-            id: data.id?.toString() || "new_user",
-            name: fullName,
+        const data = await apiPost<any>("/users/create-user", {
+            firstName: fullName.split(' ')[0],
+            lastName: fullName.split(' ').slice(1).join(' ') || '',
             email: normalizedEmail,
-            avatarUrl: `https://i.pravatar.cc/200?img=${data.id || Math.floor(Math.random() * 70)}`,
-        };
+            password: password,
+            username: normalizedEmail,
+        });
+        
+        const token = await persistAuthToken(data.token);
 
         return {
-            user,
-            token: mockToken,
+            user: data.user,
+            token,
         };
     } catch (error) {
         if (error instanceof Error) {
             throw error;
         }
         throw new Error("Network error - please check your connection");
-    }
-}
-
-export async function getCurrentSession(): Promise<AuthSession | null> {
-    try {
-        const token = await SecureStore.getItemAsync(AUTH_TOKEN_KEY);
-        if (!token) return null;
-
-        // For demo purposes, create a session from stored token
-        // In a real app, you'd validate the token with your backend
-        return {
-            user: {
-                id: "stored_user",
-                name: "Current User", 
-                email: "user@example.com",
-                avatarUrl: "https://i.pravatar.cc/200?img=20",
-            },
-            token,
-        };
-    } catch {
-        return null;
     }
 }

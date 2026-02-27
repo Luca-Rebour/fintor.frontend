@@ -9,8 +9,8 @@ type TransactionListItemProps = {
   onToggle: (id: string) => void;
 };
 
-function getNeonBackgroundColor(color: string, alpha = 0.2) {
-  const hex = color.trim();
+function getNeonBackgroundColor(color?: string, alpha = 0.2) {
+  const hex = (color ?? "").trim();
 
   if (/^#([0-9a-fA-F]{3})$/.test(hex)) {
     const [r, g, b] = hex
@@ -95,6 +95,10 @@ export function TransactionListItem({
   isExpanded,
   onToggle,
 }: TransactionListItemProps) {
+  const color = transaction.categoryColor || "#18C8FF";
+  const categoryLabel = transaction.categoryName?.trim() || "Other";
+  const accountLabel = transaction.accountName?.trim() || "Main account";
+
   return (
     <View className="mb-3 overflow-hidden">
       <Pressable
@@ -108,13 +112,13 @@ export function TransactionListItem({
             borderRadius: 999,
             alignItems: "center",
             justifyContent: "center",
-            backgroundColor: getNeonBackgroundColor(transaction.categoryColor),
+            backgroundColor: getNeonBackgroundColor(color),
             marginRight: 10,
           }}
         >
           <Feather
             name={transaction.icon as any}
-            color={transaction.categoryColor}
+            color={color}
             size={20}
           />
         </View>
@@ -124,10 +128,10 @@ export function TransactionListItem({
             numberOfLines={1}
             className="text-base font-semibold text-app-textPrimary"
           >
-            {transaction.category}
+            {categoryLabel}
           </Text>
           <Text className="text-xs text-app-textSecondary mt-1">
-            {transaction.account} -{" "}
+            {accountLabel} -{" "}
             {new Date(transaction.date).toLocaleTimeString("es-ES", {
               hour: "2-digit",
               minute: "2-digit",
@@ -139,10 +143,10 @@ export function TransactionListItem({
         <View style={{ width: 90, alignItems: "flex-end" }}>
           <Text
             className={`text-base font-semibold ${
-              transaction.type === "expense" ? "text-red-500" : "text-green-500"
+              transaction.transactionType == 1 ? "text-red-500" : "text-green-500"
             }`}
           >
-            {transaction.type === "expense" ? "-" : "+"}$
+            {transaction.transactionType == 1 ? "-" : "+"}$
             {transaction.amount.toFixed(2)}
           </Text>
         </View>

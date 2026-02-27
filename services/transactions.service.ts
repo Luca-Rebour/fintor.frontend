@@ -1,64 +1,64 @@
-import { ProfileData } from "../types/profile";
-import { TransactionDTO } from "../types/transaction";
+import { CreateTransactionDTO, TransactionDTO } from "../types/transaction";
+import { apiGet, apiPost } from "./api.client";
+import { CATEGORY_COLOR_BY_NAME } from "../constants/colors";
 
-type TransactionApiResponse = TransactionDTO;
+type TransactionsResponse = TransactionDTO[] | { transactions: TransactionDTO[] } | TransactionDTO;
 
-let MOCK_TRANSACTIONS_RESPONSE: TransactionApiResponse[] = [
-    {
-        id: "txn_12345",
-        date: "2026-02-25T14:30:00Z",
-        amount: 75.50,
-        description: "Grocery Store",
-        category: "Food & Dining",
-        type: "expense",
-        icon: "shopping-cart",
-        account: "Checking Account",
-        categoryColor: "#FF6B6B",
-    },
-    {
-        id: "txn_12346",
-        date: "2026-02-24T09:00:00Z",
-        amount: 1500.00,
-        description: "Salary",
-        category: "Income",
-        type: "income",
-        icon: "dollar-sign",
-        account: "Checking Account",
-        categoryColor: "#4ECDC4",
-    },
-    {   
-        id: "txn_12347",
-        date: "2026-02-13T18:45:00Z",
-        amount: 25.00,
-        description: "Coffee Shop",
-        category: "Food & Dining",
-        type: "expense",
-        icon: "coffee",
-        account: "Credit Card",
-        categoryColor: "#FF6B6B",
-    },
-        {   
-        id: "txn_12348",
-        date: "2026-02-13T18:45:00Z",
-        amount: 30.00,
-        description: "Restaurant",
-        category: "Breakfast",
-        type: "expense",
-        icon: "coffee",
-        account: "Credit Card",
-        categoryColor: "#FF6B6B",
-    }
-];
+function normalizeTransaction(transaction: TransactionDTO): TransactionDTO {
+  const category = (transaction.categoryName ?? transaction.categoryName ?? "Other").trim();
+  const type = transaction.transactionType ?? transaction.transactionType ?? 1;
+  const account = (transaction.accountName ?? transaction.accountName ?? "Main account").trim();
+  const categoryColor =
+    transaction.categoryColor ??
+    CATEGORY_COLOR_BY_NAME[category] ??
+    (type === 1 ? "#18C8FF" : "#FF6B6B");
 
-function mapTransactionResponse(response: TransactionApiResponse[]): TransactionDTO[] {
-  return response;
+  return {
+    id: String(transaction.id ?? `txn_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`),
+    date: transaction.date ?? new Date().toISOString(),
+    amount: typeof transaction.amount === "number" ? transaction.amount : 0,
+    description: transaction.description?.trim() || "Sin descripción",
+    categoryName: category,
+    transactionType: type,
+    icon: transaction.icon || (type === 0 ? "dollar-sign" : "shopping-cart"),
+    accountName: account,
+    categoryColor,
+  };
+}
+
+function normalizeTransactions(transactions: TransactionDTO[]): TransactionDTO[] {
+  return transactions.map(normalizeTransaction);
 }
 
 export async function getTransactionsData(): Promise<TransactionDTO[]> {
-  return mapTransactionResponse(MOCK_TRANSACTIONS_RESPONSE);
+  try {
+    const response = await apiGet<TransactionsResponse>("/transactions");
+
+    if (Array.isArray(response)) return normalizeTransactions(response);
+
+    console.error("Unexpected transactions response shape:", response);
+    return [];
+  } catch (error) {
+    console.error("Error fetching transactions:", error);
+    return [];
+  }
 }
 
-function addNewTransaction(transaction: TransactionDTO): void {
-    MOCK_TRANSACTIONS_RESPONSE.unshift(transaction);
-    console.log("Nueva transacción agregada:", transaction);
+export async function addNewTransaction(
+  transaction: CreateTransactionDTO
+): Promise<TransactionDTO> {
+  try {
+    console.log("Attempting to create transaction:", transaction);
+    
+    const response = await apiPost<TransactionDTO>(
+      "/transactions",
+      transaction
+    );
+
+    return normalizeTransaction(response);
+
+  } catch (error) {
+    console.error("Error creating transaction:", error);
+    throw error;
+  }
 }

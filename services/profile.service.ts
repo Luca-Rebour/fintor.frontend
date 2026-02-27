@@ -1,4 +1,5 @@
 import { ProfileData } from "../types/profile";
+import { apiGet } from "./api.client";
 
 type ProfileApiResponse = ProfileData;
 
@@ -11,7 +12,7 @@ const MOCK_PROFILE_RESPONSE: ProfileData = {
       id: "preferences",
       items: [
         { id: "personal", title: "Personal Information", icon: "user" },
-        { id: "security", title: "Security & Biometrics", icon: "fingerprint" },
+        { id: "security", title: "Security & Biometrics", icon: "key" },
         { id: "notifications", title: "Notification Preferences", icon: "bell" },
       ],
     },
@@ -35,5 +36,10 @@ function mapProfileResponse(response: ProfileApiResponse): ProfileData {
 }
 
 export async function getProfileData(): Promise<ProfileData> {
-  return mapProfileResponse(MOCK_PROFILE_RESPONSE);
+  try {
+    const response = await apiGet<ProfileApiResponse>("/profile");
+    return mapProfileResponse(response);
+  } catch {
+    return mapProfileResponse(MOCK_PROFILE_RESPONSE);
+  }
 }

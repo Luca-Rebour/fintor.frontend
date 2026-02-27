@@ -3,9 +3,19 @@ export type TransactionDTO = {
   date: string;
   amount: number;
   description: string;
-  category: string;
-  type: "income" | "expense";
+  categoryName: string;
+  transactionType: 0 | 1;
   icon: string;
-  account: string;
+  accountName: string;
   categoryColor: string;
+};
+
+
+export type CreateTransactionDTO = {
+  amount: number;
+  description: string;
+  transactionType: 0 | 1;
+  icon: string;
+  accountId: string;
+  categoryId: string;
 };
