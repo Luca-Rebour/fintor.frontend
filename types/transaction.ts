@@ -6,4 +6,6 @@ export type TransactionDTO = {
   category: string;
   type: "income" | "expense";
   icon: string;
+  account: string;
+  categoryColor: string;
 };
