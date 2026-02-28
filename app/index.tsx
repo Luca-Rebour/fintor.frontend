@@ -1,4 +1,3 @@
-import { Feather } from "@expo/vector-icons";
 import { Link, useRouter } from "expo-router";
 import { useState } from "react";
 import { Alert, Text, View } from "react-native";
@@ -6,6 +5,7 @@ import { Alert, Text, View } from "react-native";
 import { AuthInput } from "../components/auth/AuthInput";
 import { AuthPrimaryButton } from "../components/auth/AuthPrimaryButton";
 import { AuthScreenFrame } from "../components/auth/AuthScreenFrame";
+import { AppIcon } from "../components/shared/AppIcon";
 import { APP_GRADIENTS } from "../constants/colors";
 import { signInWithEmail } from "../services/auth.service";
 
@@ -39,7 +39,7 @@ export default function Index() {
       <View className="mt-4 flex-1 justify-between">
         <View>
           <View className="mx-auto mb-8 h-16 w-16 items-center justify-center rounded-2xl border border-app-border bg-app-cardSoft">
-            <Feather name="lock" size={24} color="#19C7FF" />
+            <AppIcon name="Lock" size={24} color="#19C7FF" />
           </View>
 
           <Text className="text-center text-4xl font-bold text-app-textPrimary">Secure Login</Text>
@@ -54,7 +54,7 @@ export default function Index() {
             <AuthInput
               label="Email Address"
               placeholder="john@finance.com"
-              icon="mail"
+              icon="Mail"
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
@@ -63,7 +63,7 @@ export default function Index() {
             <AuthInput
               label="Password"
               placeholder="••••••••"
-              icon="lock"
+              icon="Lock"
               value={password}
               onChangeText={setPassword}
               secureTextEntry
@@ -81,7 +81,7 @@ export default function Index() {
           <AuthPrimaryButton
             label={isSubmitting ? "Signing In..." : "Sign In"}
             colors={APP_GRADIENTS.actionPrimary}
-            iconRight={isSubmitting ? null : <Feather name="arrow-right" size={18} color="#FFFFFF" />}
+            iconRight={isSubmitting ? null : <AppIcon name="ArrowRight" size={18} color="#FFFFFF" />}
             onPress={handleSignIn}
             disabled={isSubmitting}
           />
@@ -96,7 +96,7 @@ export default function Index() {
 
           <View className="mb-7 items-center">
             <View className="mb-2 h-14 w-14 items-center justify-center rounded-full border border-app-border bg-app-cardSoft">
-              <Feather name="shield" size={22} color="#19C7FF" />
+              <AppIcon name="Shield" size={22} color="#19C7FF" />
             </View>
             <Text className="text-app-textSecondary">Face ID</Text>
           </View>

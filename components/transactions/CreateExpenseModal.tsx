@@ -1,4 +1,3 @@
-import { Feather } from "@expo/vector-icons";
 import { RefObject, useEffect, useRef, useState } from "react";
 import {
   KeyboardAvoidingView,
@@ -15,6 +14,7 @@ import { getCategoriesData } from "../../services/categories.service";
 import { AccountOption } from "../../types/account";
 import { CategoryOption } from "../../types/category";
 import { CreateTransactionDTO } from "../../types/transaction";
+import { AppIcon } from "../shared/AppIcon";
 
 type CreateExpenseModalProps = {
   visible: boolean;
@@ -22,18 +22,7 @@ type CreateExpenseModalProps = {
   onCreateExpense: (payload: CreateTransactionDTO) => void;
 };
 
-const ICON_OPTIONS = [
-  "shopping-cart",
-  "coffee",
-  "navigation",
-  "home",
-  "film",
-  "smartphone",
-  "package",
-  "shopping-bag",
-  "truck",
-  "tag",
-] as const;
+const DEFAULT_EXPENSE_ICON = "ShoppingCart";
 
 const DROPDOWN_MAX_HEIGHT = 240;
 const DROPDOWN_OFFSET = 6;
@@ -74,7 +63,7 @@ function SelectField({
         className="bg-[#0C1830] border border-[#1E2A47] rounded-xl px-3 py-3 flex-row items-center justify-between"
       >
         <Text className="text-app-textPrimary text-sm">{value}</Text>
-        <Feather name={isOpen ? "chevron-up" : "chevron-down"} size={16} color="#94A3B8" />
+        <AppIcon name={isOpen ? "ChevronUp" : "ChevronDown"} size={16} color="#94A3B8" />
       </Pressable>
     </View>
   );
@@ -90,7 +79,6 @@ export function CreateExpenseModal({
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
-  const [icon, setIcon] = useState<(typeof ICON_OPTIONS)[number]>(ICON_OPTIONS[0]);
   const [account, setAccount] = useState("");
   const [amountError, setAmountError] = useState("");
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
@@ -179,7 +167,6 @@ export function CreateExpenseModal({
     setAmount("");
     setDescription("");
     setCategory(categoryOptions[0]?.value ?? "");
-    setIcon(ICON_OPTIONS[0]);
     setAccount(accountOptions[0]?.value ?? "");
     setAmountError("");
     setIsCategoryOpen(false);
@@ -203,7 +190,7 @@ export function CreateExpenseModal({
       description: description.trim(),
       transactionType: 1,
       categoryId: category,
-      icon,
+      icon: DEFAULT_EXPENSE_ICON,
       accountId: account,
       exchangeRate: null,
     });
@@ -230,7 +217,7 @@ export function CreateExpenseModal({
             <View className="px-5 pt-4 pb-3 border-b border-[#1E2A47] flex-row items-center justify-between">
               <Text className="text-app-textPrimary text-xl font-bold">Add New Expense</Text>
               <Pressable onPress={handleClose} className="p-1">
-                <Feather name="x" size={18} color="#94A3B8" />
+                <AppIcon name="X" size={18} color="#94A3B8" />
               </Pressable>
             </View>
 
@@ -272,26 +259,6 @@ export function CreateExpenseModal({
               onToggle={openCategorySelect}
               triggerRef={categoryTriggerRef}
             />
-
-            <View className="mt-3">
-              <Text className="text-app-textSecondary text-xs uppercase mb-2">Icon</Text>
-              <View className="flex-row flex-wrap gap-2">
-                {ICON_OPTIONS.map((iconName) => {
-                  const selected = iconName === icon;
-                  return (
-                    <Pressable
-                      key={iconName}
-                      onPress={() => setIcon(iconName)}
-                      className={`w-10 h-10 rounded-xl border items-center justify-center ${
-                        selected ? "border-[#18C8FF] bg-[#10314A]" : "border-[#1E2A47] bg-[#0C1830]"
-                      }`}
-                    >
-                      <Feather name={iconName} size={16} color={selected ? "#18C8FF" : "#94A3B8"} />
-                    </Pressable>
-                  );
-                })}
-              </View>
-            </View>
 
             <SelectField
               label="Account"
@@ -364,7 +331,7 @@ export function CreateExpenseModal({
                       >
                         {option.label}
                       </Text>
-                      {isSelected ? <Feather name="check" size={14} color="#18C8FF" /> : null}
+                      {isSelected ? <AppIcon name="Check" size={14} color="#18C8FF" /> : null}
                     </Pressable>
                   );
                 })}

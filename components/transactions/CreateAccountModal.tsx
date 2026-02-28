@@ -1,4 +1,3 @@
-import { Feather } from "@expo/vector-icons";
 import { useEffect, useMemo, useState } from "react";
 import {
 	ActivityIndicator,
@@ -19,6 +18,7 @@ import {
 } from "../../services/currencies.service";
 import { CreateAccountDTO } from "../../types/account";
 import { getTransactionsData } from "../../services/transactions.service";
+import { AppIcon } from "../shared/AppIcon";
 
 type CreateAccountModalProps = {
 	visible: boolean;
@@ -151,7 +151,7 @@ export function CreateAccountModal({
 					<View className="mt-6">
 						<Text className="mb-2 text-xs uppercase text-app-primary">Account Name</Text>
 						<View className="flex-row items-center rounded-2xl border border-[#1E2A47] bg-[#0C1830] px-3 py-3">
-							<Feather name="home" size={17} color="#94A3B8" />
+							<AppIcon name="House" size={17} color="#94A3B8" />
 							<TextInput
 								value={accountName}
 								onChangeText={(value) => {
@@ -169,7 +169,7 @@ export function CreateAccountModal({
 					<View className="mt-4">
 						<Text className="mb-2 text-xs uppercase text-app-primary">Initial Balance</Text>
 						<View className="flex-row items-center rounded-2xl border border-[#1E2A47] bg-[#0C1830] px-3 py-3">
-							<Feather name="dollar-sign" size={17} color="#18C8FF" />
+							<AppIcon name="DollarSign" size={17} color="#18C8FF" />
 							<TextInput
 								value={initialBalance}
 								onChangeText={(value) => {
@@ -193,7 +193,7 @@ export function CreateAccountModal({
 								className="bg-[#0C1830] border border-[#1E2A47] rounded-2xl px-3 py-3 flex-row items-center justify-between"
 							>
 								<Text className="text-sm text-app-textPrimary">{getCurrencyLabel(currencyOptions, currencyCode)}</Text>
-								<Feather name={isCurrencyOpen ? "chevron-up" : "chevron-down"} size={16} color="#94A3B8" />
+								<AppIcon name={isCurrencyOpen ? "ChevronUp" : "ChevronDown"} size={16} color="#94A3B8" />
 							</Pressable>
 
 							{isCurrencyOpen ? (
@@ -203,7 +203,7 @@ export function CreateAccountModal({
 								>
 									<View className="px-3 py-3 border-b border-[#1E2A47]">
 										<View className="flex-row items-center rounded-xl border border-[#1E2A47] bg-[#111C33] px-3 py-2">
-											<Feather name="search" size={15} color="#94A3B8" />
+											<AppIcon name="Search" size={15} color="#94A3B8" />
 											<TextInput
 												value={currencySearchText}
 												onChangeText={setCurrencySearchText}
@@ -249,7 +249,7 @@ export function CreateAccountModal({
 															</Text>
 															<Text className="mt-0.5 text-xs text-app-textSecondary">{item.name}</Text>
 														</View>
-														{isSelected ? <Feather name="check" size={14} color="#18C8FF" /> : null}
+																{isSelected ? <AppIcon name="Check" size={14} color="#18C8FF" /> : null}
 													</Pressable>
 												);
 											}}
@@ -270,7 +270,7 @@ export function CreateAccountModal({
 								) : (
 									<>
 										<Text className="text-base font-bold text-[#061324]">Create Account</Text>
-										<Feather name="arrow-right" size={18} color="#061324" style={{ marginLeft: 8 }} />
+										<AppIcon name="ArrowRight" size={18} color="#061324" style={{ marginLeft: 8 }} />
 									</>
 								)}
 							</Pressable>

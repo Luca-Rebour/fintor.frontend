@@ -1,7 +1,7 @@
 export type QuickAction = {
   id: string;
   label: string;
-  icon: "plus" | "send" | "maximize-2" | "more-horizontal";
+  icon: "Plus" | "Send" | "Maximize2" | "MoreHorizontal";
 };
 
 export type CashFlowMetric = {

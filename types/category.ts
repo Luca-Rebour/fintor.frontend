@@ -4,6 +4,8 @@ export type CategoryApiItem = {
   name?: string;
   categoryName?: string;
   title?: string;
+  icon?: string;
+  color?: string;
 };
 
 export type CategoriesResponse =
@@ -14,4 +16,10 @@ export type CategoriesResponse =
 export type CategoryOption = {
   label: string;
   value: string;
+};
+
+export type CreateCategoryDTO = {
+  name: string;
+  icon: string;
+  color: string;
 };

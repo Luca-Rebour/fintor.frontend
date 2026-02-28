@@ -1,6 +1,6 @@
-import { Feather } from "@expo/vector-icons";
 import { useState } from "react";
 import { Pressable, Text, View } from "react-native";
+import { AppIcon } from "../shared/AppIcon";
 
 import { APP_COLORS } from "../../constants/colors";
 
@@ -8,6 +8,7 @@ type TransactionActionButtonsProps = {
   onAddExpense?: () => void;
   onAddIncome?: () => void;
   onAddAccount?: () => void;
+  onAddCategory?: () => void;
   onMenuOpen?: () => void;
 };
 
@@ -15,6 +16,7 @@ export function TransactionActionButtons({
   onAddExpense,
   onAddIncome,
   onAddAccount,
+  onAddCategory,
   onMenuOpen,
 }: TransactionActionButtonsProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -40,7 +42,7 @@ export function TransactionActionButtons({
               onPress={() => handleActionPress(onAddIncome)}
               className="px-4 py-3.5 min-h-14 flex-row items-center rounded-xl"
             >
-              <Feather name="dollar-sign" size={18} color="#22C55E" />
+              <AppIcon name="DollarSign" size={18} color="#22C55E" />
               <Text className="ml-3 text-base font-semibold text-app-textPrimary">Add Income</Text>
             </Pressable>
 
@@ -48,7 +50,7 @@ export function TransactionActionButtons({
               onPress={() => handleActionPress(onAddExpense)}
               className="px-4 py-3.5 min-h-14 flex-row items-center rounded-xl"
             >
-              <Feather name="minus-circle" size={18} color="#EF4444" />
+              <AppIcon name="CircleMinus" size={18} color="#EF4444" />
               <Text className="ml-3 text-base font-semibold text-app-textPrimary">Add Expense</Text>
             </Pressable>
 
@@ -56,8 +58,16 @@ export function TransactionActionButtons({
               onPress={() => handleActionPress(onAddAccount)}
               className="px-4 py-3.5 min-h-14 flex-row items-center rounded-xl"
             >
-              <Feather name="credit-card" size={18} color={APP_COLORS.actionPrimary} />
+              <AppIcon name="CreditCard" size={18} color={APP_COLORS.actionPrimary} />
               <Text className="ml-3 text-base font-semibold text-app-textPrimary">Add Account</Text>
+            </Pressable>
+
+            <Pressable
+              onPress={() => handleActionPress(onAddCategory)}
+              className="px-4 py-3.5 min-h-14 flex-row items-center rounded-xl"
+            >
+              <AppIcon name="Tag" size={18} color="#C084FC" />
+              <Text className="ml-3 text-base font-semibold text-app-textPrimary">Add Category</Text>
             </Pressable>
           </View>
         ) : null}
@@ -75,7 +85,7 @@ export function TransactionActionButtons({
           style={{ backgroundColor: APP_COLORS.actionPrimary }}
           className="h-16 w-16 items-center justify-center rounded-full border border-[#1E2A47]"
         >
-          <Feather name="plus" size={26} color="#FFFFFF" />
+          <AppIcon name="Plus" size={26} color="#FFFFFF" />
         </Pressable>
       </View>
     </>

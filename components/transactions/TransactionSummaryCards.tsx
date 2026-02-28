@@ -1,5 +1,5 @@
-import { Feather } from "@expo/vector-icons";
 import { Text, View } from "react-native";
+import { AppIcon } from "../shared/AppIcon";
 
 type TransactionSummaryCardsProps = {
   monthlySpending: number;
@@ -24,7 +24,7 @@ export function TransactionSummaryCards({
             <Text className="text-app-textSecondary text-xs uppercase">
               Monthly Spending
             </Text>
-            <Feather name="arrow-down" size={16} color="#EF4444" />
+            <AppIcon name="ArrowDown" size={16} color="#EF4444" />
           </View>
 
           <Text className="text-app-textPrimary text-xl font-semibold">
@@ -37,7 +37,7 @@ export function TransactionSummaryCards({
             <Text className="text-app-textSecondary text-xs uppercase">
               Monthly Income
             </Text>
-            <Feather name="arrow-up" size={16} color="#22C55E" />
+            <AppIcon name="ArrowUp" size={16} color="#22C55E" />
           </View>
 
           <Text className="text-app-textPrimary text-xl font-semibold">
@@ -51,8 +51,8 @@ export function TransactionSummaryCards({
           <Text className="text-app-textSecondary text-xs uppercase">
             Balance
           </Text>
-          <Feather
-            name={balance >= 0 ? "trending-up" : "trending-down"}
+          <AppIcon
+            name={balance >= 0 ? "TrendingUp" : "TrendingDown"}
             size={16}
             color={balance >= 0 ? "#22C55E" : "#EF4444"}
           />

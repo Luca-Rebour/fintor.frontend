@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Alert, FlatList, Pressable, ScrollView, Text, View } from "react-native";
-import { Feather } from "@expo/vector-icons";
+import { AppIcon } from "../../components/shared/AppIcon";
 import {
   addNewTransaction,
   getTransactionsData,
@@ -12,12 +12,15 @@ import { getAuthUserSnapshot, subscribeToAuthUser } from "../../services/auth.se
 import { CreateTransactionDTO, TransactionDTO } from "../../types/transaction";
 import { AccountOption, CreateAccountDTO } from "../../types/account";
 import { User } from "../../types/api/signUp";
+import { createCategory } from "../../services/categories.service";
+import { CreateCategoryDTO } from "../../types/category";
 import {
   CreateExpenseModal,
 } from "../../components/transactions/CreateExpenseModal";
 import { TransactionActionButtons } from "../../components/transactions/TransactionActionButtons";
 import { CreateIncomeModal} from "../../components/transactions/CreateIncomeModal";
 import { CreateAccountModal } from "../../components/transactions/CreateAccountModal";
+import { CreateCategoryModal } from "../../components/transactions/CreateCategoryModal";
 import { TransactionListItem } from "../../components/transactions/TransactionListItem";
 import { TransactionSummaryCards } from "../../components/transactions/TransactionSummaryCards";
 
@@ -101,6 +104,8 @@ export default function TransactionsScreen() {
   const [isCreateIncomeModalVisible, setIsCreateIncomeModalVisible] =
     useState(false);
   const [isCreateAccountModalVisible, setIsCreateAccountModalVisible] =
+    useState(false);
+  const [isCreateCategoryModalVisible, setIsCreateCategoryModalVisible] =
     useState(false);
   const [authUser, setAuthUser] = useState<User | null>(getAuthUserSnapshot());
   const [baseToUsdRate, setBaseToUsdRate] = useState<number | null>(null);
@@ -401,6 +406,16 @@ export default function TransactionsScreen() {
     }
   }
 
+  async function handleCreateCategory(payload: CreateCategoryDTO) {
+    try {
+      await createCategory(payload);
+      Alert.alert("Categoría creada", `La categoría \"${payload.name}\" fue creada correctamente.`);
+    } catch (createError) {
+      const message = createError instanceof Error ? createError.message : "No se pudo crear la categoría";
+      Alert.alert("Error", message);
+    }
+  }
+
   function calculateMonthlySummary(transactions: TransactionDTO[]) {
     const now = new Date();
     const currentMonth = now.getMonth();
@@ -452,8 +467,8 @@ export default function TransactionsScreen() {
                   onPress={toggleFiltersMenu}
                   className="h-10 w-10 items-center justify-center rounded-xl border border-[#1E2A47] bg-[#0C1830]"
                 >
-                  <Feather
-                    name="filter"
+                  <AppIcon
+                    name="Filter"
                     size={16}
                     color={isFiltersMenuOpen ? "#18C8FF" : "#94A3B8"}
                   />
@@ -471,8 +486,8 @@ export default function TransactionsScreen() {
                       <Text className="text-app-textPrimary text-sm">
                         {getSelectedAccountLabel(accountOptions, selectedAccountValue)}
                       </Text>
-                      <Feather
-                        name={isAccountFilterOpen ? "chevron-up" : "chevron-down"}
+                      <AppIcon
+                        name={isAccountFilterOpen ? "ChevronUp" : "ChevronDown"}
                         size={16}
                         color="#94A3B8"
                       />
@@ -498,7 +513,7 @@ export default function TransactionsScreen() {
                                 <Text className={`text-sm ${isSelected ? "text-app-primary font-semibold" : "text-app-textPrimary"}`}>
                                   {option.label}
                                 </Text>
-                                {isSelected ? <Feather name="check" size={14} color="#18C8FF" /> : null}
+                                {isSelected ? <AppIcon name="Check" size={14} color="#18C8FF" /> : null}
                               </Pressable>
                             );
                           })}
@@ -601,6 +616,7 @@ export default function TransactionsScreen() {
         onAddExpense={() => setIsCreateExpenseModalVisible(true)}
         onAddIncome={() => setIsCreateIncomeModalVisible(true)}
         onAddAccount={() => setIsCreateAccountModalVisible(true)}
+        onAddCategory={() => setIsCreateCategoryModalVisible(true)}
         onMenuOpen={() => {
           loadCurrencyOptions();
         }}
@@ -622,6 +638,12 @@ export default function TransactionsScreen() {
         visible={isCreateAccountModalVisible}
         onClose={() => setIsCreateAccountModalVisible(false)}
         onCreateAccount={handleCreateAccount}
+      />
+
+      <CreateCategoryModal
+        visible={isCreateCategoryModalVisible}
+        onClose={() => setIsCreateCategoryModalVisible(false)}
+        onCreateCategory={handleCreateCategory}
       />
     </View>
   );

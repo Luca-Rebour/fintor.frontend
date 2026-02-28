@@ -1,6 +1,6 @@
-import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { Text, View } from "react-native";
+import { AppIcon } from "../shared/AppIcon";
 
 import { GoalTarget } from "../../types/goals.types";
 
@@ -21,7 +21,7 @@ export function GoalTargetCard({ goal }: GoalTargetCardProps) {
             className="h-9 w-9 items-center justify-center rounded-full"
             style={{ backgroundColor: `${goal.accentColor}33` }}
           >
-            <Feather name={goal.icon} size={16} color={goal.accentColor} />
+            <AppIcon name={goal.icon} size={16} color={goal.accentColor} />
           </View>
 
           <View>

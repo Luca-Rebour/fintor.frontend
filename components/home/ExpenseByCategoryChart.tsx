@@ -9,7 +9,9 @@ import {
   OverviewCategoryExpense,
   ReportFilterDays,
 } from "../../services/reports.service";
+import { getAuthUserSnapshot, subscribeToAuthUser } from "../../services/auth.service";
 import { subscribeToExpenseCreated } from "../../services/transactions.service";
+import { User } from "../../types/api/signUp";
 
 type ExpenseByCategory = OverviewCategoryExpense;
 
@@ -47,6 +49,21 @@ export function NetWorthSection({ refreshKey = 0 }: NetWorthSectionProps) {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [selectedFilterDays, setSelectedFilterDays] = useState<ReportFilterDays>(30);
+  const [authUser, setAuthUser] = useState<User | null>(getAuthUserSnapshot());
+
+  function getUserBaseCurrencyCode(user: User | null) {
+    const rawCode =
+      (user as unknown as { baseCurrencyCode?: string; BaseCurrencyCode?: string })?.baseCurrencyCode ??
+      (user as unknown as { baseCurrencyCode?: string; BaseCurrencyCode?: string })?.BaseCurrencyCode;
+
+    if (typeof rawCode === "string" && rawCode.trim()) {
+      return rawCode.trim().toUpperCase();
+    }
+
+    return "USD";
+  }
+
+  const baseCurrencyCode = getUserBaseCurrencyCode(authUser);
 
   const loadOverviewDataset = useCallback(async () => {
     try {
@@ -75,6 +92,14 @@ export function NetWorthSection({ refreshKey = 0 }: NetWorthSectionProps) {
 
     return unsubscribe;
   }, [loadOverviewDataset]);
+
+  useEffect(() => {
+    const unsubscribe = subscribeToAuthUser((user) => {
+      setAuthUser(user);
+    });
+
+    return unsubscribe;
+  }, []);
 
   useEffect(() => {
     if (refreshKey > 0) {
@@ -190,6 +215,7 @@ export function NetWorthSection({ refreshKey = 0 }: NetWorthSectionProps) {
               >
                 <Text className="text-xs text-app-textSecondary">Total</Text>
                 <Text className="mt-1 text-base font-bold text-app-textPrimary">{formatMoney(totalExpenses)}</Text>
+                <Text className="mt-1 text-[11px] font-semibold text-app-textSecondary">{baseCurrencyCode}</Text>
               </View>
             </View>
           </View>
