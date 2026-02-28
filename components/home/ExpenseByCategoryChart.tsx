@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
-import { useFocusEffect } from "@react-navigation/native";
 import Svg, { Circle, G } from "react-native-svg";
 
 import { APP_COLORS } from "../../constants/colors";
@@ -10,6 +9,7 @@ import {
   OverviewCategoryExpense,
   ReportFilterDays,
 } from "../../services/reports.service";
+import { subscribeToExpenseCreated } from "../../services/transactions.service";
 
 type ExpenseByCategory = OverviewCategoryExpense;
 
@@ -68,11 +68,13 @@ export function NetWorthSection({ refreshKey = 0 }: NetWorthSectionProps) {
     loadOverviewDataset();
   }, [loadOverviewDataset]);
 
-  useFocusEffect(
-    useCallback(() => {
+  useEffect(() => {
+    const unsubscribe = subscribeToExpenseCreated(() => {
       loadOverviewDataset();
-    }, [loadOverviewDataset]),
-  );
+    });
+
+    return unsubscribe;
+  }, [loadOverviewDataset]);
 
   useEffect(() => {
     if (refreshKey > 0) {

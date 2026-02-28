@@ -43,15 +43,16 @@ function pickOverviewByDays(
   return response;
 }
 
+function toOverviewList(response: OverviewDetailedResponseDTO | OverviewResponseListDTO) {
+  return Array.isArray(response) ? response : [response];
+}
+
 export async function getOverviewByFilter(filterDays: number): Promise<OverviewDetailedResponseDTO> {
   try {
     const safeFilterDays = toValidFilterDays(filterDays);
 
-    const response = await apiGet<OverviewDetailedResponseDTO | OverviewResponseListDTO>(
-      `/reports/overview?filter=${encodeURIComponent(String(safeFilterDays))}`,
-    );
-
-    return pickOverviewByDays(response, safeFilterDays) ?? createEmptyOverview(safeFilterDays);
+    const dataset = await getOverviewDataset();
+    return dataset[safeFilterDays] ?? createEmptyOverview(safeFilterDays);
   } catch (error) {
     console.error("Error fetching reports overview:", error);
     return createEmptyOverview(toValidFilterDays(filterDays));
@@ -63,10 +64,9 @@ export async function getOverviewDataset(): Promise<OverviewDataset> {
 
   try {
     const response = await apiGet<OverviewDetailedResponseDTO | OverviewResponseListDTO>(
-      "/reports/overview?filter=365",
+      "/reports/overview",
     );
-
-    const list = Array.isArray(response) ? response : [response];
+    
 
     const dataset: OverviewDataset = {
       7: createEmptyOverview(7),
@@ -75,9 +75,15 @@ export async function getOverviewDataset(): Promise<OverviewDataset> {
       365: createEmptyOverview(365),
     };
 
-    for (const item of list) {
-      if (filters.includes(item.daysAgo as ReportFilterDays)) {
-        dataset[item.daysAgo as ReportFilterDays] = item;
+    const list = toOverviewList(response);
+
+    for (const daysAgo of filters) {
+      const overview = pickOverviewByDays(list, daysAgo);
+      if (overview) {
+        dataset[daysAgo] = {
+          ...overview,
+          daysAgo,
+        };
       }
     }
 
