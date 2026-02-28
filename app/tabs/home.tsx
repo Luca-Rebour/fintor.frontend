@@ -6,11 +6,14 @@ import { DashboardHeader } from "../../components/home/DashboardHeader";
 import { GoalSection } from "../../components/home/GoalSection";
 import { NetWorthSection } from "../../components/home/ExpenseByCategoryChart";
 import { PendingIncomeCard } from "../../components/home/PendingIncomeCard";
+import { getAuthUserSnapshot, subscribeToAuthUser } from "../../services/auth.service";
 import { getDashboardData } from "../../services/dashboard.service";
 import { DashboardData } from "../../types/dashboard";
+import { User } from "../../types/api/signUp";
 
 export default function HomeScreen() {
 	const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
+	const [authUser, setAuthUser] = useState<User | null>(getAuthUserSnapshot());
 	const [isLoading, setIsLoading] = useState(true);
 	const [isRefreshing, setIsRefreshing] = useState(false);
 	const [error, setError] = useState("");
@@ -40,8 +43,16 @@ export default function HomeScreen() {
 	}
 
 	useEffect(() => {
+		const unsubscribe = subscribeToAuthUser((user) => {
+			setAuthUser(user);
+		});
+
 		loadDashboard();
+
+		return unsubscribe;
 	}, []);
+
+	const userDisplayName = `${authUser?.name ?? ""} ${authUser?.lastName ?? ""}`.trim() || dashboardData?.userName || "";
 
 	if (isLoading) {
 		return (
@@ -73,7 +84,7 @@ export default function HomeScreen() {
 					/>
 				}
 			>
-				<DashboardHeader userName={dashboardData.userName} />
+				<DashboardHeader userName={userDisplayName} />
 
 				<NetWorthSection />
 

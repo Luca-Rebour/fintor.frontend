@@ -1,7 +1,9 @@
 import { Feather } from "@expo/vector-icons";
 import { RefObject, useEffect, useRef, useState } from "react";
 import {
+  KeyboardAvoidingView,
   Modal,
+  Platform,
   Pressable,
   ScrollView,
   Text,
@@ -32,6 +34,16 @@ const ICON_OPTIONS = [
   "truck",
   "tag",
 ] as const;
+
+const DROPDOWN_MAX_HEIGHT = 240;
+const DROPDOWN_OFFSET = 6;
+const DROPDOWN_ROW_HEIGHT = 48;
+const DROPDOWN_HEADER_HEIGHT = 36;
+
+function getEstimatedDropdownHeight(optionsCount: number) {
+  const estimatedRowsHeight = optionsCount * DROPDOWN_ROW_HEIGHT;
+  return Math.min(DROPDOWN_MAX_HEIGHT, DROPDOWN_HEADER_HEIGHT + estimatedRowsHeight);
+}
 
 function getOptionLabel(
   options: Array<{ label: string; value: string }>,
@@ -146,7 +158,9 @@ export function CreateExpenseModal({
   function openCategorySelect() {
     setIsAccountOpen(false);
     categoryTriggerRef.current?.measureInWindow((x, y, width, height) => {
-      setDropdownPosition({ top: y + height + 6, left: x, width });
+      const estimatedHeight = getEstimatedDropdownHeight(categoryOptions.length);
+      const top = Math.max(12, y - estimatedHeight - DROPDOWN_OFFSET);
+      setDropdownPosition({ top, left: x, width });
       setIsCategoryOpen((prev) => !prev);
     });
   }
@@ -154,7 +168,9 @@ export function CreateExpenseModal({
   function openAccountSelect() {
     setIsCategoryOpen(false);
     accountTriggerRef.current?.measureInWindow((x, y, width, height) => {
-      setDropdownPosition({ top: y + height + 6, left: x, width });
+      const estimatedHeight = getEstimatedDropdownHeight(accountOptions.length);
+      const top = Math.max(12, y - estimatedHeight - DROPDOWN_OFFSET);
+      setDropdownPosition({ top, left: x, width });
       setIsAccountOpen((prev) => !prev);
     });
   }
@@ -189,6 +205,7 @@ export function CreateExpenseModal({
       categoryId: category,
       icon,
       accountId: account,
+      exchangeRate: null,
     });
 
     resetForm();
@@ -196,17 +213,33 @@ export function CreateExpenseModal({
   }
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={handleClose}>
-      <View className="flex-1 bg-black/60 justify-center px-4">
-        <View className="bg-[#111C33] border border-[#1E2A47] rounded-2xl max-h-[90%]">
-          <View className="px-4 pt-4 pb-3 border-b border-[#1E2A47] flex-row items-center justify-between">
-            <Text className="text-app-textPrimary text-base font-semibold">Create Expense</Text>
-            <Pressable onPress={handleClose} className="p-1">
-              <Feather name="x" size={18} color="#94A3B8" />
-            </Pressable>
-          </View>
+    <Modal visible={visible} transparent animationType="slide" onRequestClose={handleClose}>
+      <KeyboardAvoidingView
+        className="flex-1"
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={20}
+      >
+        <View className="flex-1 justify-end bg-black/60">
+          <Pressable className="flex-1" onPress={handleClose} />
 
-          <ScrollView className="px-4 py-3" showsVerticalScrollIndicator={false}>
+          <View className="max-h-[92%] rounded-t-3xl border-t border-[#1E2A47] bg-[#111C33]">
+            <View className="items-center pt-3">
+              <View className="h-1.5 w-12 rounded-full bg-[#334155]" />
+            </View>
+
+            <View className="px-5 pt-4 pb-3 border-b border-[#1E2A47] flex-row items-center justify-between">
+              <Text className="text-app-textPrimary text-xl font-bold">Add New Expense</Text>
+              <Pressable onPress={handleClose} className="p-1">
+                <Feather name="x" size={18} color="#94A3B8" />
+              </Pressable>
+            </View>
+
+            <ScrollView
+              className="px-5 py-4"
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
+              keyboardDismissMode="on-drag"
+            >
             <Text className="text-app-textSecondary text-xs uppercase mb-2">Amount</Text>
             <TextInput
               value={amount}
@@ -269,45 +302,38 @@ export function CreateExpenseModal({
             />
           </ScrollView>
 
-          <View className="px-4 py-3 border-t border-[#1E2A47] flex-row gap-3">
-            <Pressable
-              onPress={handleClose}
-              className="flex-1 items-center justify-center py-3 rounded-xl border border-[#1E2A47]"
-            >
-              <Text className="text-app-textPrimary font-semibold">Cancel</Text>
-            </Pressable>
-
-            <Pressable
-              onPress={handleCreate}
-              className="flex-1 items-center justify-center py-3 rounded-xl bg-[#EF4444]"
-            >
-              <Text className="text-white font-semibold">Create Expense</Text>
-            </Pressable>
+            <View className="px-5 py-4 border-t border-[#1E2A47]">
+              <Pressable
+                onPress={handleCreate}
+                className="items-center justify-center py-4 rounded-2xl bg-[#EF4444]"
+              >
+                <Text className="text-white text-base font-bold">Create Expense</Text>
+              </Pressable>
+            </View>
           </View>
-        </View>
 
-        {activeSelectType ? (
-          <>
-            <Pressable
-              onPress={() => {
-                setIsCategoryOpen(false);
-                setIsAccountOpen(false);
-              }}
-              style={{ position: "absolute", top: 0, right: 0, bottom: 0, left: 0 }}
-            />
+          {activeSelectType ? (
+            <>
+              <Pressable
+                onPress={() => {
+                  setIsCategoryOpen(false);
+                  setIsAccountOpen(false);
+                }}
+                style={{ position: "absolute", top: 0, right: 0, bottom: 0, left: 0 }}
+              />
 
-            <View
-              style={{
-                position: "absolute",
-                top: dropdownPosition.top,
-                left: dropdownPosition.left,
-                width: dropdownPosition.width,
-                zIndex: 999,
-                elevation: 24,
-                maxHeight: 240,
-              }}
-              className="bg-[#0C1830] border border-[#1E2A47] rounded-xl overflow-hidden"
-            >
+              <View
+                style={{
+                  position: "absolute",
+                  top: dropdownPosition.top,
+                  left: dropdownPosition.left,
+                  width: dropdownPosition.width,
+                  zIndex: 999,
+                  elevation: 24,
+                  maxHeight: 240,
+                }}
+                className="bg-[#0C1830] border border-[#1E2A47] rounded-xl overflow-hidden"
+              >
               <View className="px-3 py-2 border-b border-[#1E2A47]">
                 <Text className="text-app-textSecondary text-xs uppercase">
                   Select {activeSelectLabel}
@@ -343,10 +369,11 @@ export function CreateExpenseModal({
                   );
                 })}
               </ScrollView>
-            </View>
-          </>
-        ) : null}
-      </View>
+              </View>
+            </>
+          ) : null}
+        </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }

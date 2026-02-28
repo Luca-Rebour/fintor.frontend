@@ -1,4 +1,5 @@
 import { Feather } from "@expo/vector-icons";
+import { useState } from "react";
 import { Pressable, Text, View } from "react-native";
 
 import { APP_COLORS } from "../../constants/colors";
@@ -6,30 +7,77 @@ import { APP_COLORS } from "../../constants/colors";
 type TransactionActionButtonsProps = {
   onAddExpense?: () => void;
   onAddIncome?: () => void;
+  onAddAccount?: () => void;
+  onMenuOpen?: () => void;
 };
 
 export function TransactionActionButtons({
   onAddExpense,
   onAddIncome,
+  onAddAccount,
+  onMenuOpen,
 }: TransactionActionButtonsProps) {
-  return (
-    <View className="flex-row items-center mt-4 px-4 gap-3 mb-2">
-      <Pressable
-        onPress={onAddExpense}
-        style={{ backgroundColor: APP_COLORS.actionPrimary }}
-        className="flex-1 flex-row items-center justify-center px-4 py-3.5 rounded-xl border border-[#1E2A47]"
-      >
-        <Feather name="plus-circle" size={16} color="#FFFFFF" />
-        <Text className="text-sm text-white font-semibold ml-2">Add Expense</Text>
-      </Pressable>
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-      <Pressable
-        onPress={onAddIncome}
-        className="flex-1 flex-row items-center justify-center px-4 py-3.5 rounded-xl border border-[#1E2A47]"
-      >
-        <Feather name="dollar-sign" size={16} color={APP_COLORS.actionPrimary} />
-        <Text className="text-sm text-app-primary font-semibold ml-2">Add Income</Text>
-      </Pressable>
-    </View>
+  function handleActionPress(action?: () => void) {
+    setIsMenuOpen(false);
+    action?.();
+  }
+
+  return (
+    <>
+      {isMenuOpen ? (
+        <Pressable
+          onPress={() => setIsMenuOpen(false)}
+          style={{ position: "absolute", top: 0, right: 0, bottom: 0, left: 0 }}
+        />
+      ) : null}
+
+      <View className="absolute bottom-6 right-4 items-end">
+        {isMenuOpen ? (
+          <View className="mb-3 w-56 bg-[#0C1830] border border-[#1E2A47] rounded-2xl p-2">
+            <Pressable
+              onPress={() => handleActionPress(onAddIncome)}
+              className="px-4 py-3.5 min-h-14 flex-row items-center rounded-xl"
+            >
+              <Feather name="dollar-sign" size={18} color="#22C55E" />
+              <Text className="ml-3 text-base font-semibold text-app-textPrimary">Add Income</Text>
+            </Pressable>
+
+            <Pressable
+              onPress={() => handleActionPress(onAddExpense)}
+              className="px-4 py-3.5 min-h-14 flex-row items-center rounded-xl"
+            >
+              <Feather name="minus-circle" size={18} color="#EF4444" />
+              <Text className="ml-3 text-base font-semibold text-app-textPrimary">Add Expense</Text>
+            </Pressable>
+
+            <Pressable
+              onPress={() => handleActionPress(onAddAccount)}
+              className="px-4 py-3.5 min-h-14 flex-row items-center rounded-xl"
+            >
+              <Feather name="credit-card" size={18} color={APP_COLORS.actionPrimary} />
+              <Text className="ml-3 text-base font-semibold text-app-textPrimary">Add Account</Text>
+            </Pressable>
+          </View>
+        ) : null}
+
+        <Pressable
+          onPress={() =>
+            setIsMenuOpen((previous) => {
+              const nextValue = !previous;
+              if (nextValue) {
+                onMenuOpen?.();
+              }
+              return nextValue;
+            })
+          }
+          style={{ backgroundColor: APP_COLORS.actionPrimary }}
+          className="h-16 w-16 items-center justify-center rounded-full border border-[#1E2A47]"
+        >
+          <Feather name="plus" size={26} color="#FFFFFF" />
+        </Pressable>
+      </View>
+    </>
   );
 }

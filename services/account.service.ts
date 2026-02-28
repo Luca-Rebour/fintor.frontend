@@ -1,9 +1,16 @@
-import { AccountApiItem, AccountOption, AccountsResponse } from "../types/account";
-import { apiGet } from "./api.client";
+import {
+	AccountApiItem,
+	AccountOption,
+	AccountsResponse,
+	CreateAccountDTO,
+	CreateAccountResponse,
+} from "../types/account";
+import { apiGet, apiPost } from "./api.client";
 
 function normalizeAccount(item: AccountApiItem): AccountOption | null {
 	const rawId = item.id ?? item.id;
 	const rawLabel = item.name ?? item.name;
+	const rawCurrencyCode = item.currency?.code;
 
 	if (rawId === undefined || rawId === null || !rawLabel) {
 		return null;
@@ -12,6 +19,7 @@ function normalizeAccount(item: AccountApiItem): AccountOption | null {
 	return {
 		value: String(rawId),
 		label: String(rawLabel).trim(),
+		currencyCode: String(rawCurrencyCode || "USD").trim().toUpperCase(),
 	};
 }
 
@@ -31,4 +39,8 @@ export async function getAccountsData(): Promise<AccountOption[]> {
 		console.error("Error fetching accounts:", error);
 		return [];
 	}
+}
+
+export async function createAccount(payload: CreateAccountDTO): Promise<CreateAccountResponse> {
+	return apiPost<CreateAccountResponse>("/accounts", payload);
 }

@@ -7,6 +7,8 @@ type TransactionListItemProps = {
   transaction: TransactionDTO;
   isExpanded: boolean;
   onToggle: (id: string) => void;
+  displayAmount?: number;
+  displayCurrencyCode?: string;
 };
 
 function getNeonBackgroundColor(color?: string, alpha = 0.2) {
@@ -94,10 +96,14 @@ export function TransactionListItem({
   transaction,
   isExpanded,
   onToggle,
+  displayAmount,
+  displayCurrencyCode,
 }: TransactionListItemProps) {
   const color = transaction.categoryColor || "#18C8FF";
   const categoryLabel = transaction.categoryName?.trim() || "Other";
   const accountLabel = transaction.accountName?.trim() || "Main account";
+  const currencyCode = displayCurrencyCode?.trim().toUpperCase() || transaction.currencyCode?.trim().toUpperCase() || "USD";
+  const amountToDisplay = Number.isFinite(displayAmount) ? Math.abs(displayAmount as number) : Math.abs(transaction.amount);
 
   return (
     <View className="mb-3 overflow-hidden">
@@ -146,8 +152,11 @@ export function TransactionListItem({
               transaction.transactionType == 1 ? "text-red-500" : "text-green-500"
             }`}
           >
-            {transaction.transactionType == 1 ? "-" : "+"}$
-            {transaction.amount.toFixed(2)}
+            {transaction.transactionType == 1 ? "-" : "+"}
+            {amountToDisplay.toFixed(2)}
+          </Text>
+          <Text className="mt-1 text-[10px] uppercase tracking-wide text-app-textSecondary">
+            {currencyCode}
           </Text>
         </View>
       </Pressable>

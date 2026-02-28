@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, View, StyleSheet } from "react-native";
 import Constants from "expo-constants";
 
-import { getStoredJwt } from "../../services/auth.service";
+import { getStoredJwt, loadAuthenticatedUser } from "../../services/auth.service";
 
 export default function ProtectedTabsLayout() {
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
@@ -15,6 +15,10 @@ export default function ProtectedTabsLayout() {
       try {
         const token = await getStoredJwt();
         setIsAuthenticated(Boolean(token));
+
+        if (token) {
+          await loadAuthenticatedUser();
+        }
       } finally {
         setIsCheckingAuth(false);
       }
