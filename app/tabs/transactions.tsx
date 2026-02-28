@@ -3,6 +3,7 @@ import { ActivityIndicator, Alert, FlatList, Pressable, ScrollView, Text, View }
 import { AppIcon } from "../../components/shared/AppIcon";
 import {
   addNewTransaction,
+  deleteTransactionById,
   getTransactionsData,
   subscribeToTransactions,
 } from "../../services/transactions.service";
@@ -107,6 +108,7 @@ export default function TransactionsScreen() {
     useState(false);
   const [isCreateCategoryModalVisible, setIsCreateCategoryModalVisible] =
     useState(false);
+  const [isItemSwipeActive, setIsItemSwipeActive] = useState(false);
   const [authUser, setAuthUser] = useState<User | null>(getAuthUserSnapshot());
   const [baseToUsdRate, setBaseToUsdRate] = useState<number | null>(null);
 
@@ -416,6 +418,28 @@ export default function TransactionsScreen() {
     }
   }
 
+  function handleRequestDeleteTransaction(transactionId: string) {
+    Alert.alert(
+      "Eliminar transacción",
+      "¿Seguro que quieres eliminar esta transacción? Esta acción no se puede deshacer.",
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Eliminar",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await deleteTransactionById(transactionId);
+            } catch (deleteError) {
+              const message = deleteError instanceof Error ? deleteError.message : "No se pudo eliminar la transacción";
+              Alert.alert("Error", message);
+            }
+          },
+        },
+      ],
+    );
+  }
+
   function calculateMonthlySummary(transactions: TransactionDTO[]) {
     const now = new Date();
     const currentMonth = now.getMonth();
@@ -450,6 +474,7 @@ export default function TransactionsScreen() {
         onRefresh={handleRefresh}
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
+        scrollEnabled={!isItemSwipeActive}
         initialNumToRender={10}
         maxToRenderPerBatch={10}
         windowSize={7}
@@ -606,6 +631,9 @@ export default function TransactionsScreen() {
                 transaction={item.transaction}
                 isExpanded={expandedTransactionId === item.transaction.id}
                 onToggle={toggleExpanded}
+                onSwipeLeft={handleRequestDeleteTransaction}
+                onDeleteRequest={handleRequestDeleteTransaction}
+                onSwipeGestureChange={setIsItemSwipeActive}
               />
             </View>
           );

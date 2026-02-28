@@ -1,14 +1,16 @@
 import { CreateTransactionDTO, TransactionDTO } from "../types/transaction";
-import { apiGet, apiPost } from "./api.client";
+import { apiDelete, apiGet, apiPost } from "./api.client";
 import { CATEGORY_COLOR_BY_NAME } from "../constants/colors";
 
 type TransactionsResponse = TransactionDTO[] | { transactions: TransactionDTO[] } | TransactionDTO;
 type TransactionsObserver = (transactions: TransactionDTO[]) => void;
 type ExpenseCreatedObserver = () => void;
+type TransactionDeletedObserver = () => void;
 
 let transactionsStore: TransactionDTO[] = [];
 const transactionsObservers = new Set<TransactionsObserver>();
 const expenseCreatedObservers = new Set<ExpenseCreatedObserver>();
+const transactionDeletedObservers = new Set<TransactionDeletedObserver>();
 
 function notifyTransactionsObservers() {
   const snapshot = [...transactionsStore];
@@ -24,6 +26,12 @@ function updateTransactionsStore(transactions: TransactionDTO[]) {
 
 function notifyExpenseCreatedObservers() {
   for (const observer of expenseCreatedObservers) {
+    observer();
+  }
+}
+
+function notifyTransactionDeletedObservers() {
+  for (const observer of transactionDeletedObservers) {
     observer();
   }
 }
@@ -46,6 +54,14 @@ export function subscribeToExpenseCreated(observer: ExpenseCreatedObserver): () 
 
   return () => {
     expenseCreatedObservers.delete(observer);
+  };
+}
+
+export function subscribeToTransactionDeleted(observer: TransactionDeletedObserver): () => void {
+  transactionDeletedObservers.add(observer);
+
+  return () => {
+    transactionDeletedObservers.delete(observer);
   };
 }
 
@@ -128,6 +144,27 @@ export async function addNewTransaction(
 
   } catch (error) {
     console.error("Error creating transaction:", error);
+    throw error;
+  }
+}
+
+export async function deleteTransactionById(transactionId: string): Promise<void> {
+  const normalizedId = String(transactionId).trim();
+
+  if (!normalizedId) {
+    throw new Error("El id de la transacción es obligatorio");
+  }
+
+  try {
+    await apiDelete<unknown>(`/transactions/${encodeURIComponent(normalizedId)}`);
+
+    updateTransactionsStore(
+      transactionsStore.filter((transaction) => transaction.id !== normalizedId),
+    );
+
+    notifyTransactionDeletedObservers();
+  } catch (error) {
+    console.error("Error deleting transaction:", error);
     throw error;
   }
 }

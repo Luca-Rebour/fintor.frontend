@@ -1,4 +1,5 @@
-import { Pressable, Text, View } from "react-native";
+import { useMemo, useRef } from "react";
+import { Animated, PanResponder, Pressable, Text, View } from "react-native";
 import { AppIcon } from "../shared/AppIcon";
 
 import { TransactionDTO } from "../../types/transaction";
@@ -7,6 +8,9 @@ type TransactionListItemProps = {
   transaction: TransactionDTO;
   isExpanded: boolean;
   onToggle: (id: string) => void;
+  onSwipeLeft?: (id: string) => void;
+  onDeleteRequest?: (id: string) => void;
+  onSwipeGestureChange?: (isSwiping: boolean) => void;
   displayAmount?: number;
   displayCurrencyCode?: string;
 };
@@ -41,8 +45,10 @@ function getNeonBackgroundColor(color?: string, alpha = 0.2) {
 
 function TransactionExpandedDetails({
   transaction,
+  onDeleteRequest,
 }: {
   transaction: TransactionDTO;
+  onDeleteRequest?: (id: string) => void;
 }) {
   const txnDate = new Date(transaction.date);
 
@@ -58,6 +64,13 @@ function TransactionExpandedDetails({
               {transaction.description?.trim() || "Sin descripción"}
             </Text>
           </View>
+
+          <Pressable
+            onPress={() => onDeleteRequest?.(transaction.id)}
+            className="h-9 w-9 items-center justify-center rounded-lg border border-red-500/40 bg-red-500/10"
+          >
+            <AppIcon name="Trash2" size={16} color="#F87171" />
+          </Pressable>
         </View>
 
         <View className="mt-3 pt-3 border-t border-[#1E2A47] flex-row">
@@ -96,9 +109,70 @@ export function TransactionListItem({
   transaction,
   isExpanded,
   onToggle,
+  onSwipeLeft,
+  onDeleteRequest,
+  onSwipeGestureChange,
   displayAmount,
   displayCurrencyCode,
 }: TransactionListItemProps) {
+  const SWIPE_TRIGGER_DISTANCE = 72;
+  const translateX = useRef(new Animated.Value(0)).current;
+  const deleteRevealOpacity = translateX.interpolate({
+    inputRange: [-110, -18, 0],
+    outputRange: [1, 0.25, 0],
+    extrapolate: "clamp",
+  });
+
+  const deleteRevealScale = translateX.interpolate({
+    inputRange: [-110, -18, 0],
+    outputRange: [1, 0.88, 0.75],
+    extrapolate: "clamp",
+  });
+
+  const panResponder = useMemo(
+    () =>
+      PanResponder.create({
+        onMoveShouldSetPanResponder: (_, gestureState) => {
+          const horizontalGesture = Math.abs(gestureState.dx) > Math.abs(gestureState.dy) * 1.15;
+          return horizontalGesture && gestureState.dx < -8;
+        },
+        onPanResponderGrant: () => {
+          onSwipeGestureChange?.(true);
+        },
+        onPanResponderMove: (_, gestureState) => {
+          const clampedDx = Math.max(-110, Math.min(0, gestureState.dx));
+          translateX.setValue(clampedDx);
+        },
+        onPanResponderTerminationRequest: () => false,
+        onPanResponderRelease: (_, gestureState) => {
+          const didSwipeLeft = gestureState.dx <= -SWIPE_TRIGGER_DISTANCE;
+
+          Animated.spring(translateX, {
+            toValue: 0,
+            useNativeDriver: true,
+            bounciness: 0,
+            speed: 22,
+          }).start();
+
+          onSwipeGestureChange?.(false);
+
+          if (didSwipeLeft) {
+            onSwipeLeft?.(transaction.id);
+          }
+        },
+        onPanResponderTerminate: () => {
+          Animated.spring(translateX, {
+            toValue: 0,
+            useNativeDriver: true,
+            bounciness: 0,
+            speed: 22,
+          }).start();
+          onSwipeGestureChange?.(false);
+        },
+      }),
+    [onSwipeGestureChange, onSwipeLeft, transaction.id, translateX],
+  );
+
   const color = transaction.categoryColor || "#18C8FF";
   const categoryLabel = transaction.categoryName?.trim() || "Other";
   const accountLabel = transaction.accountName?.trim() || "Main account";
@@ -107,6 +181,29 @@ export function TransactionListItem({
 
   return (
     <View className="mb-3 overflow-hidden">
+      <Animated.View
+        pointerEvents="none"
+        style={{
+          position: "absolute",
+          top: 0,
+          right: 0,
+          bottom: 0,
+          width: 110,
+          backgroundColor: "#EF4444",
+          alignItems: "center",
+          justifyContent: "center",
+          opacity: deleteRevealOpacity,
+        }}
+      >
+        <Animated.View style={{ transform: [{ scale: deleteRevealScale }] }}>
+          <AppIcon name="Trash2" size={22} color="#FFFFFF" />
+        </Animated.View>
+      </Animated.View>
+
+      <Animated.View
+        {...panResponder.panHandlers}
+        style={{ transform: [{ translateX }] }}
+      >
       <Pressable
         onPress={() => onToggle(transaction.id)}
         className="py-5 px-4 flex-row items-center"
@@ -160,8 +257,14 @@ export function TransactionListItem({
           </Text>
         </View>
       </Pressable>
+      </Animated.View>
 
-      {isExpanded && <TransactionExpandedDetails transaction={transaction} />}
+      {isExpanded ? (
+        <TransactionExpandedDetails
+          transaction={transaction}
+          onDeleteRequest={onDeleteRequest}
+        />
+      ) : null}
     </View>
   );
 }

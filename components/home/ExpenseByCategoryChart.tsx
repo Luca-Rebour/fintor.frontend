@@ -10,7 +10,7 @@ import {
   ReportFilterDays,
 } from "../../services/reports.service";
 import { getAuthUserSnapshot, subscribeToAuthUser } from "../../services/auth.service";
-import { subscribeToExpenseCreated } from "../../services/transactions.service";
+import { subscribeToExpenseCreated, subscribeToTransactionDeleted } from "../../services/transactions.service";
 import { User } from "../../types/api/signUp";
 
 type ExpenseByCategory = OverviewCategoryExpense;
@@ -90,7 +90,14 @@ export function NetWorthSection({ refreshKey = 0 }: NetWorthSectionProps) {
       loadOverviewDataset();
     });
 
-    return unsubscribe;
+    const unsubscribeDeleted = subscribeToTransactionDeleted(() => {
+      loadOverviewDataset();
+    });
+
+    return () => {
+      unsubscribe();
+      unsubscribeDeleted();
+    };
   }, [loadOverviewDataset]);
 
   useEffect(() => {
