@@ -16,6 +16,7 @@ export default function HomeScreen() {
 	const [authUser, setAuthUser] = useState<User | null>(getAuthUserSnapshot());
 	const [isLoading, setIsLoading] = useState(true);
 	const [isRefreshing, setIsRefreshing] = useState(false);
+	const [chartRefreshKey, setChartRefreshKey] = useState(0);
 	const [error, setError] = useState("");
 
 	async function loadDashboard(showInitialLoader = true) {
@@ -39,6 +40,7 @@ export default function HomeScreen() {
 	async function handleRefresh() {
 		setIsRefreshing(true);
 		await loadDashboard(false);
+		setChartRefreshKey((previous) => previous + 1);
 		setIsRefreshing(false);
 	}
 
@@ -86,7 +88,7 @@ export default function HomeScreen() {
 			>
 				<DashboardHeader userName={userDisplayName} />
 
-				<NetWorthSection />
+				<NetWorthSection refreshKey={chartRefreshKey} />
 
 				<PendingIncomeCard
 					amount={dashboardData.pendingIncomeAmount}

@@ -4,9 +4,11 @@ import { CATEGORY_COLOR_BY_NAME } from "../constants/colors";
 
 type TransactionsResponse = TransactionDTO[] | { transactions: TransactionDTO[] } | TransactionDTO;
 type TransactionsObserver = (transactions: TransactionDTO[]) => void;
+type ExpenseCreatedObserver = () => void;
 
 let transactionsStore: TransactionDTO[] = [];
 const transactionsObservers = new Set<TransactionsObserver>();
+const expenseCreatedObservers = new Set<ExpenseCreatedObserver>();
 
 function notifyTransactionsObservers() {
   const snapshot = [...transactionsStore];
@@ -20,6 +22,12 @@ function updateTransactionsStore(transactions: TransactionDTO[]) {
   notifyTransactionsObservers();
 }
 
+function notifyExpenseCreatedObservers() {
+  for (const observer of expenseCreatedObservers) {
+    observer();
+  }
+}
+
 export function subscribeToTransactions(observer: TransactionsObserver): () => void {
   transactionsObservers.add(observer);
   observer([...transactionsStore]);
@@ -31,6 +39,14 @@ export function subscribeToTransactions(observer: TransactionsObserver): () => v
 
 export function getTransactionsSnapshot(): TransactionDTO[] {
   return [...transactionsStore];
+}
+
+export function subscribeToExpenseCreated(observer: ExpenseCreatedObserver): () => void {
+  expenseCreatedObservers.add(observer);
+
+  return () => {
+    expenseCreatedObservers.delete(observer);
+  };
 }
 
 function normalizeTransaction(transaction: TransactionDTO): TransactionDTO {
@@ -103,6 +119,11 @@ export async function addNewTransaction(
 
     const createdTransaction = normalizeTransaction(response);
     updateTransactionsStore([createdTransaction, ...transactionsStore]);
+
+    if (transaction.transactionType === 1) {
+      notifyExpenseCreatedObservers();
+    }
+
     return createdTransaction;
 
   } catch (error) {
