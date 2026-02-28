@@ -1,5 +1,5 @@
-import { Feather } from "@expo/vector-icons";
 import { Text, View } from "react-native";
+import { AppIcon } from "../shared/AppIcon";
 
 type DashboardHeaderProps = {
   userName: string;
@@ -19,7 +19,7 @@ export function DashboardHeader({ userName }: DashboardHeaderProps) {
       </View>
 
       <View className="h-10 w-10 items-center justify-center rounded-full bg-app-cardSoft">
-        <Feather name="bell" size={18} color="#D1D5DB" />
+        <AppIcon name="Bell" size={18} color="#D1D5DB" />
       </View>
     </View>
   );

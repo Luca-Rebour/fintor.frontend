@@ -1,4 +1,3 @@
-import { Feather } from "@expo/vector-icons";
 import { Link, useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
@@ -8,6 +7,7 @@ import { AuthInput } from "../components/auth/AuthInput";
 import { AuthPrimaryButton } from "../components/auth/AuthPrimaryButton";
 import { AuthScreenFrame } from "../components/auth/AuthScreenFrame";
 import { AuthSocialButton } from "../components/auth/AuthSocialButton";
+import { AppIcon } from "../components/shared/AppIcon";
 import { APP_GRADIENTS } from "../constants/colors";
 import { CurrencyOption, loadCurrencyOptions } from "../services/currencies.service";
 import { signUpWithEmail } from "../services/auth.service";
@@ -173,7 +173,7 @@ export default function SignupScreen() {
             }}
             className="h-10 w-10 items-center justify-center"
           >
-            <Feather name="arrow-left" size={22} color="#FFFFFF" />
+            <AppIcon name="ArrowLeft" size={22} color="#FFFFFF" />
           </Pressable>
           <Text className="text-xl font-bold text-app-textPrimary">Sign Up</Text>
           <View className="w-10" />
@@ -194,7 +194,7 @@ export default function SignupScreen() {
             <AuthInput
               label="Nombre"
               placeholder="Ex. John"
-              icon="user"
+              icon="User"
               value={firstName}
               onChangeText={setFirstName}
             />
@@ -202,7 +202,7 @@ export default function SignupScreen() {
             <AuthInput
               label="Apellido"
               placeholder="Ex. Doe"
-              icon="user"
+              icon="User"
               value={lastName}
               onChangeText={setLastName}
             />
@@ -210,7 +210,7 @@ export default function SignupScreen() {
             <AuthInput
               label="Email Address"
               placeholder="name@example.com"
-              icon="mail"
+              icon="Mail"
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
@@ -238,7 +238,7 @@ export default function SignupScreen() {
             <AuthInput
               label="Password"
               placeholder="••••••••"
-              icon="lock"
+              icon="Lock"
               value={password}
               onChangeText={setPassword}
               secureTextEntry
@@ -276,7 +276,7 @@ export default function SignupScreen() {
               <AuthInput
                 label="Date of birth"
                 placeholder="YYYY-MM-DD"
-                icon="calendar"
+                icon="Calendar"
                 value={dateOfBirth}
                 onChangeText={() => undefined}
               />
@@ -321,7 +321,7 @@ export default function SignupScreen() {
                   <Text className="text-base text-app-textPrimary">
                     {mainCurrencyCode} - {selectedCurrencyLabel}
                   </Text>
-                  <Feather name={isCurrencyPickerOpen ? "chevron-up" : "chevron-down"} size={18} color="#8A85AD" />
+                  <AppIcon name={isCurrencyPickerOpen ? "ChevronUp" : "ChevronDown"} size={18} color="#8A85AD" />
                 </Pressable>
 
                 {isCurrencyPickerOpen ? (
@@ -331,7 +331,7 @@ export default function SignupScreen() {
                   >
                     <View className="px-3 py-3 border-b border-[#1E2A47]">
                       <View className="flex-row items-center rounded-xl border border-[#1E2A47] bg-[#0C1830] px-3 py-2">
-                        <Feather name="search" size={15} color="#94A3B8" />
+                        <AppIcon name="Search" size={15} color="#94A3B8" />
                         <TextInput
                           value={currencySearchText}
                           onChangeText={setCurrencySearchText}
@@ -359,7 +359,7 @@ export default function SignupScreen() {
                             <Text className={`text-sm ${isSelected ? "text-app-primary font-semibold" : "text-app-textPrimary"}`}>
                               {currency.code} - {currency.name}
                             </Text>
-                            {isSelected ? <Feather name="check" size={14} color="#18C8FF" /> : null}
+                            {isSelected ? <AppIcon name="Check" size={14} color="#18C8FF" /> : null}
                           </Pressable>
                         );
                       })}

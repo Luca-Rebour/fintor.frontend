@@ -76,7 +76,7 @@ function normalizeTransaction(transaction: TransactionDTO): TransactionDTO {
     description: transaction.description?.trim() || "Sin descripción",
     categoryName: category,
     transactionType: type,
-    icon: transaction.icon || (type === 0 ? "dollar-sign" : "shopping-cart"),
+    icon: transaction.icon || (type === 0 ? "DollarSign" : "ShoppingCart"),
     accountName: account,
     categoryColor,
     currencyCode: currencyCode || "USD",

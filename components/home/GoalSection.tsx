@@ -1,5 +1,5 @@
-import { Feather } from "@expo/vector-icons";
 import { Text, View } from "react-native";
+import { AppIcon } from "../shared/AppIcon";
 
 import { GoalProgress } from "../../types/dashboard";
 
@@ -19,7 +19,7 @@ export function GoalSection({ goal }: GoalSectionProps) {
         <View className="mb-3 flex-row items-center justify-between">
           <View className="flex-row items-center gap-3">
             <View className="h-10 w-10 items-center justify-center rounded-full bg-app-primaryStrong/30">
-              <Feather name="briefcase" size={16} color="#C084FC" />
+              <AppIcon name="Briefcase" size={16} color="#C084FC" />
             </View>
             <View>
               <Text className="font-bold text-app-textPrimary">{goal.title}</Text>

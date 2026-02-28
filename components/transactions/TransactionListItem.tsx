@@ -1,5 +1,5 @@
-import { Feather } from "@expo/vector-icons";
 import { Pressable, Text, View } from "react-native";
+import { AppIcon } from "../shared/AppIcon";
 
 import { TransactionDTO } from "../../types/transaction";
 
@@ -122,7 +122,7 @@ export function TransactionListItem({
             marginRight: 10,
           }}
         >
-          <Feather
+          <AppIcon
             name={transaction.icon as any}
             color={color}
             size={20}

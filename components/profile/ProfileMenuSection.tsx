@@ -1,5 +1,5 @@
-import { Feather } from "@expo/vector-icons";
 import { Text, View } from "react-native";
+import { AppIcon } from "../shared/AppIcon";
 
 import { ProfileMenuSection as ProfileMenuSectionType } from "../../types/profile";
 
@@ -17,7 +17,7 @@ export function ProfileMenuSection({ section }: ProfileMenuSectionProps) {
         >
           <View className="flex-row items-center gap-3">
             <View className="h-10 w-10 items-center justify-center rounded-full bg-app-primary/20">
-              <Feather name={item.icon} size={17} color="#18C8FF" />
+              <AppIcon name={item.icon} size={17} color="#18C8FF" />
             </View>
             <Text className="text-lg font-semibold text-app-textPrimary">{item.title}</Text>
           </View>
@@ -28,7 +28,7 @@ export function ProfileMenuSection({ section }: ProfileMenuSectionProps) {
                 {item.badgeText}
               </Text>
             ) : null}
-            <Feather name="chevron-right" size={16} color="#94A3B8" />
+            <AppIcon name="ChevronRight" size={16} color="#94A3B8" />
           </View>
         </View>
       ))}

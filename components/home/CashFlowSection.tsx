@@ -1,5 +1,5 @@
-import { Feather } from "@expo/vector-icons";
 import { Text, View } from "react-native";
+import { AppIcon } from "../shared/AppIcon";
 
 import { CashFlowMetric } from "../../types/dashboard";
 
@@ -23,8 +23,8 @@ export function CashFlowSection({ metrics }: CashFlowSectionProps) {
                 metric.trend === "up" ? "bg-emerald-500/20" : "bg-red-500/20"
               }`}
             >
-              <Feather
-                name={metric.trend === "up" ? "arrow-down" : "arrow-up"}
+              <AppIcon
+                name={metric.trend === "up" ? "ArrowDown" : "ArrowUp"}
                 size={12}
                 color={metric.trend === "up" ? "#10B981" : "#EF4444"}
               />

@@ -14,10 +14,10 @@ const MOCK_DASHBOARD_RESPONSE: DashboardApiResponse = {
     { id: "expenses", label: "Expenses", amount: "$3,240", trend: "down" },
   ],
   quickActions: [
-    { id: "topup", label: "Top Up", icon: "plus" },
-    { id: "send", label: "Send", icon: "send" },
-    { id: "scan", label: "Scan", icon: "maximize-2" },
-    { id: "more", label: "More", icon: "more-horizontal" },
+    { id: "topup", label: "Top Up", icon: "Plus" },
+    { id: "send", label: "Send", icon: "Send" },
+    { id: "scan", label: "Scan", icon: "Maximize2" },
+    { id: "more", label: "More", icon: "MoreHorizontal" },
   ],
   goal: {
     title: "Tesla Model 3",

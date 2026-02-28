@@ -11,16 +11,16 @@ const MOCK_PROFILE_RESPONSE: ProfileData = {
     {
       id: "preferences",
       items: [
-        { id: "personal", title: "Personal Information", icon: "user" },
-        { id: "security", title: "Security & Biometrics", icon: "key" },
-        { id: "notifications", title: "Notification Preferences", icon: "bell" },
+        { id: "personal", title: "Personal Information", icon: "User" },
+        { id: "security", title: "Security & Biometrics", icon: "Key" },
+        { id: "notifications", title: "Notification Preferences", icon: "Bell" },
       ],
     },
     {
       id: "support",
       items: [
-        { id: "bank", title: "Linked Bank Accounts", icon: "credit-card", badgeText: "3 Active" },
-        { id: "help", title: "Help & Support", icon: "help-circle" },
+        { id: "bank", title: "Linked Bank Accounts", icon: "CreditCard", badgeText: "3 Active" },
+        { id: "help", title: "Help & Support", icon: "CircleHelp" },
       ],
     },
   ],

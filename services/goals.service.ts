@@ -16,7 +16,7 @@ const MOCK_GOALS_DATA: GoalsData = {
       currentAmount: 13000,
       targetAmount: 20000,
       targetDate: "Dec 2024",
-      icon: "truck",
+      icon: "Truck",
       accentColor: "#8B5CF6",
     },
     {
@@ -26,7 +26,7 @@ const MOCK_GOALS_DATA: GoalsData = {
       currentAmount: 28000,
       targetAmount: 100000,
       targetDate: "Aug 2026",
-      icon: "home",
+      icon: "House",
       accentColor: "#EC4899",
     },
   ],

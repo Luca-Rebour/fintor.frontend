@@ -1,8 +1,8 @@
-import { Feather } from "@expo/vector-icons";
 import { Redirect, Tabs } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, View, StyleSheet } from "react-native";
 import Constants from "expo-constants";
+import { AppIcon } from "../../components/shared/AppIcon";
 
 import { getStoredJwt, loadAuthenticatedUser } from "../../services/auth.service";
 
@@ -61,7 +61,7 @@ export default function ProtectedTabsLayout() {
         options={{
           title: "Home",
           tabBarIcon: ({ color, size }) => (
-            <Feather name="home" color={color} size={size} />
+            <AppIcon name="House" color={color} size={size} />
           ),
         }}
       />
@@ -71,7 +71,7 @@ export default function ProtectedTabsLayout() {
         options={{
           title: "Transactions",
           tabBarIcon: ({ color, size }) => (
-            <Feather name="dollar-sign" color={color} size={size} />
+            <AppIcon name="DollarSign" color={color} size={size} />
           ),
         }}
       />
@@ -81,7 +81,7 @@ export default function ProtectedTabsLayout() {
         options={{
           title: "Goals",
           tabBarIcon: ({ color, size }) => (
-            <Feather name="target" color={color} size={size} />
+            <AppIcon name="Target" color={color} size={size} />
           ),
         }}
       />
@@ -91,7 +91,7 @@ export default function ProtectedTabsLayout() {
         options={{
           title: "Profile",
           tabBarIcon: ({ color, size }) => (
-            <Feather name="user" color={color} size={size} />
+            <AppIcon name="User" color={color} size={size} />
           ),
         }}
       />

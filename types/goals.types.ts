@@ -5,7 +5,7 @@ export type GoalTarget = {
   currentAmount: number;
   targetAmount: number;
   targetDate: string;
-  icon: "truck" | "home";
+  icon: "Truck" | "House";
   accentColor: string;
 };
 
