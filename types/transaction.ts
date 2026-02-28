@@ -8,6 +8,8 @@ export type TransactionDTO = {
   icon: string;
   accountName: string;
   categoryColor: string;
+  currencyCode: string;
+  exchangeRate?: number | null;
 };
 
 
@@ -18,4 +20,5 @@ export type CreateTransactionDTO = {
   icon: string;
   accountId: string;
   categoryId: string;
+  exchangeRate: number | null;
 };

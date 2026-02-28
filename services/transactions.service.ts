@@ -37,6 +37,17 @@ function normalizeTransaction(transaction: TransactionDTO): TransactionDTO {
   const category = (transaction.categoryName ?? transaction.categoryName ?? "Other").trim();
   const type = transaction.transactionType ?? transaction.transactionType ?? 1;
   const account = (transaction.accountName ?? transaction.accountName ?? "Main account").trim();
+  const currencyCode = (transaction.currencyCode ?? "USD").trim().toUpperCase();
+  const rawExchangeRate =
+    (transaction as unknown as { exchangeRate?: unknown; ExchangeRate?: unknown; rate?: unknown }).exchangeRate ??
+    (transaction as unknown as { exchangeRate?: unknown; ExchangeRate?: unknown; rate?: unknown }).ExchangeRate ??
+    (transaction as unknown as { exchangeRate?: unknown; ExchangeRate?: unknown; rate?: unknown }).rate;
+  const exchangeRate =
+    rawExchangeRate == null
+      ? null
+      : Number.isFinite(Number(rawExchangeRate)) && Number(rawExchangeRate) > 0
+        ? Number(rawExchangeRate)
+        : null;
   const categoryColor =
     transaction.categoryColor ??
     CATEGORY_COLOR_BY_NAME[category] ??
@@ -52,6 +63,8 @@ function normalizeTransaction(transaction: TransactionDTO): TransactionDTO {
     icon: transaction.icon || (type === 0 ? "dollar-sign" : "shopping-cart"),
     accountName: account,
     categoryColor,
+    currencyCode: currencyCode || "USD",
+    exchangeRate,
   };
 }
 

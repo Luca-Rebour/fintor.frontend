@@ -19,4 +19,13 @@ export type AccountsResponse =
 export type AccountOption = {
   label: string;
   value: string;
+  currencyCode: string;
 };
+
+export type CreateAccountDTO = {
+  name: string;
+  initialBalance: number;
+  currencyCode: string;
+};
+
+export type CreateAccountResponse = AccountApiItem;

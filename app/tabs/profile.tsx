@@ -5,17 +5,23 @@ import { LinearGradient } from "expo-linear-gradient";
 
 import { ProfileHeader } from "../../components/profile/ProfileHeader";
 import { ProfileMenuSection } from "../../components/profile/ProfileMenuSection";
-import { clearStoredJwt } from "../../services/auth.service";
+import { clearStoredJwt, getAuthUserSnapshot, subscribeToAuthUser } from "../../services/auth.service";
 import { getProfileData } from "../../services/profile.service";
 import { ProfileData } from "../../types/profile";
+import { User } from "../../types/api/signUp";
 
 export default function ProfileScreen() {
 	const router = useRouter();
 	const [profileData, setProfileData] = useState<ProfileData | null>(null);
+	const [authUser, setAuthUser] = useState<User | null>(getAuthUserSnapshot());
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState("");
 
 	useEffect(() => {
+		const unsubscribe = subscribeToAuthUser((user) => {
+			setAuthUser(user);
+		});
+
 		async function loadProfile() {
 			try {
 				setIsLoading(true);
@@ -31,7 +37,11 @@ export default function ProfileScreen() {
 		}
 
 		loadProfile();
+
+		return unsubscribe;
 	}, []);
+
+	const fullNameFromAuth = `${authUser?.name ?? ""} ${authUser?.lastName ?? ""}`.trim();
 
 	async function handleLogout() {
 		await clearStoredJwt();
@@ -59,7 +69,7 @@ export default function ProfileScreen() {
 		<View className="flex-1 bg-[#062027] px-4">
 			<ScrollView showsVerticalScrollIndicator={false} contentContainerClassName="pb-20 pt-2">
 				<ProfileHeader
-					fullName={profileData.fullName}
+					fullName={fullNameFromAuth || profileData.fullName}
 					membershipLabel={profileData.membershipLabel}
 					onBackPress={() => router.replace("/tabs/home")}
 				/>
