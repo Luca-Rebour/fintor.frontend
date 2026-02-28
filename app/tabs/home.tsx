@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { ActivityIndicator, ScrollView, Text, View } from "react-native";
+import { ActivityIndicator, RefreshControl, ScrollView, Text, View } from "react-native";
 
 import { CashFlowSection } from "../../components/home/CashFlowSection";
 import { DashboardHeader } from "../../components/home/DashboardHeader";
 import { GoalSection } from "../../components/home/GoalSection";
-import { NetWorthSection } from "../../components/home/NetWorthSection";
+import { NetWorthSection } from "../../components/home/ExpenseByCategoryChart";
 import { PendingIncomeCard } from "../../components/home/PendingIncomeCard";
 import { getDashboardData } from "../../services/dashboard.service";
 import { DashboardData } from "../../types/dashboard";
@@ -12,23 +12,34 @@ import { DashboardData } from "../../types/dashboard";
 export default function HomeScreen() {
 	const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
+	const [isRefreshing, setIsRefreshing] = useState(false);
 	const [error, setError] = useState("");
 
-	useEffect(() => {
-		async function loadDashboard() {
-			try {
+	async function loadDashboard(showInitialLoader = true) {
+		try {
+			if (showInitialLoader) {
 				setIsLoading(true);
-				setError("");
-				const data = await getDashboardData();
-				setDashboardData(data);
-			} catch (loadError) {
-				const message = loadError instanceof Error ? loadError.message : "Failed to load dashboard";
-				setError(message);
-			} finally {
+			}
+			setError("");
+			const data = await getDashboardData();
+			setDashboardData(data);
+		} catch (loadError) {
+			const message = loadError instanceof Error ? loadError.message : "Failed to load dashboard";
+			setError(message);
+		} finally {
+			if (showInitialLoader) {
 				setIsLoading(false);
 			}
 		}
+	}
 
+	async function handleRefresh() {
+		setIsRefreshing(true);
+		await loadDashboard(false);
+		setIsRefreshing(false);
+	}
+
+	useEffect(() => {
 		loadDashboard();
 	}, []);
 
@@ -50,14 +61,21 @@ export default function HomeScreen() {
 
 	return (
 		<View className="flex-1 bg-[#060F24] px-4">
-			<ScrollView showsVerticalScrollIndicator={false} contentContainerClassName="pb-20 pt-2">
+			<ScrollView
+				showsVerticalScrollIndicator={false}
+				contentContainerClassName="pb-20 pt-2"
+				refreshControl={
+					<RefreshControl
+						refreshing={isRefreshing}
+						onRefresh={handleRefresh}
+						tintColor="#18C8FF"
+						colors={["#18C8FF"]}
+					/>
+				}
+			>
 				<DashboardHeader userName={dashboardData.userName} />
 
-				<NetWorthSection
-					totalNetWorth={dashboardData.totalNetWorth}
-					monthlyChange={dashboardData.monthlyChange}
-					quickActions={dashboardData.quickActions}
-				/>
+				<NetWorthSection />
 
 				<PendingIncomeCard
 					amount={dashboardData.pendingIncomeAmount}

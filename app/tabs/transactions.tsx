@@ -1,6 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, FlatList, Text, View } from "react-native";
-import { getTransactionsData, addNewTransaction } from "../../services/transactions.service";
+import {
+  addNewTransaction,
+  getTransactionsData,
+  subscribeToTransactions,
+} from "../../services/transactions.service";
 import { CreateTransactionDTO, TransactionDTO } from "../../types/transaction";
 import {
   CreateExpenseModal,
@@ -84,9 +88,7 @@ export default function TransactionsScreen() {
         setIsLoading(true);
       }
       setError("");
-      const data = await getTransactionsData();
-      setTransactionsData(data);
-      setMonthlySummary(calculateMonthlySummary(data));
+      await getTransactionsData();
     } catch (loadError) {
       const message =
         loadError instanceof Error
@@ -107,7 +109,14 @@ export default function TransactionsScreen() {
   }
 
   useEffect(() => {
+    const unsubscribe = subscribeToTransactions((transactions) => {
+      setTransactionsData(transactions);
+      setMonthlySummary(calculateMonthlySummary(transactions));
+    });
+
     loadTransactions();
+
+    return unsubscribe;
   }, []);
 
   const groupedTransactions = useMemo<TransactionGroup[]>(() => {
@@ -161,13 +170,7 @@ export default function TransactionsScreen() {
       accountId: payload.accountId
     };
 
-  const created = await addNewTransaction(toCreate);
-
-  setTransactionsData(prev => {
-    const next = [created, ...prev];
-    setMonthlySummary(calculateMonthlySummary(next));
-    return next;
-  });
+  await addNewTransaction(toCreate);
   }
 
   async function handleCreateIncome(payload: CreateTransactionDTO) {
@@ -180,13 +183,7 @@ export default function TransactionsScreen() {
       accountId: payload.accountId
     };
 
-  const created = await addNewTransaction(toCreate);
-
-  setTransactionsData(prev => {
-    const next = [created, ...prev];
-    setMonthlySummary(calculateMonthlySummary(next));
-    return next;
-  });
+  await addNewTransaction(toCreate);
   }
 
   function calculateMonthlySummary(transactions: TransactionDTO[]) {

@@ -3,6 +3,35 @@ import { apiGet, apiPost } from "./api.client";
 import { CATEGORY_COLOR_BY_NAME } from "../constants/colors";
 
 type TransactionsResponse = TransactionDTO[] | { transactions: TransactionDTO[] } | TransactionDTO;
+type TransactionsObserver = (transactions: TransactionDTO[]) => void;
+
+let transactionsStore: TransactionDTO[] = [];
+const transactionsObservers = new Set<TransactionsObserver>();
+
+function notifyTransactionsObservers() {
+  const snapshot = [...transactionsStore];
+  for (const observer of transactionsObservers) {
+    observer(snapshot);
+  }
+}
+
+function updateTransactionsStore(transactions: TransactionDTO[]) {
+  transactionsStore = transactions;
+  notifyTransactionsObservers();
+}
+
+export function subscribeToTransactions(observer: TransactionsObserver): () => void {
+  transactionsObservers.add(observer);
+  observer([...transactionsStore]);
+
+  return () => {
+    transactionsObservers.delete(observer);
+  };
+}
+
+export function getTransactionsSnapshot(): TransactionDTO[] {
+  return [...transactionsStore];
+}
 
 function normalizeTransaction(transaction: TransactionDTO): TransactionDTO {
   const category = (transaction.categoryName ?? transaction.categoryName ?? "Other").trim();
@@ -34,12 +63,18 @@ export async function getTransactionsData(): Promise<TransactionDTO[]> {
   try {
     const response = await apiGet<TransactionsResponse>("/transactions");
 
-    if (Array.isArray(response)) return normalizeTransactions(response);
+    const rawTransactions = Array.isArray(response)
+      ? response
+      : "transactions" in response
+        ? response.transactions
+        : [response];
 
-    console.error("Unexpected transactions response shape:", response);
-    return [];
+    const normalizedTransactions = normalizeTransactions(rawTransactions);
+    updateTransactionsStore(normalizedTransactions);
+    return normalizedTransactions;
   } catch (error) {
     console.error("Error fetching transactions:", error);
+    updateTransactionsStore([]);
     return [];
   }
 }
@@ -48,14 +83,14 @@ export async function addNewTransaction(
   transaction: CreateTransactionDTO
 ): Promise<TransactionDTO> {
   try {
-    console.log("Attempting to create transaction:", transaction);
-    
     const response = await apiPost<TransactionDTO>(
       "/transactions",
       transaction
     );
 
-    return normalizeTransaction(response);
+    const createdTransaction = normalizeTransaction(response);
+    updateTransactionsStore([createdTransaction, ...transactionsStore]);
+    return createdTransaction;
 
   } catch (error) {
     console.error("Error creating transaction:", error);
