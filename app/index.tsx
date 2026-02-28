@@ -18,12 +18,14 @@ export default function Index() {
   const [authMessage, setAuthMessage] = useState("");
 
   async function handleSignIn() {
+    
     setIsSubmitting(true);
     setAuthMessage("");
 
     try {
+          console.log("Attempting sign in with email:", email, "and password:", password ? "[REDACTED]" : "[EMPTY]");
       const session = await signInWithEmail(email, password);
-
+      console.log("Sign in successful, received session:", session);
       router.replace("/tabs/home");
       
     } catch (error) {
