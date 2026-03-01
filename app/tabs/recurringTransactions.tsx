@@ -20,17 +20,15 @@ import {
 	getRecurringTransactionsData,
 	reschedulePendingRecurringApproval,
 } from "../../services/recurringTransactions.service";
-import {
-	RecurringPendingApproval,
-	RecurringTransaction,
-	RecurringTransactionType,
-	RecurringTransactionsData,
-} from "../../types/recurring";
+import { RecurringTransactionsData } from "../../types/recurring";
+import { RecurringPendingApprovalApiDTO, RecurringTransactionApiDTO } from "../../types/api/recurring";
+import { PendingTransactionStatus } from "../../types/enums/pendingTransactionStatus";
+import { TransactionType } from "../../types/enums/transactionType";
 
 export default function RecurringTransactionsScreen() {
 	const router = useRouter();
 	const [recurringData, setRecurringData] = useState<RecurringTransactionsData | null>(null);
-	const [selectedType, setSelectedType] = useState<RecurringTransactionType>("expense");
+	const [selectedType, setSelectedType] = useState<TransactionType>(TransactionType.Expense);
 	const [isLoading, setIsLoading] = useState(true);
 	const [isRefreshing, setIsRefreshing] = useState(false);
 	const [isSubmittingAction, setIsSubmittingAction] = useState(false);
@@ -61,7 +59,7 @@ export default function RecurringTransactionsScreen() {
 		setIsRefreshing(false);
 	}
 
-	async function handleConfirmApproval(approval: RecurringPendingApproval) {
+	async function handleConfirmApproval(approval: RecurringPendingApprovalApiDTO) {
 		if (isSubmittingAction) {
 			return;
 		}
@@ -70,7 +68,7 @@ export default function RecurringTransactionsScreen() {
 			setIsSubmittingAction(true);
 			await confirmPendingRecurringApproval(approval.id);
 			await loadRecurringTransactions(false);
-			Alert.alert("Recurring updated", `${approval.title} was confirmed successfully.`);
+			Alert.alert("Recurring updated", `${approval.description} was confirmed successfully.`);
 		} catch (actionError) {
 			const message = actionError instanceof Error ? actionError.message : "Could not confirm recurring transaction";
 			Alert.alert("Error", message);
@@ -79,18 +77,18 @@ export default function RecurringTransactionsScreen() {
 		}
 	}
 
-	async function handleRescheduleApproval(approval: RecurringPendingApproval) {
+	async function handleRescheduleApproval(approval: RecurringPendingApprovalApiDTO) {
 		if (isSubmittingAction) {
 			return;
 		}
 
 		try {
 			setIsSubmittingAction(true);
-			const nextDay = new Date(approval.expectedDate);
+			const nextDay = new Date(approval.dueDate);
 			nextDay.setDate(nextDay.getDate() + 1);
 			await reschedulePendingRecurringApproval(approval.id, nextDay.toISOString());
 			await loadRecurringTransactions(false);
-			Alert.alert("Recurring updated", `${approval.title} was rescheduled successfully.`);
+			Alert.alert("Recurring updated", `${approval.description} was rescheduled successfully.`);
 		} catch (actionError) {
 			const message = actionError instanceof Error ? actionError.message : "Could not reschedule recurring transaction";
 			Alert.alert("Error", message);
@@ -99,7 +97,7 @@ export default function RecurringTransactionsScreen() {
 		}
 	}
 
-	function handlePressRecurringTransaction(recurringTransaction: RecurringTransaction) {
+	function handlePressRecurringTransaction(recurringTransaction: RecurringTransactionApiDTO) {
 		Alert.alert("Recurring Transaction detail", `${recurringTransaction.name} detail will be enabled soon.`);
 	}
 
@@ -119,13 +117,23 @@ export default function RecurringTransactionsScreen() {
 	}, []);
 
 	const pendingApproval = useMemo(() => {
-		if (!recurringData?.pendingApproval) {
+		if (!recurringData?.pendingApprovals.length) {
 			return null;
 		}
 
-		return recurringData.pendingApproval.transactionType === selectedType
-			? recurringData.pendingApproval
-			: null;
+		const pendingByType = recurringData.pendingApprovals.filter(
+			(approval) =>
+				Number(approval.transactionType) === selectedType &&
+				approval.status === PendingTransactionStatus.Pending,
+		);
+
+		if (!pendingByType.length) {
+			return null;
+		}
+
+		return [...pendingByType].sort(
+			(left, right) => +new Date(left.dueDate) - +new Date(right.dueDate),
+		)[0];
 	}, [recurringData, selectedType]);
 
 	const filteredRecurringTransactions = useMemo(() => {
@@ -134,7 +142,7 @@ export default function RecurringTransactionsScreen() {
 		}
 
 		return recurringData.recurringTransactions.filter(
-			(recurringTransaction) => recurringTransaction.transactionType === selectedType,
+			(recurringTransaction) => Number(recurringTransaction.transactionType) === selectedType,
 		);
 	}, [recurringData, selectedType]);
 

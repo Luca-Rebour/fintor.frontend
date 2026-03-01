@@ -24,7 +24,7 @@ const DEFAULT_FORM: RecurringAdminFormState = {
   currencyCode: "USD",
   startDate: "",
   endDate: "",
-  transactionType: "expense",
+  transactionType: TransactionType.Expense,
   frequency: Frequency.Monthly,
 };
 
@@ -47,8 +47,7 @@ function toFormState(transaction: RecurringTransactionApiDTO): RecurringAdminFor
     currencyCode: (transaction.currencyCode || "USD").toUpperCase(),
     startDate: toDateInputValue(transaction.startDate),
     endDate: toDateInputValue(transaction.endDate),
-    transactionType:
-      Number(transaction.transactionType) === TransactionType.Income ? "income" : "expense",
+    transactionType: Number(transaction.transactionType) as TransactionType,
     frequency: Number(transaction.frequency) as Frequency,
   };
 }
