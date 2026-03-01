@@ -46,9 +46,14 @@ export function RecurringTransactionItem({ recurringTransaction, onPress }: Recu
       </View>
 
       <View className="flex-row items-center">
-        <Text className={`text-lg font-bold ${isExpense ? "text-[#F43F5E]" : "text-[#18C8FF]"}`}>
-          {formatAmount(recurringTransaction.amount, recurringTransaction.currencyCode, recurringTransaction.transactionType)}
-        </Text>
+        <View className="items-end mr-1">
+          <Text className={`text-lg font-bold ${isExpense ? "text-[#F43F5E]" : "text-[#18C8FF]"}`}>
+            {formatAmount(recurringTransaction.amount, recurringTransaction.currencyCode, recurringTransaction.transactionType)}
+          </Text>
+          <Text className="text-[10px] font-semibold tracking-wide text-[#94A3B8]">
+            {recurringTransaction.currencyCode}
+          </Text>
+        </View>
         <AppIcon name="ChevronRight" color="#334155" size={16} />
       </View>
     </Pressable>

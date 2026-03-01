@@ -46,6 +46,9 @@ export function PendingApprovalCard({ approval, onConfirm, onReschedule }: Pendi
         <View className="flex-1">
           <Text className="text-xs text-[#94A3B8]">{approval.description}</Text>
           <Text className="mt-0.5 text-3xl font-bold text-white">{formatCurrency(approval.amount, approval.currencyCode)}</Text>
+          <Text className="mt-1 text-xs font-semibold tracking-wide text-[#94A3B8]">
+            {approval.currencyCode}
+          </Text>
         </View>
 
         <View className="items-end">
