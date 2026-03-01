@@ -129,9 +129,15 @@ export async function confirmPendingRecurringApproval(approvalId: string, source
 
 export async function reschedulePendingRecurringApproval(approvalId: string, dueDate: string): Promise<void> {
   const encodedId = ensurePendingApprovalId(approvalId);
-  await apiPost<unknown>(`${RECURRING_PENDING_ACTIONS_PATH}/${encodedId}/reschedule`, {
-    dueDate,
-  });
+  await apiPost<unknown>(
+    `${RECURRING_PENDING_ACTIONS_PATH}/${encodedId}/reschedule`,
+    toApiDateString(dueDate),
+  );
+}
+
+export async function cancelPendingRecurringApproval(approvalId: string): Promise<void> {
+  const encodedId = ensurePendingApprovalId(approvalId);
+  await apiPost<unknown>(`${RECURRING_PENDING_ACTIONS_PATH}/${encodedId}/cancel`, {});
 }
 
 export async function createRecurringTransaction(

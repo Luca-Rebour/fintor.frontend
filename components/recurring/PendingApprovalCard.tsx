@@ -7,6 +7,7 @@ type PendingApprovalCardProps = {
   approval: RecurringPendingApprovalApiDTO;
   onConfirm?: (approval: RecurringPendingApprovalApiDTO) => void;
   onReschedule?: (approval: RecurringPendingApprovalApiDTO) => void;
+  onCancel?: (approval: RecurringPendingApprovalApiDTO) => void;
 };
 
 function formatCurrency(amount: number, currencyCode: string): string {
@@ -24,18 +25,25 @@ function formatDate(input: string): string {
   }).format(new Date(input));
 }
 
-export function PendingApprovalCard({ approval, onConfirm, onReschedule }: PendingApprovalCardProps) {
-  const requiresAction = approval.status === PendingTransactionStatus.Pending;
+export function PendingApprovalCard({ approval, onConfirm, onReschedule, onCancel }: PendingApprovalCardProps) {
+  const isRescheduled =
+    approval.status === PendingTransactionStatus.Rescheduled ||
+    String(approval.status).toLowerCase() === "rescheduled";
 
   return (
     <View className="mb-6 rounded-3xl border border-[#1E2A47] bg-[#111C33] p-4">
       <View className="mb-3 flex-row items-center justify-between">
-        <Text className="text-xs font-semibold tracking-widest text-[#94A3B8]">PENDING APPROVAL</Text>
-        {requiresAction ? (
-          <View className="rounded-full bg-[#18C8FF]/20 px-2.5 py-1">
-            <Text className="text-[10px] font-bold text-[#18C8FF]">1 ACTION REQUIRED</Text>
-          </View>
-        ) : null}
+        <View className="flex-row items-center gap-2">
+          <Text className="text-xs font-semibold tracking-widest text-[#94A3B8]">PENDING APPROVAL</Text>
+          
+        </View>
+
+        <Pressable
+          onPress={() => onCancel?.(approval)}
+          className="h-8 w-8 items-center justify-center rounded-full bg-[#1A243B]"
+        >
+          <AppIcon name="Trash2" color="#F87171" size={16} />
+        </Pressable>
       </View>
 
       <View className="mb-4 flex-row items-center rounded-2xl bg-[#1A243B] px-3 py-3">
@@ -58,16 +66,18 @@ export function PendingApprovalCard({ approval, onConfirm, onReschedule }: Pendi
       </View>
 
       <View className="flex-row gap-3">
-        <Pressable
-          onPress={() => onConfirm?.(approval)}
-          className="flex-1 rounded-2xl bg-[#1D4ED8] px-4 py-3"
-        >
-          <Text className="text-center text-sm font-semibold text-white">Confirm</Text>
-        </Pressable>
+        {!isRescheduled ? (
+          <Pressable
+            onPress={() => onConfirm?.(approval)}
+            className="flex-1 rounded-2xl bg-[#1D4ED8] px-4 py-3"
+          >
+            <Text className="text-center text-sm font-semibold text-white">Confirm</Text>
+          </Pressable>
+        ) : null}
 
         <Pressable
           onPress={() => onReschedule?.(approval)}
-          className="flex-1 rounded-2xl border border-[#334155] bg-[#1A243B] px-4 py-3"
+          className={`${isRescheduled ? "w-full" : "flex-1"} rounded-2xl border border-[#334155] bg-[#1A243B] px-4 py-3`}
         >
           <Text className="text-center text-sm font-semibold text-[#94A3B8]">Reschedule</Text>
         </Pressable>
