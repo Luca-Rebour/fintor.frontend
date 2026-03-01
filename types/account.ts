@@ -25,6 +25,7 @@ export type AccountOption = {
 export type CreateAccountDTO = {
   name: string;
   initialBalance: number;
+  exchangeRate: number;
   currencyCode: string;
 };
 

@@ -23,7 +23,7 @@ import { AppIcon } from "../shared/AppIcon";
 type CreateAccountModalProps = {
 	visible: boolean;
 	onClose: () => void;
-	onCreateAccount: (payload: CreateAccountDTO) => Promise<void> | void;
+	onCreateAccount: (payload: Omit<CreateAccountDTO, "exchangeRate">) => Promise<void> | void;
 };
 
 function getCurrencyLabel(options: CurrencyOption[], selectedCode: string) {
