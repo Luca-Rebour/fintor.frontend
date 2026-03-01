@@ -41,6 +41,16 @@ function getOptionLabel(
   return options.find((option) => option.value === value)?.label ?? value;
 }
 
+function formatAccountOptionLabel(option: AccountOption) {
+  const currencyCode = option.currencyCode?.trim().toUpperCase();
+  return currencyCode ? `${option.label} (${currencyCode})` : option.label;
+}
+
+function getSelectedAccountLabel(options: AccountOption[], value: string) {
+  const selected = options.find((option) => option.value === value);
+  return selected ? formatAccountOptionLabel(selected) : value;
+}
+
 function SelectField({
   label,
   value,
@@ -262,7 +272,7 @@ export function CreateExpenseModal({
 
             <SelectField
               label="Account"
-              value={getOptionLabel(accountOptions, account)}
+              value={getSelectedAccountLabel(accountOptions, account)}
               isOpen={isAccountOpen}
               onToggle={openAccountSelect}
               triggerRef={accountTriggerRef}
@@ -310,6 +320,10 @@ export function CreateExpenseModal({
               <ScrollView nestedScrollEnabled>
                 {activeSelectOptions.map((option) => {
                   const isSelected = option.value === activeSelectValue;
+                  const optionLabel =
+                    activeSelectType === "account" && "currencyCode" in option
+                      ? formatAccountOptionLabel(option)
+                      : option.label;
                   return (
                     <Pressable
                       key={option.value}
@@ -329,7 +343,7 @@ export function CreateExpenseModal({
                           isSelected ? "text-app-primary font-semibold" : "text-app-textPrimary"
                         }`}
                       >
-                        {option.label}
+                        {optionLabel}
                       </Text>
                       {isSelected ? <AppIcon name="Check" size={14} color="#18C8FF" /> : null}
                     </Pressable>
