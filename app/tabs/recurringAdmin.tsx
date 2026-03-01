@@ -2,26 +2,30 @@ import { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Alert, Pressable, RefreshControl, ScrollView, Text, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 
-import { RecurringAdminFormModal, RecurringAdminFormState } from "../../components/recurringAdmin/RecurringAdminFormModal";
+import { RecurringAdminFormModal } from "../../components/recurringAdmin/RecurringAdminFormModal";
 import { RecurringAdminHeader } from "../../components/recurringAdmin/RecurringAdminHeader";
 import { RecurringAdminItem } from "../../components/recurringAdmin/RecurringAdminItem";
 import {
-  UpsertRecurringTransactionInput,
   createRecurringTransaction,
   deleteRecurringTransaction,
   getRecurringTransactionsList,
   updateRecurringTransaction,
 } from "../../services/recurringTransactions.service";
+import { getAccountsData } from "../../services/account.service";
+import { getCategoriesData } from "../../services/categories.service";
 import { RecurringTransactionApiDTO } from "../../types/api/recurring";
 import { Frequency } from "../../types/enums/frequency";
 import { TransactionType } from "../../types/enums/transactionType";
+import { CreateRecurringTransactionInput, UpdateRecurringTransactionInput } from "../../types/recurring";
+import { AccountOption } from "../../types/account";
+import { CategoryOption } from "../../types/category";
 
-const DEFAULT_FORM: RecurringAdminFormState = {
+const DEFAULT_FORM: CreateRecurringTransactionInput = {
   name: "",
   description: "",
-  amount: "",
-  accountName: "",
-  currencyCode: "USD",
+  amount: 0,
+  accountId: "",
+  categoryId: "",
   startDate: "",
   endDate: "",
   transactionType: TransactionType.Expense,
@@ -38,13 +42,18 @@ function toDateInputValue(value: string): string {
   return parsed.toISOString().slice(0, 10);
 }
 
-function toFormState(transaction: RecurringTransactionApiDTO): RecurringAdminFormState {
+function toFormState(transaction: RecurringTransactionApiDTO): CreateRecurringTransactionInput {
+  const maybeTransactionWithIds = transaction as RecurringTransactionApiDTO & {
+    accountId?: string;
+    categoryId?: string;
+  };
+
   return {
     name: transaction.name || "",
     description: transaction.description || "",
-    amount: String(Math.abs(Number(transaction.amount) || 0)),
-    accountName: transaction.accountName || "",
-    currencyCode: (transaction.currencyCode || "USD").toUpperCase(),
+    amount: Math.abs(Number(transaction.amount) || 0),
+    accountId: maybeTransactionWithIds.accountId || "",
+    categoryId: maybeTransactionWithIds.categoryId || "",
     startDate: toDateInputValue(transaction.startDate),
     endDate: toDateInputValue(transaction.endDate),
     transactionType: Number(transaction.transactionType) as TransactionType,
@@ -52,13 +61,13 @@ function toFormState(transaction: RecurringTransactionApiDTO): RecurringAdminFor
   };
 }
 
-function toUpsertPayload(form: RecurringAdminFormState): UpsertRecurringTransactionInput {
+function toUpsertPayload(form: CreateRecurringTransactionInput): CreateRecurringTransactionInput {
   return {
     name: form.name,
     description: form.description,
-    amount: Number(form.amount),
-    accountName: form.accountName,
-    currencyCode: form.currencyCode,
+    amount: form.amount,
+    accountId: form.accountId,
+    categoryId: form.categoryId,
     startDate: form.startDate,
     endDate: form.endDate,
     transactionType: form.transactionType,
@@ -75,7 +84,9 @@ export default function RecurringAdminScreen() {
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [editingTransactionId, setEditingTransactionId] = useState<string | null>(null);
-  const [form, setForm] = useState<RecurringAdminFormState>(DEFAULT_FORM);
+  const [form, setForm] = useState<CreateRecurringTransactionInput>(DEFAULT_FORM);
+  const [accountOptions, setAccountOptions] = useState<AccountOption[]>([]);
+  const [categoryOptions, setCategoryOptions] = useState<CategoryOption[]>([]);
   const [error, setError] = useState("");
 
   const formMode = useMemo(() => (editingTransactionId ? "edit" : "create"), [editingTransactionId]);
@@ -87,8 +98,14 @@ export default function RecurringAdminScreen() {
       }
 
       setError("");
-      const data = await getRecurringTransactionsList();
-      setTransactions(data);
+      const [recurringTransactions, accountOptions, categoryOptions] = await Promise.all([
+        getRecurringTransactionsList(),
+        getAccountsData(),
+        getCategoriesData(),
+      ]);
+      setTransactions(recurringTransactions);
+      setAccountOptions(accountOptions);
+      setCategoryOptions(categoryOptions);
     } catch (loadError) {
       const message = loadError instanceof Error ? loadError.message : "Failed to load recurring transactions";
       setError(message);
@@ -107,7 +124,11 @@ export default function RecurringAdminScreen() {
 
   function openCreateModal() {
     setEditingTransactionId(null);
-    setForm(DEFAULT_FORM);
+    setForm({
+      ...DEFAULT_FORM,
+      accountId: accountOptions[0]?.value || "",
+      categoryId: categoryOptions[0]?.value || "",
+    });
     setIsFormVisible(true);
   }
 
@@ -131,12 +152,26 @@ export default function RecurringAdminScreen() {
       return;
     }
 
+    if (!form.accountId) {
+      Alert.alert("Validation", "Please select an account.");
+      return;
+    }
+
+    if (!form.categoryId) {
+      Alert.alert("Validation", "Please select a category.");
+      return;
+    }
+
     try {
       setIsSubmitting(true);
       const payload = toUpsertPayload(form);
 
       if (editingTransactionId) {
-        await updateRecurringTransaction(editingTransactionId, payload);
+        const updatePayload: UpdateRecurringTransactionInput = {
+          ...payload,
+          lastGeneratedAt: new Date().toISOString(),
+        };
+        await updateRecurringTransaction(editingTransactionId, updatePayload);
       } else {
         await createRecurringTransaction(payload);
       }
@@ -249,6 +284,8 @@ export default function RecurringAdminScreen() {
         visible={isFormVisible}
         mode={formMode}
         form={form}
+        accountOptions={accountOptions}
+        categoryOptions={categoryOptions}
         isSubmitting={isSubmitting}
         onClose={closeModal}
         onChange={setForm}

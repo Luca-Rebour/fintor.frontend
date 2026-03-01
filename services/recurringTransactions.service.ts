@@ -3,7 +3,7 @@ import {
   RecurringPendingApprovalApiDTO,
   RecurringTransactionApiDTO
 } from "../types/api/recurring";
-import { RecurringTransactionsData } from "../types/recurring";
+import { RecurringTransactionsData, UpdateRecurringTransactionInput, CreateRecurringTransactionInput } from "../types/recurring";
 
 const RECURRING_ENDPOINT_PATH = "/recurring-transactions";
 const RECURRING_PENDING_ACTIONS_PATH = "/pending-approval-transactions";
@@ -11,34 +11,30 @@ const RECURRING_PENDING_ACTIONS_PATH = "/pending-approval-transactions";
 type RecurringTransactionsResponse = RecurringTransactionApiDTO[] | null;
 type PendingApprovalsResponse = RecurringPendingApprovalApiDTO[] | null;
 
-export type UpsertRecurringTransactionInput = Pick<
-  RecurringTransactionApiDTO,
-  | "name"
-  | "amount"
-  | "description"
-  | "transactionType"
-  | "frequency"
-  | "startDate"
-  | "endDate"
-  | "accountName"
-  | "currencyCode"
->;
-
 function toApiDateString(value: string): string {
-  const parsedDate = new Date(value);
+  const trimmedValue = String(value ?? "").trim();
+
+  if (/^\d{4}-\d{2}-\d{2}$/.test(trimmedValue)) {
+    return trimmedValue;
+  }
+
+  const parsedDate = new Date(trimmedValue);
 
   if (Number.isNaN(parsedDate.getTime())) {
     throw new Error("Invalid date format");
   }
 
-  return parsedDate.toISOString();
+  const year = parsedDate.getUTCFullYear();
+  const month = String(parsedDate.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(parsedDate.getUTCDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
 }
 
-function toApiUpsertPayload(input: UpsertRecurringTransactionInput): UpsertRecurringTransactionInput {
+function toApiUpsertPayload(input: CreateRecurringTransactionInput): CreateRecurringTransactionInput {
   const normalizedName = String(input.name ?? "").trim();
   const normalizedDescription = String(input.description ?? "").trim();
-  const normalizedAccountName = String(input.accountName ?? "").trim();
-  const normalizedCurrencyCode = String(input.currencyCode ?? "").trim().toUpperCase();
+  const accountId = input.accountId;
   const normalizedAmount = Number(input.amount);
 
   if (!normalizedName) {
@@ -47,14 +43,6 @@ function toApiUpsertPayload(input: UpsertRecurringTransactionInput): UpsertRecur
 
   if (!normalizedDescription) {
     throw new Error("Description is required");
-  }
-
-  if (!normalizedAccountName) {
-    throw new Error("Account name is required");
-  }
-
-  if (!normalizedCurrencyCode) {
-    throw new Error("Currency code is required");
   }
 
   if (!Number.isFinite(normalizedAmount) || normalizedAmount <= 0) {
@@ -69,8 +57,8 @@ function toApiUpsertPayload(input: UpsertRecurringTransactionInput): UpsertRecur
     frequency: input.frequency,
     startDate: toApiDateString(input.startDate),
     endDate: toApiDateString(input.endDate),
-    accountName: normalizedAccountName,
-    currencyCode: normalizedCurrencyCode,
+    accountId: accountId,
+    categoryId: input.categoryId,
   };
 }
 
@@ -118,15 +106,16 @@ export async function reschedulePendingRecurringApproval(approvalId: string, due
 }
 
 export async function createRecurringTransaction(
-  input: UpsertRecurringTransactionInput,
+  input: CreateRecurringTransactionInput,
 ): Promise<RecurringTransactionApiDTO> {
   const payload = toApiUpsertPayload(input);
+console.log("Creating recurring transaction with payload:", payload);
   return apiPost<RecurringTransactionApiDTO>(RECURRING_ENDPOINT_PATH, payload);
 }
 
 export async function updateRecurringTransaction(
   transactionId: string,
-  input: UpsertRecurringTransactionInput,
+  input: UpdateRecurringTransactionInput,
 ): Promise<RecurringTransactionApiDTO> {
   const normalizedId = String(transactionId ?? "").trim();
 
