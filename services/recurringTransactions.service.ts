@@ -1,8 +1,7 @@
-import { apiGet } from "./api.client";
+import { apiGet, apiPost } from "./api.client";
 import {
   RecurringTransactionApiDTO,
   RecurringPendingApprovalApiDTO,
-  RecurringTransactionsApiResponse,
 } from "../types/api/recurring";
 import { PendingTransactionStatus } from "../types/enums/pendingTransactionStatus";
 import { TransactionType } from "../types/enums/transactionType";
@@ -13,94 +12,12 @@ import {
   RecurringTransactionsData,
 } from "../types/recurring";
 
-const RECURRING_ENDPOINT_PATH = "/transactions/recurring";
+const RECURRING_ENDPOINT_PATH = "/recurring-transactions";
 
-const MOCK_RECURRING_RESPONSE: RecurringTransactionsApiResponse = {
-  pendingApproval: {
-    id: "pending_salary_1",
-    dueDate: "2026-09-30",
-    status: PendingTransactionStatus.Pending,
-    description: "Monthly Salary",
-    transactionType: TransactionType.Income,
-    amount: 4200,
-    categoryName: "Salary",
-    icon: "WalletCards",
-    accountName: "Main Account",
-    currencyCode: "USD",
-  },
-  recurringTransactions: [
-    {
-      id: "subscription_netflix",
-      name: "Netflix Premium",
-      amount: 19.99,
-      description: "Monthly entertainment plan",
-      transactionType: TransactionType.Expense,
-      frequency: 3,
-      startDate: "2026-01-01",
-      endDate: "2030-01-01",
-      lastGeneratedAt: "2026-09-02",
-      nextChargeDate: "2026-10-02",
-      currencyCode: "USD",
-      accountName: "Savings Account",
-    },
-    {
-      id: "subscription_rent",
-      name: "Rent Payment",
-      amount: 1250,
-      description: "Monthly apartment rent",
-      transactionType: TransactionType.Expense,
-      frequency: 3,
-      startDate: "2026-01-01",
-      endDate: "2030-01-01",
-      lastGeneratedAt: "2026-09-05",
-      nextChargeDate: "2026-10-05",
-      currencyCode: "USD",
-      accountName: "Checking Account",
-    },
-    {
-      id: "subscription_energy",
-      name: "Electricity Bill",
-      amount: 84.2,
-      description: "Electricity usage",
-      transactionType: TransactionType.Expense,
-      frequency: 3,
-      startDate: "2026-01-01",
-      endDate: "2030-01-01",
-      lastGeneratedAt: "2026-09-12",
-      nextChargeDate: "2026-10-12",
-      currencyCode: "USD",
-      accountName: "Main Account",
-    },
-    {
-      id: "subscription_spotify",
-      name: "Spotify Family",
-      amount: 15.99,
-      description: "Music subscription",
-      transactionType: TransactionType.Expense,
-      frequency: 3,
-      startDate: "2026-01-01",
-      endDate: "2030-01-01",
-      lastGeneratedAt: "2026-09-15",
-      nextChargeDate: "2026-10-15",
-      currencyCode: "USD",
-      accountName: "Credit Card",
-    },
-    {
-      id: "income_dividends",
-      name: "ETF Dividends",
-      amount: 130,
-      description: "Monthly dividends",
-      transactionType: TransactionType.Income,
-      frequency: 3,
-      startDate: "2026-01-01",
-      endDate: "2030-01-01",
-      lastGeneratedAt: "2026-09-03",
-      nextChargeDate: "2026-10-03",
-      currencyCode: "USD",
-      accountName: "Broker Account",
-    },
-  ],
-};
+const RECURRING_PENDING_ACTIONS_PATH = `/pending-approval-transactions`;
+
+type RecurringTransactionsResponse = RecurringTransactionApiDTO[] | null;
+type PendingApprovalsResponse = RecurringPendingApprovalApiDTO[] | null;
 
 function normalizeTransactionType(value: TransactionType | number | unknown): RecurringTransactionType {
   const parsed = Number(value);
@@ -124,7 +41,7 @@ function normalizeCurrencyCode(value: unknown): string {
 function normalizeDate(value: unknown): string {
   const parsedDate = String(value ?? "").trim();
 
-  if (!parsedDate) {
+  if (!parsedDate || parsedDate.startsWith("0001-01-01")) {
     return new Date().toISOString();
   }
 
@@ -182,21 +99,67 @@ function normalizeSubscription(dto: RecurringTransactionApiDTO): RecurringSubscr
   };
 }
 
-function mapRecurringResponse(response: RecurringTransactionsApiResponse): RecurringTransactionsData {
-  const pendingApprovalRaw = response.pendingApproval ?? null;
-  const subscriptionsRaw = response.recurringTransactions ?? [];
+function pickPendingApproval(
+  pendingApprovals: RecurringPendingApprovalApiDTO[],
+): RecurringPendingApprovalApiDTO | null {
+  const pendingOnly = pendingApprovals.filter(
+    (approval) => approval.status === PendingTransactionStatus.Pending,
+  );
+
+  if (!pendingOnly.length) {
+    return null;
+  }
+
+  return [...pendingOnly].sort(
+    (left, right) => +new Date(left.dueDate) - +new Date(right.dueDate),
+  )[0];
+}
+
+function mapRecurringResponse(
+  recurringTransactionsResponse: RecurringTransactionsResponse,
+  pendingApprovalsResponse: PendingApprovalsResponse,
+): RecurringTransactionsData {
+  const subscriptionsRaw = Array.isArray(recurringTransactionsResponse)
+    ? recurringTransactionsResponse
+    : [];
+  const pendingApprovalsRaw = Array.isArray(pendingApprovalsResponse)
+    ? pendingApprovalsResponse
+    : [];
+  const pendingApprovalRaw = pickPendingApproval(pendingApprovalsRaw);
 
   return {
     pendingApproval: pendingApprovalRaw ? normalizePendingApproval(pendingApprovalRaw) : null,
-    subscriptions: Array.isArray(subscriptionsRaw) ? subscriptionsRaw.map(normalizeSubscription) : [],
+    subscriptions: subscriptionsRaw.map(normalizeSubscription),
   };
 }
 
 export async function getRecurringTransactionsData(): Promise<RecurringTransactionsData> {
-  try {
-    const response = await apiGet<RecurringTransactionsApiResponse>(RECURRING_ENDPOINT_PATH);
-    return mapRecurringResponse(response);
-  } catch {
-    return mapRecurringResponse(MOCK_RECURRING_RESPONSE);
+  const [recurringTransactionsResponse, pendingApprovalsResponse] = await Promise.all([
+    apiGet<RecurringTransactionsResponse>(RECURRING_ENDPOINT_PATH),
+    apiGet<PendingApprovalsResponse>(RECURRING_PENDING_ACTIONS_PATH),
+  ]);
+
+  return mapRecurringResponse(recurringTransactionsResponse, pendingApprovalsResponse);
+}
+
+function ensurePendingApprovalId(approvalId: string): string {
+  const normalizedId = String(approvalId ?? "").trim();
+
+  if (!normalizedId) {
+    throw new Error("Pending approval id is required");
   }
+
+  return encodeURIComponent(normalizedId);
+}
+
+export async function confirmPendingRecurringApproval(approvalId: string): Promise<void> {
+  const encodedId = ensurePendingApprovalId(approvalId);
+  await apiPost<unknown>(`${RECURRING_PENDING_ACTIONS_PATH}/${encodedId}/confirm`, {});
+}
+
+export async function reschedulePendingRecurringApproval(approvalId: string, dueDate: string): Promise<void> {
+  const encodedId = ensurePendingApprovalId(approvalId);
+  await apiPost<unknown>(`${RECURRING_PENDING_ACTIONS_PATH}/${encodedId}/reschedule`, {
+    dueDate,
+  });
 }
