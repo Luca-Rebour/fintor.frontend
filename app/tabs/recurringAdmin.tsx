@@ -179,7 +179,6 @@ export default function RecurringAdminScreen() {
       await loadRecurringList(false);
       setIsFormVisible(false);
       setEditingTransactionId(null);
-      Alert.alert("Recurring updated", "Changes were saved successfully.");
     } catch (submitError) {
       const message = submitError instanceof Error ? submitError.message : "Could not save recurring transaction";
       Alert.alert("Error", message);

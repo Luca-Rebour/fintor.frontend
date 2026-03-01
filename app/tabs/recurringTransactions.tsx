@@ -145,7 +145,6 @@ export default function RecurringTransactionsScreen() {
 			setIsSubmittingAction(true);
 			await confirmPendingRecurringApproval(approval.id, approval.currencyCode);
 			await loadRecurringTransactions(false);
-			Alert.alert("Recurring updated", `${approval.description} was confirmed successfully.`);
 		} catch (actionError) {
 			const message = actionError instanceof Error ? actionError.message : "Could not confirm recurring transaction";
 			Alert.alert("Error", message);
@@ -185,7 +184,6 @@ export default function RecurringTransactionsScreen() {
 				toDateOnlyString(selectedDateStart),
 			);
 			await loadRecurringTransactions(false);
-			Alert.alert("Recurring updated", `${rescheduleApproval.description} was rescheduled successfully.`);
 			setRescheduleApproval(null);
 		} catch (actionError) {
 			const message = actionError instanceof Error ? actionError.message : "Could not reschedule recurring transaction";
@@ -236,7 +234,6 @@ export default function RecurringTransactionsScreen() {
 							setIsSubmittingAction(true);
 							await cancelPendingRecurringApproval(approval.id);
 							await loadRecurringTransactions(false);
-							Alert.alert("Recurring updated", `${approval.description} was cancelled successfully.`);
 						} catch (actionError) {
 							const message =
 								actionError instanceof Error ? actionError.message : "Could not cancel recurring transaction";

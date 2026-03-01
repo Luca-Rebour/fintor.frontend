@@ -137,6 +137,8 @@ export async function reschedulePendingRecurringApproval(approvalId: string, due
 
 export async function cancelPendingRecurringApproval(approvalId: string): Promise<void> {
   const encodedId = ensurePendingApprovalId(approvalId);
+  console.log(approvalId);
+  
   await apiPost<unknown>(`${RECURRING_PENDING_ACTIONS_PATH}/${encodedId}/cancel`, {});
 }
 
