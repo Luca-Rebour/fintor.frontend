@@ -397,9 +397,36 @@ export default function TransactionsScreen() {
     await addNewTransaction(toCreate);
   }
 
-  async function handleCreateAccount(payload: CreateAccountDTO) {
+  async function handleCreateAccount(payload: Omit<CreateAccountDTO, "exchangeRate">) {
     try {
-      await createAccount(payload);
+      const normalizedInitialBalance = Number(payload.initialBalance);
+
+      if (!Number.isFinite(normalizedInitialBalance)) {
+        Alert.alert("Error", "El saldo inicial no es válido.");
+        return;
+      }
+
+      const accountCurrencyCode = payload.currencyCode.trim().toUpperCase() || "USD";
+      const userBaseCurrencyCode = getUserBaseCurrencyCode(authUser);
+
+      let exchangeRate = 1;
+      if (accountCurrencyCode !== userBaseCurrencyCode) {
+        const resolvedRate = await getExchangeRateForCurrencies(accountCurrencyCode, userBaseCurrencyCode);
+
+        if (resolvedRate === null) {
+          Alert.alert("Error", "No se pudo obtener el tipo de cambio para crear la cuenta.");
+          return;
+        }
+
+        exchangeRate = resolvedRate;
+      }
+
+      await createAccount({
+        ...payload,
+        initialBalance: normalizedInitialBalance,
+        currencyCode: accountCurrencyCode,
+        exchangeRate,
+      });
       await loadAccounts();
       setSelectedAccountValue(ALL_ACCOUNTS_VALUE);
     } catch (createError) {
