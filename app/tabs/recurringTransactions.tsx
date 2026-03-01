@@ -2,6 +2,8 @@ import { useMemo, useEffect, useState } from "react";
 import {
 	ActivityIndicator,
 	Alert,
+	Modal,
+	Platform,
 	Pressable,
 	RefreshControl,
 	ScrollView,
@@ -9,6 +11,7 @@ import {
 	View,
 } from "react-native";
 import { useRouter } from "expo-router";
+import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 
 import { AddRecurringTransactionCard } from "../../components/recurring/AddRecurringTransactionCard";
 import { PendingApprovalCard } from "../../components/recurring/PendingApprovalCard";
@@ -16,6 +19,7 @@ import { RecurringHeader } from "../../components/recurring/RecurringHeader";
 import { RecurringTransactionItem } from "../../components/recurring/RecurringTransactionItem";
 import { RecurringTypeToggle } from "../../components/recurring/RecurringTypeToggle";
 import {
+	cancelPendingRecurringApproval,
 	confirmPendingRecurringApproval,
 	getRecurringTransactionsData,
 	reschedulePendingRecurringApproval,
@@ -63,6 +67,36 @@ function isPendingStatus(value: unknown): boolean {
 	return false;
 }
 
+function isRescheduledStatus(value: unknown): boolean {
+	if (typeof value === "number") {
+		return value === PendingTransactionStatus.Rescheduled;
+	}
+
+	if (typeof value === "string") {
+		const normalized = value.trim().toLowerCase();
+		return normalized === "rescheduled" || normalized === String(PendingTransactionStatus.Rescheduled);
+	}
+
+	return false;
+}
+
+function toDateOnlyString(date: Date): string {
+	const year = date.getFullYear();
+	const month = String(date.getMonth() + 1).padStart(2, "0");
+	const day = String(date.getDate()).padStart(2, "0");
+	return `${year}-${month}-${day}`;
+}
+
+function getStartOfDay(date: Date): Date {
+	return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+function getTomorrowStartDate(): Date {
+	const todayStart = getStartOfDay(new Date());
+	todayStart.setDate(todayStart.getDate() + 1);
+	return todayStart;
+}
+
 export default function RecurringTransactionsScreen() {
 	const router = useRouter();
 	const [recurringData, setRecurringData] = useState<RecurringTransactionsData | null>(null);
@@ -71,6 +105,11 @@ export default function RecurringTransactionsScreen() {
 	const [isRefreshing, setIsRefreshing] = useState(false);
 	const [isSubmittingAction, setIsSubmittingAction] = useState(false);
 	const [error, setError] = useState("");
+	const [isPendingExpanded, setIsPendingExpanded] = useState(true);
+	const [isRescheduledExpanded, setIsRescheduledExpanded] = useState(false);
+	const [rescheduleApproval, setRescheduleApproval] = useState<RecurringPendingApprovalApiDTO | null>(null);
+	const [rescheduleDate, setRescheduleDate] = useState(new Date());
+	const minimumRescheduleDate = getTomorrowStartDate();
 
 	async function loadRecurringTransactions(showInitialLoader = true) {
 		try {
@@ -115,24 +154,100 @@ export default function RecurringTransactionsScreen() {
 		}
 	}
 
-	async function handleRescheduleApproval(approval: RecurringPendingApprovalApiDTO) {
+	function handleRescheduleApproval(approval: RecurringPendingApprovalApiDTO) {
+		const dueDate = getStartOfDay(new Date(approval.dueDate));
+		const initialDate = dueDate < minimumRescheduleDate ? minimumRescheduleDate : dueDate;
+
+		setRescheduleApproval(approval);
+		setRescheduleDate(initialDate);
+	}
+
+	async function submitRescheduleApproval() {
+		if (!rescheduleApproval || isSubmittingAction) {
+			return;
+		}
+
 		if (isSubmittingAction) {
 			return;
 		}
 
 		try {
+			const selectedDateStart = getStartOfDay(rescheduleDate);
+
+			if (selectedDateStart < minimumRescheduleDate) {
+				Alert.alert("Invalid date", "Please select a date after today.");
+				return;
+			}
+
 			setIsSubmittingAction(true);
-			const nextDay = new Date(approval.dueDate);
-			nextDay.setDate(nextDay.getDate() + 1);
-			await reschedulePendingRecurringApproval(approval.id, nextDay.toISOString());
+			await reschedulePendingRecurringApproval(
+				rescheduleApproval.id,
+				toDateOnlyString(selectedDateStart),
+			);
 			await loadRecurringTransactions(false);
-			Alert.alert("Recurring updated", `${approval.description} was rescheduled successfully.`);
+			Alert.alert("Recurring updated", `${rescheduleApproval.description} was rescheduled successfully.`);
+			setRescheduleApproval(null);
 		} catch (actionError) {
 			const message = actionError instanceof Error ? actionError.message : "Could not reschedule recurring transaction";
 			Alert.alert("Error", message);
 		} finally {
 			setIsSubmittingAction(false);
 		}
+	}
+
+	function handleRescheduleDateChange(event: DateTimePickerEvent, selectedDate?: Date) {
+		if (event.type === "dismissed") {
+			if (Platform.OS !== "ios") {
+				setRescheduleApproval(null);
+			}
+			return;
+		}
+
+		if (!selectedDate) {
+			return;
+		}
+
+		const selectedDateStart = getStartOfDay(selectedDate);
+		const nextDate = selectedDateStart < minimumRescheduleDate ? minimumRescheduleDate : selectedDateStart;
+
+		if (Platform.OS === "ios") {
+			setRescheduleDate(nextDate);
+			return;
+		}
+
+		setRescheduleDate(nextDate);
+	}
+
+	function handleCancelApproval(approval: RecurringPendingApprovalApiDTO) {
+		Alert.alert(
+			"Cancel transaction",
+			`Are you sure you want to cancel ${approval.description}?`,
+			[
+				{ text: "Keep", style: "cancel" },
+				{
+					text: "Cancel transaction",
+					style: "destructive",
+					onPress: async () => {
+						if (isSubmittingAction) {
+							return;
+						}
+
+						try {
+							setIsSubmittingAction(true);
+							await cancelPendingRecurringApproval(approval.id);
+							await loadRecurringTransactions(false);
+							Alert.alert("Recurring updated", `${approval.description} was cancelled successfully.`);
+						} catch (actionError) {
+							const message =
+								actionError instanceof Error ? actionError.message : "Could not cancel recurring transaction";
+							Alert.alert("Error", message);
+						} finally {
+							setIsSubmittingAction(false);
+						}
+					},
+				},
+			],
+		);
 	}
 
 	function handlePressRecurringTransaction(recurringTransaction: RecurringTransactionApiDTO) {
@@ -166,6 +281,22 @@ export default function RecurringTransactionsScreen() {
 		);
 
 		return [...pendingByType].sort(
+			(left, right) => +new Date(left.dueDate) - +new Date(right.dueDate),
+		);
+	}, [recurringData, selectedType]);
+
+	const rescheduledApprovalsForType = useMemo(() => {
+		if (!recurringData?.pendingApprovals.length) {
+			return [];
+		}
+
+		const rescheduledByType = recurringData.pendingApprovals.filter(
+			(approval) =>
+				resolveTransactionType(approval.transactionType) === selectedType &&
+				isRescheduledStatus(approval.status),
+		);
+
+		return [...rescheduledByType].sort(
 			(left, right) => +new Date(left.dueDate) - +new Date(right.dueDate),
 		);
 	}, [recurringData, selectedType]);
@@ -226,16 +357,61 @@ export default function RecurringTransactionsScreen() {
 			>
 				<RecurringTypeToggle value={selectedType} onChange={setSelectedType} />
 
-				{pendingApprovalsForType.length
-					? pendingApprovalsForType.map((approval) => (
-							<PendingApprovalCard
-								key={approval.id}
-								approval={approval}
-								onConfirm={handleConfirmApproval}
-								onReschedule={handleRescheduleApproval}
-							/>
-						))
-					: null}
+				{pendingApprovalsForType.length ? (
+					<View className="mb-6 rounded-2xl border border-[#1E2A47] bg-[#111C33]">
+						<Pressable
+							onPress={() => setIsPendingExpanded((previous) => !previous)}
+							className="flex-row items-center justify-between px-4 py-3"
+						>
+							<Text className="text-xs font-semibold tracking-widest text-[#94A3B8]">
+								PENDING ({pendingApprovalsForType.length})
+							</Text>
+							<Text className="text-sm font-semibold text-[#18C8FF]">
+								{isPendingExpanded ? "Hide" : "Show"}
+							</Text>
+						</Pressable>
+
+						{isPendingExpanded
+							? pendingApprovalsForType.map((approval) => (
+									<PendingApprovalCard
+										key={approval.id}
+										approval={approval}
+										onConfirm={handleConfirmApproval}
+										onReschedule={handleRescheduleApproval}
+										onCancel={handleCancelApproval}
+									/>
+								))
+							: null}
+					</View>
+				) : null}
+
+				{rescheduledApprovalsForType.length ? (
+					<View className="mb-6 rounded-2xl border border-[#1E2A47] bg-[#111C33]">
+						<Pressable
+							onPress={() => setIsRescheduledExpanded((previous) => !previous)}
+							className="flex-row items-center justify-between px-4 py-3"
+						>
+							<Text className="text-xs font-semibold tracking-widest text-[#94A3B8]">
+								RESCHEDULED ({rescheduledApprovalsForType.length})
+							</Text>
+							<Text className="text-sm font-semibold text-[#18C8FF]">
+								{isRescheduledExpanded ? "Hide" : "Show"}
+							</Text>
+						</Pressable>
+
+						{isRescheduledExpanded
+							? rescheduledApprovalsForType.map((approval) => (
+									<PendingApprovalCard
+										key={approval.id}
+										approval={approval}
+										onConfirm={handleConfirmApproval}
+										onReschedule={handleRescheduleApproval}
+										onCancel={handleCancelApproval}
+									/>
+								))
+							: null}
+					</View>
+				) : null}
 
 				<View className="mb-3 mt-1 flex-row items-center justify-between">
 					<Text className="text-xs font-semibold tracking-widest text-[#94A3B8]">
@@ -264,6 +440,52 @@ export default function RecurringTransactionsScreen() {
 
 				<AddRecurringTransactionCard onPress={handleAddRecurringTransaction} />
 			</ScrollView>
+
+			<Modal
+				visible={!!rescheduleApproval}
+				transparent
+				animationType="fade"
+				onRequestClose={() => setRescheduleApproval(null)}
+			>
+				<View className="flex-1 justify-end bg-[#060F24]/70">
+					<Pressable className="flex-1" onPress={() => setRescheduleApproval(null)} />
+
+					<View className="rounded-t-3xl border border-[#1E2A47] bg-[#060F24] px-4 pb-6 pt-4">
+						<Text className="mb-1 text-base font-bold text-app-textPrimary">Reschedule transaction</Text>
+						<Text className="mb-3 text-sm text-[#94A3B8]">
+							Choose a new date for {rescheduleApproval?.description ?? "this transaction"}.
+						</Text>
+
+						<DateTimePicker
+							value={rescheduleDate}
+							mode="date"
+							display={Platform.OS === "ios" ? "spinner" : "default"}
+							minimumDate={minimumRescheduleDate}
+							onChange={handleRescheduleDateChange}
+						/>
+
+						<View className="mt-4 flex-row gap-3">
+							<Pressable
+								onPress={() => setRescheduleApproval(null)}
+								disabled={isSubmittingAction}
+								className="flex-1 rounded-2xl border border-[#334155] bg-[#1A243B] px-4 py-3"
+							>
+								<Text className="text-center text-sm font-semibold text-[#94A3B8]">Cancel</Text>
+							</Pressable>
+
+							<Pressable
+								onPress={submitRescheduleApproval}
+								disabled={isSubmittingAction}
+								className="flex-1 rounded-2xl bg-[#1D4ED8] px-4 py-3"
+							>
+								<Text className="text-center text-sm font-semibold text-white">
+									{isSubmittingAction ? "Saving..." : "Save date"}
+								</Text>
+							</Pressable>
+						</View>
+					</View>
+				</View>
+			</Modal>
 		</View>
 	);
 }
