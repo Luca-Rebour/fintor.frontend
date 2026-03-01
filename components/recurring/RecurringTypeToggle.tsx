@@ -1,19 +1,19 @@
 import { Pressable, Text, View } from "react-native";
-import { RecurringTransactionType } from "../../types/recurring";
+import { TransactionType } from "../../types/enums/transactionType";
 
 type RecurringTypeToggleProps = {
-  value: RecurringTransactionType;
-  onChange: (transactionType: RecurringTransactionType) => void;
+  value: TransactionType;
+  onChange: (transactionType: TransactionType) => void;
 };
 
 type ToggleOption = {
-  value: RecurringTransactionType;
+  value: TransactionType;
   label: string;
 };
 
 const OPTIONS: ToggleOption[] = [
-  { value: "income", label: "Income" },
-  { value: "expense", label: "Expenses" },
+  { value: TransactionType.Income, label: "Income" },
+  { value: TransactionType.Expense, label: "Expenses" },
 ];
 
 export function RecurringTypeToggle({ value, onChange }: RecurringTypeToggleProps) {

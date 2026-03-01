@@ -28,4 +28,5 @@ export type RecurringTransactionApiDTO = {
   nextChargeDate: string;
   currencyCode: string;
   accountName: string;
+  icon: string;
 };

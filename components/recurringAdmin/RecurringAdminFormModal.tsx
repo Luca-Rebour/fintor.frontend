@@ -1,6 +1,6 @@
 import { Modal, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { Frequency } from "../../types/enums/frequency";
-import { RecurringTransactionType } from "../../types/recurring";
+import { TransactionType } from "../../types/enums/transactionType";
 
 export type RecurringAdminFormState = {
   name: string;
@@ -10,7 +10,7 @@ export type RecurringAdminFormState = {
   currencyCode: string;
   startDate: string;
   endDate: string;
-  transactionType: RecurringTransactionType;
+  transactionType: TransactionType;
   frequency: Frequency;
 };
 
@@ -106,14 +106,14 @@ export function RecurringAdminFormModal({
 
             <View className="mt-4 flex-row gap-3">
               <Pressable
-                onPress={() => onChange({ ...form, transactionType: "income" })}
+                onPress={() => onChange({ ...form, transactionType: TransactionType.Income })}
                 className={`flex-1 rounded-xl px-3 py-3 ${
-                  form.transactionType === "income" ? "bg-[#18C8FF]" : "bg-[#111C33]"
+                  form.transactionType === TransactionType.Income ? "bg-[#18C8FF]" : "bg-[#111C33]"
                 }`}
               >
                 <Text
                   className={`text-center text-sm font-semibold ${
-                    form.transactionType === "income" ? "text-[#060F24]" : "text-[#94A3B8]"
+                    form.transactionType === TransactionType.Income ? "text-[#060F24]" : "text-[#94A3B8]"
                   }`}
                 >
                   Income
@@ -121,14 +121,14 @@ export function RecurringAdminFormModal({
               </Pressable>
 
               <Pressable
-                onPress={() => onChange({ ...form, transactionType: "expense" })}
+                onPress={() => onChange({ ...form, transactionType: TransactionType.Expense })}
                 className={`flex-1 rounded-xl px-3 py-3 ${
-                  form.transactionType === "expense" ? "bg-[#1D4ED8]" : "bg-[#111C33]"
+                  form.transactionType === TransactionType.Expense ? "bg-[#1D4ED8]" : "bg-[#111C33]"
                 }`}
               >
                 <Text
                   className={`text-center text-sm font-semibold ${
-                    form.transactionType === "expense" ? "text-white" : "text-[#94A3B8]"
+                    form.transactionType === TransactionType.Expense ? "text-white" : "text-[#94A3B8]"
                   }`}
                 >
                   Expense

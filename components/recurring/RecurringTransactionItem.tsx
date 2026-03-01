@@ -1,19 +1,20 @@
 import { Pressable, Text, View } from "react-native";
 import { AppIcon } from "../shared/AppIcon";
-import { RecurringTransaction } from "../../types/recurring";
+import { RecurringTransactionApiDTO } from "../../types/api/recurring";
+import { TransactionType } from "../../types/enums/transactionType";
 
 type RecurringTransactionItemProps = {
-  recurringTransaction: RecurringTransaction;
-  onPress?: (recurringTransaction: RecurringTransaction) => void;
+  recurringTransaction: RecurringTransactionApiDTO;
+  onPress?: (recurringTransaction: RecurringTransactionApiDTO) => void;
 };
 
-function formatAmount(amount: number, currencyCode: string, transactionType: RecurringTransaction["transactionType"]) {
-  const prefix = transactionType === "expense" ? "-" : "+";
+function formatAmount(amount: number, currencyCode: string, transactionType: TransactionType) {
+  const prefix = transactionType === TransactionType.Expense ? "-" : "+";
   const value = new Intl.NumberFormat("en-US", {
     style: "currency",
-    currency: currencyCode,
+    currency: currencyCode || "USD",
     minimumFractionDigits: 2,
-  }).format(amount);
+  }).format(Number(amount) || 0);
 
   return `${prefix}${value}`;
 }
@@ -26,7 +27,7 @@ function formatChargeDate(dateInput: string) {
 }
 
 export function RecurringTransactionItem({ recurringTransaction, onPress }: RecurringTransactionItemProps) {
-  const isExpense = recurringTransaction.transactionType === "expense";
+  const isExpense = Number(recurringTransaction.transactionType) === TransactionType.Expense;
 
   return (
     <Pressable
