@@ -12,6 +12,49 @@ const RECURRING_PENDING_ACTIONS_PATH = "/pending-approval-transactions";
 
 type RecurringTransactionsResponse = RecurringTransactionApiDTO[] | null;
 type PendingApprovalsResponse = RecurringPendingApprovalApiDTO[] | null;
+type RecurringTransactionsObserver = (data: RecurringTransactionsData) => void;
+
+let recurringTransactionsStore: RecurringTransactionsData = {
+  recurringTransactions: [],
+  pendingApprovals: [],
+};
+
+const recurringTransactionsObservers = new Set<RecurringTransactionsObserver>();
+
+function toRecurringSnapshot(data: RecurringTransactionsData): RecurringTransactionsData {
+  return {
+    recurringTransactions: [...data.recurringTransactions],
+    pendingApprovals: [...data.pendingApprovals],
+  };
+}
+
+function notifyRecurringTransactionsObservers() {
+  const snapshot = toRecurringSnapshot(recurringTransactionsStore);
+
+  for (const observer of recurringTransactionsObservers) {
+    observer(snapshot);
+  }
+}
+
+function setRecurringTransactionsStore(data: RecurringTransactionsData) {
+  recurringTransactionsStore = toRecurringSnapshot(data);
+  notifyRecurringTransactionsObservers();
+}
+
+export function subscribeToRecurringTransactions(
+  observer: RecurringTransactionsObserver,
+): () => void {
+  recurringTransactionsObservers.add(observer);
+  observer(toRecurringSnapshot(recurringTransactionsStore));
+
+  return () => {
+    recurringTransactionsObservers.delete(observer);
+  };
+}
+
+export function getRecurringTransactionsSnapshot(): RecurringTransactionsData {
+  return toRecurringSnapshot(recurringTransactionsStore);
+}
 
 function toApiDateString(value: string): string {
   const trimmedValue = String(value ?? "").trim();
@@ -70,7 +113,7 @@ export async function getRecurringTransactionsData(): Promise<RecurringTransacti
     apiGet<PendingApprovalsResponse>(RECURRING_PENDING_ACTIONS_PATH),
   ]);
 
-  return {
+  const data: RecurringTransactionsData = {
     recurringTransactions: Array.isArray(recurringTransactionsResponse)
       ? recurringTransactionsResponse
       : [],
@@ -78,10 +121,23 @@ export async function getRecurringTransactionsData(): Promise<RecurringTransacti
       ? pendingApprovalsResponse
       : [],
   };
+
+  setRecurringTransactionsStore(data);
+
+  return toRecurringSnapshot(data);
+}
+
+export async function refreshRecurringTransactionsData(): Promise<RecurringTransactionsData> {
+  return getRecurringTransactionsData();
 }
 
 export async function getRecurringTransactionsList(): Promise<RecurringTransactionApiDTO[]> {
   const response = await apiGet<RecurringTransactionsResponse>(RECURRING_ENDPOINT_PATH);
+  return Array.isArray(response) ? response : [];
+}
+
+export async function getPendingRecurringApprovalsList(): Promise<RecurringPendingApprovalApiDTO[]> {
+  const response = await apiGet<PendingApprovalsResponse>(RECURRING_PENDING_ACTIONS_PATH);
   return Array.isArray(response) ? response : [];
 }
 
@@ -125,6 +181,7 @@ export async function confirmPendingRecurringApproval(approvalId: string, source
   const exchangeRate = await getExchangeRateForCurrencies(sourceCurrency, baseCurrencyCode);
 
   await apiPost<unknown>(`${RECURRING_PENDING_ACTIONS_PATH}/${encodedId}/approve`, exchangeRate ?? null);
+  await refreshRecurringTransactionsData();
 }
 
 export async function reschedulePendingRecurringApproval(approvalId: string, dueDate: string): Promise<void> {
@@ -133,20 +190,22 @@ export async function reschedulePendingRecurringApproval(approvalId: string, due
     `${RECURRING_PENDING_ACTIONS_PATH}/${encodedId}/reschedule`,
     toApiDateString(dueDate),
   );
+  await refreshRecurringTransactionsData();
 }
 
 export async function cancelPendingRecurringApproval(approvalId: string): Promise<void> {
   const encodedId = ensurePendingApprovalId(approvalId);
-  console.log(approvalId);
-  
   await apiPost<unknown>(`${RECURRING_PENDING_ACTIONS_PATH}/${encodedId}/cancel`, {});
+  await refreshRecurringTransactionsData();
 }
 
 export async function createRecurringTransaction(
   input: CreateRecurringTransactionInput,
 ): Promise<RecurringTransactionApiDTO> {
   const payload = toApiUpsertPayload(input);
-  return apiPost<RecurringTransactionApiDTO>(RECURRING_ENDPOINT_PATH, payload);
+  const created = await apiPost<RecurringTransactionApiDTO>(RECURRING_ENDPOINT_PATH, payload);
+  await refreshRecurringTransactionsData();
+  return created;
 }
 
 export async function updateRecurringTransaction(
@@ -160,10 +219,12 @@ export async function updateRecurringTransaction(
   }
 
   const payload = toApiUpsertPayload(input);
-  return apiPut<RecurringTransactionApiDTO>(
+  const updated = await apiPut<RecurringTransactionApiDTO>(
     `${RECURRING_ENDPOINT_PATH}/${encodeURIComponent(normalizedId)}`,
     payload,
   );
+  await refreshRecurringTransactionsData();
+  return updated;
 }
 
 export async function deleteRecurringTransaction(transactionId: string): Promise<void> {
@@ -172,6 +233,7 @@ export async function deleteRecurringTransaction(transactionId: string): Promise
   if (!normalizedId) {
     throw new Error("Recurring transaction id is required");
   }
-
+  
   await apiDelete<unknown>(`${RECURRING_ENDPOINT_PATH}/${encodeURIComponent(normalizedId)}`);
+  await refreshRecurringTransactionsData();
 }

@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { ActivityIndicator, RefreshControl, ScrollView, Text, View } from "react-native";
+import { useEffect, useMemo, useState } from "react";
+import { ActivityIndicator, Alert, RefreshControl, ScrollView, Text, View } from "react-native";
 
 import { CashFlowSection } from "../../components/home/CashFlowSection";
 import { DashboardHeader } from "../../components/home/DashboardHeader";
@@ -8,14 +8,38 @@ import { NetWorthSection } from "../../components/home/ExpenseByCategoryChart";
 import { PendingIncomeCard } from "../../components/home/PendingIncomeCard";
 import { getAuthUserSnapshot, subscribeToAuthUser } from "../../services/auth.service";
 import { getDashboardData } from "../../services/dashboard.service";
+import {
+	confirmPendingRecurringApproval,
+	getRecurringTransactionsSnapshot,
+	refreshRecurringTransactionsData,
+	subscribeToRecurringTransactions,
+} from "../../services/recurringTransactions.service";
 import { DashboardData } from "../../types/dashboard";
 import { User } from "../../types/api/signUp";
+import { RecurringPendingApprovalApiDTO } from "../../types/api/recurring";
+import { RecurringTransactionsData } from "../../types/recurring";
+import { PendingTransactionStatus } from "../../types/enums/pendingTransactionStatus";
+
+function isPendingStatus(value: unknown): boolean {
+	if (typeof value === "number") {
+		return value === PendingTransactionStatus.Pending;
+	}
+
+	if (typeof value === "string") {
+		const normalized = value.trim().toLowerCase();
+		return normalized === "pending" || normalized === String(PendingTransactionStatus.Pending);
+	}
+
+	return false;
+}
 
 export default function HomeScreen() {
 	const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
+	const [recurringData, setRecurringData] = useState<RecurringTransactionsData>(getRecurringTransactionsSnapshot());
 	const [authUser, setAuthUser] = useState<User | null>(getAuthUserSnapshot());
 	const [isLoading, setIsLoading] = useState(true);
 	const [isRefreshing, setIsRefreshing] = useState(false);
+	const [isConfirmingPending, setIsConfirmingPending] = useState(false);
 	const [chartRefreshKey, setChartRefreshKey] = useState(0);
 	const [error, setError] = useState("");
 
@@ -25,7 +49,10 @@ export default function HomeScreen() {
 				setIsLoading(true);
 			}
 			setError("");
-			const data = await getDashboardData();
+			const [data] = await Promise.all([
+				getDashboardData(),
+				refreshRecurringTransactionsData(),
+			]);
 			setDashboardData(data);
 		} catch (loadError) {
 			const message = loadError instanceof Error ? loadError.message : "Failed to load dashboard";
@@ -44,15 +71,47 @@ export default function HomeScreen() {
 		setIsRefreshing(false);
 	}
 
+	async function handleConfirmPendingTransaction(pendingTransaction: RecurringPendingApprovalApiDTO) {
+		if (isConfirmingPending) {
+			return;
+		}
+
+		try {
+			setIsConfirmingPending(true);
+			await confirmPendingRecurringApproval(pendingTransaction.id, pendingTransaction.currencyCode);
+			await loadDashboard(false);
+		} catch (confirmError) {
+			const message = confirmError instanceof Error ? confirmError.message : "Could not confirm pending transaction";
+			Alert.alert("Error", message);
+		} finally {
+			setIsConfirmingPending(false);
+		}
+	}
+
 	useEffect(() => {
-		const unsubscribe = subscribeToAuthUser((user) => {
+		const unsubscribeAuth = subscribeToAuthUser((user) => {
 			setAuthUser(user);
+		});
+
+		const unsubscribeRecurring = subscribeToRecurringTransactions((data) => {
+			setRecurringData(data);
 		});
 
 		loadDashboard();
 
-		return unsubscribe;
+		return () => {
+			unsubscribeAuth();
+			unsubscribeRecurring();
+		};
 	}, []);
+
+	const pendingTransactions = useMemo(
+		() =>
+			recurringData.pendingApprovals
+				.filter((pendingApproval) => isPendingStatus(pendingApproval.status))
+				.sort((left, right) => +new Date(left.dueDate) - +new Date(right.dueDate)),
+		[recurringData],
+	);
 
 	const userDisplayName = `${authUser?.name ?? ""} ${authUser?.lastName ?? ""}`.trim() || dashboardData?.userName || "";
 
@@ -91,8 +150,9 @@ export default function HomeScreen() {
 				<NetWorthSection refreshKey={chartRefreshKey} />
 
 				<PendingIncomeCard
-					amount={dashboardData.pendingIncomeAmount}
-					source={dashboardData.pendingIncomeSource}
+					pendingTransactions={pendingTransactions}
+					onConfirm={handleConfirmPendingTransaction}
+					isSubmitting={isConfirmingPending}
 				/>
 
 				<CashFlowSection metrics={dashboardData.cashFlow} />

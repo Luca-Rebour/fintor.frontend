@@ -21,8 +21,10 @@ import { RecurringTypeToggle } from "../../components/recurring/RecurringTypeTog
 import {
 	cancelPendingRecurringApproval,
 	confirmPendingRecurringApproval,
-	getRecurringTransactionsData,
+	getRecurringTransactionsSnapshot,
+	refreshRecurringTransactionsData,
 	reschedulePendingRecurringApproval,
+	subscribeToRecurringTransactions,
 } from "../../services/recurringTransactions.service";
 import { RecurringTransactionsData } from "../../types/recurring";
 import { RecurringPendingApprovalApiDTO, RecurringTransactionApiDTO } from "../../types/api/recurring";
@@ -99,7 +101,7 @@ function getTomorrowStartDate(): Date {
 
 export default function RecurringTransactionsScreen() {
 	const router = useRouter();
-	const [recurringData, setRecurringData] = useState<RecurringTransactionsData | null>(null);
+	const [recurringData, setRecurringData] = useState<RecurringTransactionsData>(getRecurringTransactionsSnapshot());
 	const [selectedType, setSelectedType] = useState<TransactionType>(TransactionType.Expense);
 	const [isLoading, setIsLoading] = useState(true);
 	const [isRefreshing, setIsRefreshing] = useState(false);
@@ -117,8 +119,7 @@ export default function RecurringTransactionsScreen() {
 				setIsLoading(true);
 			}
 			setError("");
-			const data = await getRecurringTransactionsData();
-			setRecurringData(data);
+			await refreshRecurringTransactionsData();
 		} catch (loadError) {
 			const message =
 				loadError instanceof Error ? loadError.message : "Failed to load recurring transactions";
@@ -263,7 +264,13 @@ export default function RecurringTransactionsScreen() {
 	}
 
 	useEffect(() => {
+		const unsubscribe = subscribeToRecurringTransactions((data) => {
+			setRecurringData(data);
+		});
+
 		loadRecurringTransactions();
+
+		return unsubscribe;
 	}, []);
 
 	const pendingApprovalsForType = useMemo(() => {
@@ -316,11 +323,11 @@ export default function RecurringTransactionsScreen() {
 		);
 	}
 
-	if (error || !recurringData) {
+	if (error) {
 		return (
 			<View className="flex-1 items-center justify-center bg-[#060F24] px-6">
 				<Text className="text-center text-base text-app-textPrimary">
-					{error || "No recurring transactions available"}
+					{error}
 				</Text>
 				<Pressable
 					onPress={() => loadRecurringTransactions()}
