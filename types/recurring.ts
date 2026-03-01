@@ -11,7 +11,7 @@ export type RecurringPendingApproval = {
   requiresAction: boolean;
 };
 
-export type RecurringSubscription = {
+export type RecurringTransaction = {
   id: string;
   name: string;
   amount: number;
@@ -24,5 +24,5 @@ export type RecurringSubscription = {
 
 export type RecurringTransactionsData = {
   pendingApproval: RecurringPendingApproval | null;
-  subscriptions: RecurringSubscription[];
+  recurringTransactions: RecurringTransaction[];
 };

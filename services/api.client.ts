@@ -2,7 +2,7 @@ import { buildApiUrl } from "../constants/env";
 import { getAuthToken } from "./token.storage";
 
 type RequestOptions = {
-  method: "GET" | "POST" | "DELETE";
+  method: "GET" | "POST" | "PUT" | "DELETE";
   body?: unknown;
   headers?: Record<string, string>;
 };
@@ -74,6 +74,21 @@ export async function apiDelete<T>(
   const token = await getAuthToken();
   return requestJson<T>(path, {
     method: "DELETE",
+    headers: token
+      ? { ...(headers ?? {}), Authorization: `Bearer ${token}` }
+      : headers,
+  });
+}
+
+export async function apiPut<T>(
+  path: string,
+  body: unknown,
+  headers?: Record<string, string>,
+): Promise<T> {
+  const token = await getAuthToken();
+  return requestJson<T>(path, {
+    method: "PUT",
+    body,
     headers: token
       ? { ...(headers ?? {}), Authorization: `Bearer ${token}` }
       : headers,

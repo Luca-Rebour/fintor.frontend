@@ -9,7 +9,7 @@
   <ul>
     <li>Create and manage multiple accounts (bank accounts, cash, savings, etc.)</li>
     <li>Track one-time and recurring income</li>
-    <li>Register recurring subscriptions and fixed expenses</li>
+    <li>Register recurring transactions and fixed expenses</li>
     <li>Add categorized expenses linked to specific accounts</li>
     <li>Create financial goals (e.g., Buy a car, Buy a house, Travel)</li>
     <li>Allocate funds from accounts to goals while keeping balances clearly separated</li>

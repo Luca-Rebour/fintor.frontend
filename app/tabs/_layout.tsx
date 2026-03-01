@@ -131,6 +131,13 @@ export default function ProtectedTabsLayout() {
         />
 
         <Tabs.Screen
+          name="recurringAdmin"
+          options={{
+            href: null,
+          }}
+        />
+
+        <Tabs.Screen
           name="goals"
           options={{
             title: "Goals",
@@ -165,6 +172,14 @@ export default function ProtectedTabsLayout() {
             >
               <AppIcon name="Calendar" color="#18C8FF" size={18} />
               <Text className="ml-2 text-base font-medium text-white">Recurring Transactions</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              className="flex-row items-center rounded-xl bg-[#1A243B] px-3 py-3"
+              onPress={() => navigateToTab("/tabs/recurringAdmin")}
+            >
+              <AppIcon name="Settings" color="#18C8FF" size={18} />
+              <Text className="ml-2 text-base font-medium text-white">Manage Recurring</Text>
             </TouchableOpacity>
           </View>
         </Pressable>
