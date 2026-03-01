@@ -8,9 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import Constants from "expo-constants";
 import { AppIcon } from "../../components/shared/AppIcon";
-import { APP_COLORS } from "../../constants/colors";
 
 import { getStoredJwt, loadAuthenticatedUser } from "../../services/auth.service";
 
@@ -119,10 +117,16 @@ export default function ProtectedTabsLayout() {
             ),
           }}
           listeners={{
-            tabPress: (event) => {
-              event.preventDefault();
+            tabPress: () => {
               openMoreMenu();
             },
+          }}
+        />
+
+        <Tabs.Screen
+          name="recurringTransactions"
+          options={{
+            href: null,
           }}
         />
 
@@ -155,38 +159,12 @@ export default function ProtectedTabsLayout() {
       >
         <Pressable className="flex-1 bg-[#060F24]/70" onPress={closeMoreMenu}>
           <View className="absolute bottom-24 left-4 right-4 rounded-2xl border border-[#1A243B] bg-[#111C33] p-4">
-            <Text className="mb-3 text-sm font-semibold text-white">More tab options</Text>
-
             <TouchableOpacity
               className="mb-2 flex-row items-center rounded-xl bg-[#1A243B] px-3 py-3"
-              onPress={() => navigateToTab("/tabs/home")}
+              onPress={() => navigateToTab("/tabs/recurringTransactions")}
             >
-              <AppIcon name="House" color="#18C8FF" size={18} />
-              <Text className="ml-2 text-base font-medium text-white">Home</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              className="mb-2 flex-row items-center rounded-xl bg-[#1A243B] px-3 py-3"
-              onPress={() => navigateToTab("/tabs/transactions")}
-            >
-              <AppIcon name="DollarSign" color="#18C8FF" size={18} />
-              <Text className="ml-2 text-base font-medium text-white">Transactions</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              className="mb-2 flex-row items-center rounded-xl bg-[#1A243B] px-3 py-3"
-              onPress={() => navigateToTab("/tabs/goals")}
-            >
-              <AppIcon name="Target" color="#18C8FF" size={18} />
-              <Text className="ml-2 text-base font-medium text-white">Goals</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              className="flex-row items-center rounded-xl bg-[#1A243B] px-3 py-3"
-              onPress={() => navigateToTab("/tabs/profile")}
-            >
-              <AppIcon name="User" color="#18C8FF" size={18} />
-              <Text className="ml-2 text-base font-medium text-white">Profile</Text>
+              <AppIcon name="Calendar" color="#18C8FF" size={18} />
+              <Text className="ml-2 text-base font-medium text-white">Recurring Transactions</Text>
             </TouchableOpacity>
           </View>
         </Pressable>
