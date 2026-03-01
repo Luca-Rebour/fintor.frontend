@@ -10,10 +10,10 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 
-import { AddRecurringSubscriptionCard } from "../../components/recurring/AddRecurringSubscriptionCard";
+import { AddRecurringTransactionCard } from "../../components/recurring/AddRecurringTransactionCard";
 import { PendingApprovalCard } from "../../components/recurring/PendingApprovalCard";
 import { RecurringHeader } from "../../components/recurring/RecurringHeader";
-import { RecurringSubscriptionItem } from "../../components/recurring/RecurringSubscriptionItem";
+import { RecurringTransactionItem } from "../../components/recurring/RecurringTransactionItem";
 import { RecurringTypeToggle } from "../../components/recurring/RecurringTypeToggle";
 import {
 	confirmPendingRecurringApproval,
@@ -22,7 +22,7 @@ import {
 } from "../../services/recurringTransactions.service";
 import {
 	RecurringPendingApproval,
-	RecurringSubscription,
+	RecurringTransaction,
 	RecurringTransactionType,
 	RecurringTransactionsData,
 } from "../../types/recurring";
@@ -99,16 +99,19 @@ export default function RecurringTransactionsScreen() {
 		}
 	}
 
-	function handlePressSubscription(subscription: RecurringSubscription) {
-		Alert.alert("Recurring detail", `${subscription.name} detail will be enabled soon.`);
+	function handlePressRecurringTransaction(recurringTransaction: RecurringTransaction) {
+		Alert.alert("Recurring Transaction detail", `${recurringTransaction.name} detail will be enabled soon.`);
 	}
 
 	function handleSearchPress() {
 		Alert.alert("Search", "Recurring search will be enabled soon.");
 	}
 
-	function handleAddSubscription() {
-		Alert.alert("Create recurring", "Create recurring flow is pending form design.");
+	function handleAddRecurringTransaction() {
+		router.push({
+			pathname: "/tabs/recurringAdmin",
+			params: { openCreate: "1" },
+		});
 	}
 
 	useEffect(() => {
@@ -125,13 +128,13 @@ export default function RecurringTransactionsScreen() {
 			: null;
 	}, [recurringData, selectedType]);
 
-	const filteredSubscriptions = useMemo(() => {
-		if (!recurringData?.subscriptions.length) {
+	const filteredRecurringTransactions = useMemo(() => {
+		if (!recurringData?.recurringTransactions.length) {
 			return [];
 		}
 
-		return recurringData.subscriptions.filter(
-			(subscription) => subscription.transactionType === selectedType,
+		return recurringData.recurringTransactions.filter(
+			(recurringTransaction) => recurringTransaction.transactionType === selectedType,
 		);
 	}, [recurringData, selectedType]);
 
@@ -191,19 +194,19 @@ export default function RecurringTransactionsScreen() {
 
 				<View className="mb-3 mt-1 flex-row items-center justify-between">
 					<Text className="text-xs font-semibold tracking-widest text-[#94A3B8]">
-						UPCOMING SUBSCRIPTIONS
+						UPCOMING RECURRING TRANSACTIONS
 					</Text>
-					<Pressable>
+					<Pressable onPress={() => router.push("/tabs/recurringAdmin")}>
 						<Text className="text-sm font-semibold text-[#18C8FF]">View All</Text>
 					</Pressable>
 				</View>
 
-				{filteredSubscriptions.length ? (
-					filteredSubscriptions.map((subscription) => (
-						<RecurringSubscriptionItem
-							key={subscription.id}
-							subscription={subscription}
-							onPress={handlePressSubscription}
+				{filteredRecurringTransactions.length ? (
+					filteredRecurringTransactions.map((recurringTransaction) => (
+						<RecurringTransactionItem
+							key={recurringTransaction.id}
+							recurringTransaction={recurringTransaction}
+							onPress={handlePressRecurringTransaction}
 						/>
 					))
 				) : (
@@ -214,7 +217,7 @@ export default function RecurringTransactionsScreen() {
 					</View>
 				)}
 
-				<AddRecurringSubscriptionCard onPress={handleAddSubscription} />
+				<AddRecurringTransactionCard onPress={handleAddRecurringTransaction} />
 			</ScrollView>
 		</View>
 	);

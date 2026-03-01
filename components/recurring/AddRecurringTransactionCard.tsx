@@ -1,11 +1,11 @@
 import { Pressable, Text, View } from "react-native";
 import { AppIcon } from "../shared/AppIcon";
 
-type AddRecurringSubscriptionCardProps = {
+type AddRecurringTransactionCardProps = {
   onPress?: () => void;
 };
 
-export function AddRecurringSubscriptionCard({ onPress }: AddRecurringSubscriptionCardProps) {
+export function AddRecurringTransactionCard({ onPress }: AddRecurringTransactionCardProps) {
   return (
     <Pressable
       onPress={onPress}
@@ -14,7 +14,7 @@ export function AddRecurringSubscriptionCard({ onPress }: AddRecurringSubscripti
       <View className="h-10 w-10 items-center justify-center rounded-full bg-[#1A243B]">
         <AppIcon name="Plus" color="#94A3B8" size={18} />
       </View>
-      <Text className="mt-3 text-base font-semibold text-[#94A3B8]">Add New Subscription</Text>
+      <Text className="mt-3 text-base font-semibold text-[#94A3B8]">Add New Recurring Transaction</Text>
     </Pressable>
   );
 }
