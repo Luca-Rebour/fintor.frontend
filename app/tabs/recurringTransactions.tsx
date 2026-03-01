@@ -15,7 +15,11 @@ import { PendingApprovalCard } from "../../components/recurring/PendingApprovalC
 import { RecurringHeader } from "../../components/recurring/RecurringHeader";
 import { RecurringSubscriptionItem } from "../../components/recurring/RecurringSubscriptionItem";
 import { RecurringTypeToggle } from "../../components/recurring/RecurringTypeToggle";
-import { getRecurringTransactionsData } from "../../services/recurringTransactions.service";
+import {
+	confirmPendingRecurringApproval,
+	getRecurringTransactionsData,
+	reschedulePendingRecurringApproval,
+} from "../../services/recurringTransactions.service";
 import {
 	RecurringPendingApproval,
 	RecurringSubscription,
@@ -29,6 +33,7 @@ export default function RecurringTransactionsScreen() {
 	const [selectedType, setSelectedType] = useState<RecurringTransactionType>("expense");
 	const [isLoading, setIsLoading] = useState(true);
 	const [isRefreshing, setIsRefreshing] = useState(false);
+	const [isSubmittingAction, setIsSubmittingAction] = useState(false);
 	const [error, setError] = useState("");
 
 	async function loadRecurringTransactions(showInitialLoader = true) {
@@ -56,12 +61,42 @@ export default function RecurringTransactionsScreen() {
 		setIsRefreshing(false);
 	}
 
-	function handleConfirmApproval(approval: RecurringPendingApproval) {
-		Alert.alert("Confirm recurring", `Confirm ${approval.title} is scheduled.`);
+	async function handleConfirmApproval(approval: RecurringPendingApproval) {
+		if (isSubmittingAction) {
+			return;
+		}
+
+		try {
+			setIsSubmittingAction(true);
+			await confirmPendingRecurringApproval(approval.id);
+			await loadRecurringTransactions(false);
+			Alert.alert("Recurring updated", `${approval.title} was confirmed successfully.`);
+		} catch (actionError) {
+			const message = actionError instanceof Error ? actionError.message : "Could not confirm recurring transaction";
+			Alert.alert("Error", message);
+		} finally {
+			setIsSubmittingAction(false);
+		}
 	}
 
-	function handleRescheduleApproval(approval: RecurringPendingApproval) {
-		Alert.alert("Reschedule recurring", `Reschedule ${approval.title}.`);
+	async function handleRescheduleApproval(approval: RecurringPendingApproval) {
+		if (isSubmittingAction) {
+			return;
+		}
+
+		try {
+			setIsSubmittingAction(true);
+			const nextDay = new Date(approval.expectedDate);
+			nextDay.setDate(nextDay.getDate() + 1);
+			await reschedulePendingRecurringApproval(approval.id, nextDay.toISOString());
+			await loadRecurringTransactions(false);
+			Alert.alert("Recurring updated", `${approval.title} was rescheduled successfully.`);
+		} catch (actionError) {
+			const message = actionError instanceof Error ? actionError.message : "Could not reschedule recurring transaction";
+			Alert.alert("Error", message);
+		} finally {
+			setIsSubmittingAction(false);
+		}
 	}
 
 	function handlePressSubscription(subscription: RecurringSubscription) {
@@ -73,7 +108,7 @@ export default function RecurringTransactionsScreen() {
 	}
 
 	function handleAddSubscription() {
-		Alert.alert("Create recurring", "Create recurring subscription flow will be enabled soon.");
+		Alert.alert("Create recurring", "Create recurring flow is pending form design.");
 	}
 
 	useEffect(() => {

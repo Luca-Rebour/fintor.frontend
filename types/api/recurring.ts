@@ -29,8 +29,3 @@ export type RecurringTransactionApiDTO = {
   currencyCode: string;
   accountName: string;
 };
-
-export type RecurringTransactionsApiResponse = {
-  pendingApproval?: RecurringPendingApprovalApiDTO | null;
-  recurringTransactions?: RecurringTransactionApiDTO[] | null;
-};
