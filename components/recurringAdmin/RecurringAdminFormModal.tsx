@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Modal, Pressable, ScrollView, Text, TextInput, View, KeyboardAvoidingView, Platform } from "react-native";
 import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import { Frequency } from "../../types/enums/frequency";
@@ -80,28 +80,53 @@ export function RecurringAdminFormModal({
   onSubmit,
 }: RecurringAdminFormModalProps) {
   const [activeDateField, setActiveDateField] = useState<"startDate" | "endDate" | null>(null);
+  const [draftDate, setDraftDate] = useState(new Date());
 
-  function handleDateChange(event: DateTimePickerEvent, selectedDate?: Date) {
-    if (event.type === "dismissed" || !selectedDate) {
+  useEffect(() => {
+    if (!visible) {
       setActiveDateField(null);
+    }
+  }, [visible]);
+
+  function applySelectedDate(nextDate: Date) {
+    if (!activeDateField) {
       return;
     }
 
-    const formattedDate = formatDateForForm(selectedDate);
+    const formattedDate = formatDateForForm(nextDate);
 
     if (activeDateField === "startDate") {
       onChange({ ...form, startDate: formattedDate });
-    }
-
-    if (activeDateField === "endDate") {
-      onChange({ ...form, endDate: formattedDate });
-    }
-
-    if (Platform.OS !== "ios") {
-      setActiveDateField(null);
       return;
     }
 
+    onChange({ ...form, endDate: formattedDate });
+  }
+
+  function openDatePicker(field: "startDate" | "endDate") {
+    const currentValue = field === "startDate" ? form.startDate : form.endDate;
+    setDraftDate(resolveDateFromForm(currentValue));
+    setActiveDateField(field);
+  }
+
+  function handleDateChange(event: DateTimePickerEvent, selectedDate?: Date) {
+    if (event.type === "dismissed") {
+      if (Platform.OS !== "ios") {
+        setActiveDateField(null);
+      }
+      return;
+    }
+
+    if (!selectedDate) {
+      return;
+    }
+
+    if (Platform.OS === "ios") {
+      setDraftDate(selectedDate);
+      return;
+    }
+
+    applySelectedDate(selectedDate);
     setActiveDateField(null);
   }
 
@@ -258,7 +283,7 @@ export function RecurringAdminFormModal({
             <View className="mt-4">
               <FieldLabel>START DATE</FieldLabel>
               <Pressable
-                onPress={() => setActiveDateField("startDate")}
+                onPress={() => openDatePicker("startDate")}
                 className="rounded-xl border border-[#1E2A47] bg-[#111C33] px-3 py-3"
               >
                 <Text className={`text-base ${form.startDate ? "text-white" : "text-[#64748B]"}`}>
@@ -270,7 +295,7 @@ export function RecurringAdminFormModal({
             <View className="mt-4">
               <FieldLabel>END DATE</FieldLabel>
               <Pressable
-                onPress={() => setActiveDateField("endDate")}
+                onPress={() => openDatePicker("endDate")}
                 className="rounded-xl border border-[#1E2A47] bg-[#111C33] px-3 py-3"
               >
                 <Text className={`text-base ${form.endDate ? "text-white" : "text-[#64748B]"}`}>
@@ -301,15 +326,45 @@ export function RecurringAdminFormModal({
             </View>
           </View>
 
-          {activeDateField ? (
+          {activeDateField && Platform.OS !== "ios" ? (
             <DateTimePicker
               value={resolveDateFromForm(activeDateField === "startDate" ? form.startDate : form.endDate)}
               mode="date"
-              display={Platform.OS === "ios" ? "spinner" : "default"}
+              display="default"
               onChange={handleDateChange}
             />
           ) : null}
         </KeyboardAvoidingView>
+
+        {activeDateField && Platform.OS === "ios" ? (
+          <View className="absolute inset-0 justify-end bg-[#060F24]/70">
+            <Pressable className="flex-1" onPress={() => setActiveDateField(null)} />
+
+            <View className="rounded-t-3xl border border-[#1E2A47] bg-[#060F24] px-4 pb-6 pt-3">
+              <View className="mb-2 flex-row items-center justify-between">
+                <Pressable onPress={() => setActiveDateField(null)} className="px-2 py-2">
+                  <Text className="text-sm font-semibold text-[#94A3B8]">Cancel</Text>
+                </Pressable>
+
+                <Text className="text-sm font-semibold text-app-textPrimary">
+                  {activeDateField === "startDate" ? "Start date" : "End date"}
+                </Text>
+
+                <Pressable
+                  onPress={() => {
+                    applySelectedDate(draftDate);
+                    setActiveDateField(null);
+                  }}
+                  className="px-2 py-2"
+                >
+                  <Text className="text-sm font-semibold text-[#18C8FF]">Done</Text>
+                </Pressable>
+              </View>
+
+              <DateTimePicker value={draftDate} mode="date" display="spinner" onChange={handleDateChange} />
+            </View>
+          </View>
+        ) : null}
       </View>
     </Modal>
   );
