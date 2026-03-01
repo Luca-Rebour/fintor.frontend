@@ -1,4 +1,6 @@
 import { apiDelete, apiGet, apiPost, apiPut } from "./api.client";
+import { getAuthUserSnapshot, loadAuthenticatedUser } from "./auth.service";
+import { getExchangeRateForCurrencies } from "./currencies.service";
 import {
   RecurringPendingApprovalApiDTO,
   RecurringTransactionApiDTO
@@ -93,9 +95,36 @@ function ensurePendingApprovalId(approvalId: string): string {
   return encodeURIComponent(normalizedId);
 }
 
-export async function confirmPendingRecurringApproval(approvalId: string): Promise<void> {
+async function getLoggedUserBaseCurrencyCode(): Promise<string> {
+  const authUser = getAuthUserSnapshot();
+
+  if (authUser?.baseCurrencyCode?.trim()) {
+    return authUser.baseCurrencyCode.trim().toUpperCase();
+  }
+
+  try {
+    const loadedUser = await loadAuthenticatedUser();
+    if (loadedUser?.baseCurrencyCode?.trim()) {
+      return loadedUser.baseCurrencyCode.trim().toUpperCase();
+    }
+  } catch {
+  }
+
+  return "USD";
+}
+
+export async function confirmPendingRecurringApproval(approvalId: string, sourceCurrencyCode: string): Promise<void> {
   const encodedId = ensurePendingApprovalId(approvalId);
-  await apiPost<unknown>(`${RECURRING_PENDING_ACTIONS_PATH}/${encodedId}/confirm`, {});
+  const sourceCurrency = String(sourceCurrencyCode ?? "").trim().toUpperCase();
+
+  if (!sourceCurrency) {
+    throw new Error("Source currency code is required");
+  }
+
+  const baseCurrencyCode = await getLoggedUserBaseCurrencyCode();
+  const exchangeRate = await getExchangeRateForCurrencies(sourceCurrency, baseCurrencyCode);
+
+  await apiPost<unknown>(`${RECURRING_PENDING_ACTIONS_PATH}/${encodedId}/approve`, exchangeRate ?? null);
 }
 
 export async function reschedulePendingRecurringApproval(approvalId: string, dueDate: string): Promise<void> {
@@ -109,7 +138,6 @@ export async function createRecurringTransaction(
   input: CreateRecurringTransactionInput,
 ): Promise<RecurringTransactionApiDTO> {
   const payload = toApiUpsertPayload(input);
-console.log("Creating recurring transaction with payload:", payload);
   return apiPost<RecurringTransactionApiDTO>(RECURRING_ENDPOINT_PATH, payload);
 }
 

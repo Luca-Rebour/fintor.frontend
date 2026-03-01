@@ -25,6 +25,44 @@ import { RecurringPendingApprovalApiDTO, RecurringTransactionApiDTO } from "../.
 import { PendingTransactionStatus } from "../../types/enums/pendingTransactionStatus";
 import { TransactionType } from "../../types/enums/transactionType";
 
+function resolveTransactionType(value: unknown): TransactionType | null {
+	if (typeof value === "number") {
+		return value === TransactionType.Income || value === TransactionType.Expense ? value : null;
+	}
+
+	if (typeof value === "string") {
+		const normalized = value.trim().toLowerCase();
+
+		if (normalized === "income") {
+			return TransactionType.Income;
+		}
+
+		if (normalized === "expense" || normalized === "expenses") {
+			return TransactionType.Expense;
+		}
+
+		const parsed = Number(normalized);
+		if (!Number.isNaN(parsed)) {
+			return resolveTransactionType(parsed);
+		}
+	}
+
+	return null;
+}
+
+function isPendingStatus(value: unknown): boolean {
+	if (typeof value === "number") {
+		return value === PendingTransactionStatus.Pending;
+	}
+
+	if (typeof value === "string") {
+		const normalized = value.trim().toLowerCase();
+		return normalized === "pending" || normalized === String(PendingTransactionStatus.Pending);
+	}
+
+	return false;
+}
+
 export default function RecurringTransactionsScreen() {
 	const router = useRouter();
 	const [recurringData, setRecurringData] = useState<RecurringTransactionsData | null>(null);
@@ -66,7 +104,7 @@ export default function RecurringTransactionsScreen() {
 
 		try {
 			setIsSubmittingAction(true);
-			await confirmPendingRecurringApproval(approval.id);
+			await confirmPendingRecurringApproval(approval.id, approval.currencyCode);
 			await loadRecurringTransactions(false);
 			Alert.alert("Recurring updated", `${approval.description} was confirmed successfully.`);
 		} catch (actionError) {
@@ -116,24 +154,20 @@ export default function RecurringTransactionsScreen() {
 		loadRecurringTransactions();
 	}, []);
 
-	const pendingApproval = useMemo(() => {
+	const pendingApprovalsForType = useMemo(() => {
 		if (!recurringData?.pendingApprovals.length) {
-			return null;
+			return [];
 		}
 
 		const pendingByType = recurringData.pendingApprovals.filter(
 			(approval) =>
-				Number(approval.transactionType) === selectedType &&
-				approval.status === PendingTransactionStatus.Pending,
+				resolveTransactionType(approval.transactionType) === selectedType &&
+				isPendingStatus(approval.status),
 		);
-
-		if (!pendingByType.length) {
-			return null;
-		}
 
 		return [...pendingByType].sort(
 			(left, right) => +new Date(left.dueDate) - +new Date(right.dueDate),
-		)[0];
+		);
 	}, [recurringData, selectedType]);
 
 	const filteredRecurringTransactions = useMemo(() => {
@@ -142,7 +176,7 @@ export default function RecurringTransactionsScreen() {
 		}
 
 		return recurringData.recurringTransactions.filter(
-			(recurringTransaction) => Number(recurringTransaction.transactionType) === selectedType,
+			(recurringTransaction) => resolveTransactionType(recurringTransaction.transactionType) === selectedType,
 		);
 	}, [recurringData, selectedType]);
 
@@ -192,13 +226,16 @@ export default function RecurringTransactionsScreen() {
 			>
 				<RecurringTypeToggle value={selectedType} onChange={setSelectedType} />
 
-				{pendingApproval ? (
-					<PendingApprovalCard
-						approval={pendingApproval}
-						onConfirm={handleConfirmApproval}
-						onReschedule={handleRescheduleApproval}
-					/>
-				) : null}
+				{pendingApprovalsForType.length
+					? pendingApprovalsForType.map((approval) => (
+							<PendingApprovalCard
+								key={approval.id}
+								approval={approval}
+								onConfirm={handleConfirmApproval}
+								onReschedule={handleRescheduleApproval}
+							/>
+						))
+					: null}
 
 				<View className="mb-3 mt-1 flex-row items-center justify-between">
 					<Text className="text-xs font-semibold tracking-widest text-[#94A3B8]">
