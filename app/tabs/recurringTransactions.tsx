@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
+import { useTranslation } from "react-i18next";
 
 import { AddRecurringTransactionCard } from "../../components/recurring/AddRecurringTransactionCard";
 import { PendingApprovalCard } from "../../components/recurring/PendingApprovalCard";
@@ -21,8 +22,10 @@ import { RecurringTypeToggle } from "../../components/recurring/RecurringTypeTog
 import {
 	cancelPendingRecurringApproval,
 	confirmPendingRecurringApproval,
-	getRecurringTransactionsData,
+	getRecurringTransactionsSnapshot,
+	refreshRecurringTransactionsData,
 	reschedulePendingRecurringApproval,
+	subscribeToRecurringTransactions,
 } from "../../services/recurringTransactions.service";
 import { RecurringTransactionsData } from "../../types/recurring";
 import { RecurringPendingApprovalApiDTO, RecurringTransactionApiDTO } from "../../types/api/recurring";
@@ -98,8 +101,9 @@ function getTomorrowStartDate(): Date {
 }
 
 export default function RecurringTransactionsScreen() {
+	const { t } = useTranslation();
 	const router = useRouter();
-	const [recurringData, setRecurringData] = useState<RecurringTransactionsData | null>(null);
+	const [recurringData, setRecurringData] = useState<RecurringTransactionsData>(getRecurringTransactionsSnapshot());
 	const [selectedType, setSelectedType] = useState<TransactionType>(TransactionType.Expense);
 	const [isLoading, setIsLoading] = useState(true);
 	const [isRefreshing, setIsRefreshing] = useState(false);
@@ -117,11 +121,10 @@ export default function RecurringTransactionsScreen() {
 				setIsLoading(true);
 			}
 			setError("");
-			const data = await getRecurringTransactionsData();
-			setRecurringData(data);
+			await refreshRecurringTransactionsData();
 		} catch (loadError) {
 			const message =
-				loadError instanceof Error ? loadError.message : "Failed to load recurring transactions";
+				loadError instanceof Error ? loadError.message : t("recurring.errors.failedToLoad");
 			setError(message);
 		} finally {
 			if (showInitialLoader) {
@@ -146,8 +149,8 @@ export default function RecurringTransactionsScreen() {
 			await confirmPendingRecurringApproval(approval.id, approval.currencyCode);
 			await loadRecurringTransactions(false);
 		} catch (actionError) {
-			const message = actionError instanceof Error ? actionError.message : "Could not confirm recurring transaction";
-			Alert.alert("Error", message);
+			const message = actionError instanceof Error ? actionError.message : t("recurring.errors.couldNotConfirm");
+			Alert.alert(t("recurring.errors.genericTitle"), message);
 		} finally {
 			setIsSubmittingAction(false);
 		}
@@ -174,7 +177,7 @@ export default function RecurringTransactionsScreen() {
 			const selectedDateStart = getStartOfDay(rescheduleDate);
 
 			if (selectedDateStart < minimumRescheduleDate) {
-				Alert.alert("Invalid date", "Please select a date after today.");
+				Alert.alert(t("recurring.errors.invalidDateTitle"), t("recurring.errors.invalidDateMessage"));
 				return;
 			}
 
@@ -186,8 +189,8 @@ export default function RecurringTransactionsScreen() {
 			await loadRecurringTransactions(false);
 			setRescheduleApproval(null);
 		} catch (actionError) {
-			const message = actionError instanceof Error ? actionError.message : "Could not reschedule recurring transaction";
-			Alert.alert("Error", message);
+			const message = actionError instanceof Error ? actionError.message : t("recurring.errors.couldNotReschedule");
+			Alert.alert(t("recurring.errors.genericTitle"), message);
 		} finally {
 			setIsSubmittingAction(false);
 		}
@@ -218,12 +221,12 @@ export default function RecurringTransactionsScreen() {
 
 	function handleCancelApproval(approval: RecurringPendingApprovalApiDTO) {
 		Alert.alert(
-			"Cancel transaction",
-			`Are you sure you want to cancel ${approval.description}?`,
+			t("recurring.alerts.cancelTitle"),
+			t("recurring.alerts.cancelMessage", { description: approval.description }),
 			[
-				{ text: "Keep", style: "cancel" },
+				{ text: t("recurring.actions.keep"), style: "cancel" },
 				{
-					text: "Cancel transaction",
+					text: t("recurring.actions.cancelTransaction"),
 					style: "destructive",
 					onPress: async () => {
 						if (isSubmittingAction) {
@@ -236,8 +239,8 @@ export default function RecurringTransactionsScreen() {
 							await loadRecurringTransactions(false);
 						} catch (actionError) {
 							const message =
-								actionError instanceof Error ? actionError.message : "Could not cancel recurring transaction";
-							Alert.alert("Error", message);
+								actionError instanceof Error ? actionError.message : t("recurring.errors.couldNotCancel");
+							Alert.alert(t("recurring.errors.genericTitle"), message);
 						} finally {
 							setIsSubmittingAction(false);
 						}
@@ -248,11 +251,14 @@ export default function RecurringTransactionsScreen() {
 	}
 
 	function handlePressRecurringTransaction(recurringTransaction: RecurringTransactionApiDTO) {
-		Alert.alert("Recurring Transaction detail", `${recurringTransaction.name} detail will be enabled soon.`);
+		Alert.alert(
+			t("recurring.alerts.detailTitle"),
+			t("recurring.alerts.detailMessage", { name: recurringTransaction.name }),
+		);
 	}
 
 	function handleSearchPress() {
-		Alert.alert("Search", "Recurring search will be enabled soon.");
+		Alert.alert(t("recurring.alerts.searchTitle"), t("recurring.alerts.searchMessage"));
 	}
 
 	function handleAddRecurringTransaction() {
@@ -263,7 +269,13 @@ export default function RecurringTransactionsScreen() {
 	}
 
 	useEffect(() => {
+		const unsubscribe = subscribeToRecurringTransactions((data) => {
+			setRecurringData(data);
+		});
+
 		loadRecurringTransactions();
+
+		return unsubscribe;
 	}, []);
 
 	const pendingApprovalsForType = useMemo(() => {
@@ -316,17 +328,17 @@ export default function RecurringTransactionsScreen() {
 		);
 	}
 
-	if (error || !recurringData) {
+	if (error) {
 		return (
 			<View className="flex-1 items-center justify-center bg-[#060F24] px-6">
 				<Text className="text-center text-base text-app-textPrimary">
-					{error || "No recurring transactions available"}
+					{error}
 				</Text>
 				<Pressable
 					onPress={() => loadRecurringTransactions()}
 					className="mt-4 rounded-xl border border-[#1E2A47] bg-[#111C33] px-4 py-2"
 				>
-					<Text className="font-semibold text-app-primary">Retry</Text>
+					<Text className="font-semibold text-app-primary">{t("common.retry")}</Text>
 				</Pressable>
 			</View>
 		);
@@ -335,7 +347,7 @@ export default function RecurringTransactionsScreen() {
 	return (
 		<View className="flex-1 bg-[#060F24]">
 			<RecurringHeader
-				title="Recurring"
+				title={t("recurring.title")}
 				onBackPress={() => router.push("/tabs/home")}
 				onSearchPress={handleSearchPress}
 			/>
@@ -361,10 +373,10 @@ export default function RecurringTransactionsScreen() {
 							className="flex-row items-center justify-between px-4 py-3"
 						>
 							<Text className="text-xs font-semibold tracking-widest text-[#94A3B8]">
-								PENDING ({pendingApprovalsForType.length})
+								{t("recurring.labels.pending")} ({pendingApprovalsForType.length})
 							</Text>
 							<Text className="text-sm font-semibold text-[#18C8FF]">
-								{isPendingExpanded ? "Hide" : "Show"}
+								{isPendingExpanded ? t("recurring.actions.hide") : t("recurring.actions.show")}
 							</Text>
 						</Pressable>
 
@@ -389,10 +401,10 @@ export default function RecurringTransactionsScreen() {
 							className="flex-row items-center justify-between px-4 py-3"
 						>
 							<Text className="text-xs font-semibold tracking-widest text-[#94A3B8]">
-								RESCHEDULED ({rescheduledApprovalsForType.length})
+								{t("recurring.labels.rescheduled")} ({rescheduledApprovalsForType.length})
 							</Text>
 							<Text className="text-sm font-semibold text-[#18C8FF]">
-								{isRescheduledExpanded ? "Hide" : "Show"}
+								{isRescheduledExpanded ? t("recurring.actions.hide") : t("recurring.actions.show")}
 							</Text>
 						</Pressable>
 
@@ -412,10 +424,10 @@ export default function RecurringTransactionsScreen() {
 
 				<View className="mb-3 mt-1 flex-row items-center justify-between">
 					<Text className="text-xs font-semibold tracking-widest text-[#94A3B8]">
-						UPCOMING RECURRING TRANSACTIONS
+						{t("recurring.labels.upcomingRecurringTransactions")}
 					</Text>
 					<Pressable onPress={() => router.push("/tabs/recurringAdmin")}>
-						<Text className="text-sm font-semibold text-[#18C8FF]">View All</Text>
+						<Text className="text-sm font-semibold text-[#18C8FF]">{t("common.viewAll")}</Text>
 					</Pressable>
 				</View>
 
@@ -430,7 +442,7 @@ export default function RecurringTransactionsScreen() {
 				) : (
 					<View className="mb-4 rounded-2xl border border-[#1E2A47] bg-[#111C33] px-4 py-5">
 						<Text className="text-center text-sm text-[#94A3B8]">
-							No recurring transactions found for this filter.
+							{t("recurring.empty.filtered")}
 						</Text>
 					</View>
 				)}
@@ -448,9 +460,11 @@ export default function RecurringTransactionsScreen() {
 					<Pressable className="flex-1" onPress={() => setRescheduleApproval(null)} />
 
 					<View className="rounded-t-3xl border border-[#1E2A47] bg-[#060F24] px-4 pb-6 pt-4">
-						<Text className="mb-1 text-base font-bold text-app-textPrimary">Reschedule transaction</Text>
+						<Text className="mb-1 text-base font-bold text-app-textPrimary">{t("recurring.reschedule.title")}</Text>
 						<Text className="mb-3 text-sm text-[#94A3B8]">
-							Choose a new date for {rescheduleApproval?.description ?? "this transaction"}.
+							{t("recurring.reschedule.message", {
+								description: rescheduleApproval?.description ?? t("recurring.reschedule.fallbackDescription"),
+							})}
 						</Text>
 
 						<DateTimePicker
@@ -467,7 +481,7 @@ export default function RecurringTransactionsScreen() {
 								disabled={isSubmittingAction}
 								className="flex-1 rounded-2xl border border-[#334155] bg-[#1A243B] px-4 py-3"
 							>
-								<Text className="text-center text-sm font-semibold text-[#94A3B8]">Cancel</Text>
+								<Text className="text-center text-sm font-semibold text-[#94A3B8]">{t("common.cancel")}</Text>
 							</Pressable>
 
 							<Pressable
@@ -476,7 +490,7 @@ export default function RecurringTransactionsScreen() {
 								className="flex-1 rounded-2xl bg-[#1D4ED8] px-4 py-3"
 							>
 								<Text className="text-center text-sm font-semibold text-white">
-									{isSubmittingAction ? "Saving..." : "Save date"}
+									{isSubmittingAction ? t("recurringAdmin.form.actions.saving") : t("recurring.actions.saveDate")}
 								</Text>
 							</Pressable>
 						</View>

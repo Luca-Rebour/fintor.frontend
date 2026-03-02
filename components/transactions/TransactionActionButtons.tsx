@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Pressable, Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
 import { AppIcon } from "../shared/AppIcon";
 
 import { APP_COLORS } from "../../constants/colors";
@@ -19,6 +20,7 @@ export function TransactionActionButtons({
   onAddCategory,
   onMenuOpen,
 }: TransactionActionButtonsProps) {
+  const { t } = useTranslation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   function handleActionPress(action?: () => void) {
@@ -43,7 +45,7 @@ export function TransactionActionButtons({
               className="px-4 py-3.5 min-h-14 flex-row items-center rounded-xl"
             >
               <AppIcon name="DollarSign" size={18} color="#22C55E" />
-              <Text className="ml-3 text-base font-semibold text-app-textPrimary">Add Income</Text>
+              <Text className="ml-3 text-base font-semibold text-app-textPrimary">{t("transactions.actions.addIncome")}</Text>
             </Pressable>
 
             <Pressable
@@ -51,7 +53,7 @@ export function TransactionActionButtons({
               className="px-4 py-3.5 min-h-14 flex-row items-center rounded-xl"
             >
               <AppIcon name="CircleMinus" size={18} color="#EF4444" />
-              <Text className="ml-3 text-base font-semibold text-app-textPrimary">Add Expense</Text>
+              <Text className="ml-3 text-base font-semibold text-app-textPrimary">{t("transactions.actions.addExpense")}</Text>
             </Pressable>
 
             <Pressable
@@ -59,7 +61,7 @@ export function TransactionActionButtons({
               className="px-4 py-3.5 min-h-14 flex-row items-center rounded-xl"
             >
               <AppIcon name="CreditCard" size={18} color={APP_COLORS.actionPrimary} />
-              <Text className="ml-3 text-base font-semibold text-app-textPrimary">Add Account</Text>
+              <Text className="ml-3 text-base font-semibold text-app-textPrimary">{t("transactions.actions.addAccount")}</Text>
             </Pressable>
 
             <Pressable
@@ -67,7 +69,7 @@ export function TransactionActionButtons({
               className="px-4 py-3.5 min-h-14 flex-row items-center rounded-xl"
             >
               <AppIcon name="Tag" size={18} color="#C084FC" />
-              <Text className="ml-3 text-base font-semibold text-app-textPrimary">Add Category</Text>
+              <Text className="ml-3 text-base font-semibold text-app-textPrimary">{t("transactions.actions.addCategory")}</Text>
             </Pressable>
           </View>
         ) : null}

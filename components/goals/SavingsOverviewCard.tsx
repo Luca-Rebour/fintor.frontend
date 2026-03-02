@@ -1,5 +1,6 @@
 import { LinearGradient } from "expo-linear-gradient";
 import { Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
 
 type SavingsOverviewCardProps = {
   totalSavings: number;
@@ -18,6 +19,7 @@ export function SavingsOverviewCard({
   currentValue,
   goalValue,
 }: SavingsOverviewCardProps) {
+  const { t } = useTranslation();
   const progress = Math.min(100, Math.max(0, (currentValue / goalValue) * 100));
 
   return (
@@ -28,14 +30,14 @@ export function SavingsOverviewCard({
         end={{ x: 1, y: 1 }}
         style={{ padding: 16 }}
       >
-        <Text className="text-[12px] text-app-textSecondary">Total Savings</Text>
+        <Text className="text-[12px] text-app-textSecondary">{t("goals.overview.totalSavings")}</Text>
 
         <View className="mt-1 flex-row items-end gap-2">
           <Text className="text-4xl font-bold text-app-textPrimary">
             {formatCurrency(totalSavings)}
           </Text>
           <Text className="text-xs font-medium text-app-success mb-2">
-            +{monthlyChangePercent}% this month
+            {t("goals.overview.thisMonth", { value: monthlyChangePercent })}
           </Text>
         </View>
 
@@ -50,7 +52,7 @@ export function SavingsOverviewCard({
 
         <View className="mt-2 flex-row items-center justify-between">
           <Text className="text-[11px] text-app-textSecondary">$0</Text>
-          <Text className="text-[11px] text-app-textSecondary">Goal: {formatCurrency(goalValue)}</Text>
+          <Text className="text-[11px] text-app-textSecondary">{t("goals.overview.goal", { amount: formatCurrency(goalValue) })}</Text>
         </View>
       </LinearGradient>
     </View>

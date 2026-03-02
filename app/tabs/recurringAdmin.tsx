@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Alert, Pressable, RefreshControl, ScrollView, Text, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { useTranslation } from "react-i18next";
 
 import { RecurringAdminFormModal } from "../../components/recurringAdmin/RecurringAdminFormModal";
 import { RecurringAdminHeader } from "../../components/recurringAdmin/RecurringAdminHeader";
@@ -76,6 +77,7 @@ function toUpsertPayload(form: CreateRecurringTransactionInput): CreateRecurring
 }
 
 export default function RecurringAdminScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const params = useLocalSearchParams<{ openCreate?: string }>();
   const [transactions, setTransactions] = useState<RecurringTransactionApiDTO[]>([]);
@@ -107,7 +109,7 @@ export default function RecurringAdminScreen() {
       setAccountOptions(accountOptions);
       setCategoryOptions(categoryOptions);
     } catch (loadError) {
-      const message = loadError instanceof Error ? loadError.message : "Failed to load recurring transactions";
+      const message = loadError instanceof Error ? loadError.message : t("recurringAdmin.errors.failedToLoad");
       setError(message);
     } finally {
       if (showInitialLoader) {
@@ -153,12 +155,12 @@ export default function RecurringAdminScreen() {
     }
 
     if (!form.accountId) {
-      Alert.alert("Validation", "Please select an account.");
+      Alert.alert(t("recurringAdmin.validation.title"), t("recurringAdmin.validation.selectAccount"));
       return;
     }
 
     if (!form.categoryId) {
-      Alert.alert("Validation", "Please select a category.");
+      Alert.alert(t("recurringAdmin.validation.title"), t("recurringAdmin.validation.selectCategory"));
       return;
     }
 
@@ -180,8 +182,8 @@ export default function RecurringAdminScreen() {
       setIsFormVisible(false);
       setEditingTransactionId(null);
     } catch (submitError) {
-      const message = submitError instanceof Error ? submitError.message : "Could not save recurring transaction";
-      Alert.alert("Error", message);
+      const message = submitError instanceof Error ? submitError.message : t("recurringAdmin.errors.couldNotSave");
+      Alert.alert(t("recurringAdmin.errors.genericTitle"), message);
     } finally {
       setIsSubmitting(false);
     }
@@ -189,20 +191,20 @@ export default function RecurringAdminScreen() {
 
   function handleDelete(transaction: RecurringTransactionApiDTO) {
     Alert.alert(
-      "Delete recurring",
-      `Delete ${transaction.name}?`,
+      t("recurringAdmin.delete.title"),
+      t("recurringAdmin.delete.message", { name: transaction.name }),
       [
-        { text: "Cancel", style: "cancel" },
+        { text: t("common.cancel"), style: "cancel" },
         {
-          text: "Delete",
+          text: t("recurringAdmin.delete.confirm"),
           style: "destructive",
           onPress: async () => {
             try {
               await deleteRecurringTransaction(transaction.id);
               await loadRecurringList(false);
             } catch (deleteError) {
-              const message = deleteError instanceof Error ? deleteError.message : "Could not delete recurring transaction";
-              Alert.alert("Error", message);
+              const message = deleteError instanceof Error ? deleteError.message : t("recurringAdmin.errors.couldNotDelete");
+              Alert.alert(t("recurringAdmin.errors.genericTitle"), message);
             }
           },
         },
@@ -237,7 +239,7 @@ export default function RecurringAdminScreen() {
           onPress={() => loadRecurringList()}
           className="mt-4 rounded-xl border border-[#1E2A47] bg-[#111C33] px-4 py-2"
         >
-          <Text className="font-semibold text-app-primary">Retry</Text>
+          <Text className="font-semibold text-app-primary">{t("common.retry")}</Text>
         </Pressable>
       </View>
     );
@@ -246,7 +248,7 @@ export default function RecurringAdminScreen() {
   return (
     <View className="flex-1 bg-[#060F24]">
       <RecurringAdminHeader
-        title="Manage Recurring"
+        title={t("recurringAdmin.title")}
         onBackPress={() => router.push("/tabs/recurringTransactions")}
         onCreatePress={openCreateModal}
       />
@@ -274,7 +276,7 @@ export default function RecurringAdminScreen() {
           ))
         ) : (
           <View className="rounded-2xl border border-[#1E2A47] bg-[#111C33] px-4 py-5">
-            <Text className="text-center text-sm text-[#94A3B8]">No recurring transactions found.</Text>
+            <Text className="text-center text-sm text-[#94A3B8]">{t("recurring.empty.list")}</Text>
           </View>
         )}
       </ScrollView>

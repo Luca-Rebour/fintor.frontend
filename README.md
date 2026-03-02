@@ -49,3 +49,27 @@ With `EXPO_PUBLIC_API_BASE_URL`, services call these routes:
 - `GET /transactions`
 
 If `dashboard`, `goals`, `profile`, or `transactions` endpoints are not available yet, the app uses local fallback mock data so screens keep working while backend is being integrated.
+
+## Internationalization (i18n)
+
+The app uses `i18next` + `react-i18next` with Expo localization.
+
+- Initialization: `i18n/index.ts`
+- Translation resources: `i18n/resources/en.ts` and `i18n/resources/es.ts`
+- Typed keys: `i18n/react-i18next.d.ts`
+
+### How language is resolved
+
+1. First, it loads the saved language from AsyncStorage (`app.language`).
+2. If there is no saved preference, it uses device locale via `expo-localization`.
+3. Fallback language is English (`en`).
+
+### How to add new translations
+
+1. Add the same key in both `en.ts` and `es.ts`.
+2. Use `const { t } = useTranslation()` in screens/components.
+3. Replace hardcoded strings with `t("your.key")`.
+
+### Runtime switch
+
+The profile screen includes a simple language switch (Español / English), and language changes are persisted automatically.

@@ -1,4 +1,5 @@
 import { Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
 import { AppIcon } from "../shared/AppIcon";
 
 type DashboardHeaderProps = {
@@ -6,6 +7,7 @@ type DashboardHeaderProps = {
 };
 
 export function DashboardHeader({ userName }: DashboardHeaderProps) {
+  const { t } = useTranslation();
   return (
     <View className="mb-6 flex-row items-center justify-between" >
       <View className="flex-row items-center gap-3">
@@ -13,7 +15,7 @@ export function DashboardHeader({ userName }: DashboardHeaderProps) {
           <Text className="text-xs font-bold text-slate-700">AM</Text>
         </View>
         <View >
-          <Text className="text-xs text-app-textSecondary">Welcome back</Text>
+          <Text className="text-xs text-app-textSecondary">{t("home.header.welcomeBack")}</Text>
           <Text className="text-2xl font-bold text-app-textPrimary">{userName}</Text>
         </View>
       </View>

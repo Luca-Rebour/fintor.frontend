@@ -1,4 +1,5 @@
 import { Pressable, Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
 import { AppIcon } from "../shared/AppIcon";
 import { RecurringPendingApprovalApiDTO } from "../../types/api/recurring";
 import { PendingTransactionStatus } from "../../types/enums/pendingTransactionStatus";
@@ -26,6 +27,7 @@ function formatDate(input: string): string {
 }
 
 export function PendingApprovalCard({ approval, onConfirm, onReschedule, onCancel }: PendingApprovalCardProps) {
+  const { t } = useTranslation();
   const isRescheduled =
     approval.status === PendingTransactionStatus.Rescheduled ||
     String(approval.status).toLowerCase() === "rescheduled";
@@ -34,7 +36,7 @@ export function PendingApprovalCard({ approval, onConfirm, onReschedule, onCance
     <View className="mb-6 rounded-3xl border border-[#1E2A47] bg-[#111C33] p-4">
       <View className="mb-3 flex-row items-center justify-between">
         <View className="flex-row items-center gap-2">
-          <Text className="text-xs font-semibold tracking-widest text-[#94A3B8]">PENDING APPROVAL</Text>
+          <Text className="text-xs font-semibold tracking-widest text-[#94A3B8]">{t("recurring.labels.pendingApproval")}</Text>
           
         </View>
 
@@ -60,7 +62,7 @@ export function PendingApprovalCard({ approval, onConfirm, onReschedule, onCance
         </View>
 
         <View className="items-end">
-          <Text className="text-[10px] font-semibold tracking-wide text-[#94A3B8]">EXPECTED</Text>
+          <Text className="text-[10px] font-semibold tracking-wide text-[#94A3B8]">{t("recurring.labels.expected")}</Text>
           <Text className="mt-0.5 text-base font-bold text-[#18C8FF]">{formatDate(approval.dueDate)}</Text>
         </View>
       </View>
@@ -71,7 +73,7 @@ export function PendingApprovalCard({ approval, onConfirm, onReschedule, onCance
             onPress={() => onConfirm?.(approval)}
             className="flex-1 rounded-2xl bg-[#1D4ED8] px-4 py-3"
           >
-            <Text className="text-center text-sm font-semibold text-white">Confirm</Text>
+            <Text className="text-center text-sm font-semibold text-white">{t("recurring.actions.confirm")}</Text>
           </Pressable>
         ) : null}
 
@@ -79,7 +81,7 @@ export function PendingApprovalCard({ approval, onConfirm, onReschedule, onCance
           onPress={() => onReschedule?.(approval)}
           className={`${isRescheduled ? "w-full" : "flex-1"} rounded-2xl border border-[#334155] bg-[#1A243B] px-4 py-3`}
         >
-          <Text className="text-center text-sm font-semibold text-[#94A3B8]">Reschedule</Text>
+          <Text className="text-center text-sm font-semibold text-[#94A3B8]">{t("recurring.actions.reschedule")}</Text>
         </Pressable>
       </View>
     </View>

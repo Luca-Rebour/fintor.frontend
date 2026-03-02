@@ -1,6 +1,7 @@
 import { Link, useRouter } from "expo-router";
 import { useState } from "react";
-import { Alert, Text, View } from "react-native";
+import { Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
 
 import { AuthInput } from "../components/auth/AuthInput";
 import { AuthPrimaryButton } from "../components/auth/AuthPrimaryButton";
@@ -10,6 +11,7 @@ import { APP_GRADIENTS } from "../constants/colors";
 import { signInWithEmail } from "../services/auth.service";
 
 export default function Index() {
+  const { t } = useTranslation();
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -29,7 +31,7 @@ export default function Index() {
       router.replace("/tabs/home");
       
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Unable to sign in";
+      const message = error instanceof Error ? error.message : t("auth.errors.unableToSignIn");
       setAuthMessage(`❌ ${message}`);
     } finally {
       setIsSubmitting(false);
@@ -44,18 +46,18 @@ export default function Index() {
             <AppIcon name="Lock" size={24} color="#19C7FF" />
           </View>
 
-          <Text className="text-center text-4xl font-bold text-app-textPrimary">Secure Login</Text>
+          <Text className="text-center text-4xl font-bold text-app-textPrimary">{t("auth.login.title")}</Text>
           <Text className="mt-3 text-center text-base text-app-textSecondary">
-            Welcome back to your financial hub.
+            {t("auth.login.subtitle")}
           </Text>
           <Text className="mt-2 text-center text-xs text-app-textSecondary">
-            Demo: emilys / emilyspass
+            {t("auth.login.demoCredentials")}
           </Text>
 
           <View className="mt-10">
             <AuthInput
-              label="Email Address"
-              placeholder="john@finance.com"
+              label={t("auth.login.emailLabel")}
+              placeholder={t("auth.login.emailPlaceholder")}
               icon="Mail"
               value={email}
               onChangeText={setEmail}
@@ -63,8 +65,8 @@ export default function Index() {
               autoCapitalize="none"
             />
             <AuthInput
-              label="Password"
-              placeholder="••••••••"
+              label={t("auth.login.passwordLabel")}
+              placeholder={t("auth.login.passwordPlaceholder")}
               icon="Lock"
               value={password}
               onChangeText={setPassword}
@@ -74,14 +76,14 @@ export default function Index() {
             />
           </View>
 
-          <Text className="mb-7 text-right text-sm font-semibold text-app-primary">Forgot Password?</Text>
+          <Text className="mb-7 text-right text-sm font-semibold text-app-primary">{t("auth.login.forgotPassword")}</Text>
 
           {authMessage ? (
             <Text className="mb-4 text-center text-sm font-medium text-app-textPrimary">{authMessage}</Text>
           ) : null}
 
           <AuthPrimaryButton
-            label={isSubmitting ? "Signing In..." : "Sign In"}
+            label={isSubmitting ? t("auth.login.signingIn") : t("auth.login.signIn")}
             colors={APP_GRADIENTS.actionPrimary}
             iconRight={isSubmitting ? null : <AppIcon name="ArrowRight" size={18} color="#FFFFFF" />}
             onPress={handleSignIn}
@@ -92,7 +94,7 @@ export default function Index() {
         <View className="mt-10">
           <View className="mb-6 flex-row items-center">
             <View className="h-px flex-1 bg-app-border" />
-            <Text className="mx-4 text-sm text-app-textSecondary">Or sign in with</Text>
+            <Text className="mx-4 text-sm text-app-textSecondary">{t("auth.login.orSignInWith")}</Text>
             <View className="h-px flex-1 bg-app-border" />
           </View>
 
@@ -100,13 +102,13 @@ export default function Index() {
             <View className="mb-2 h-14 w-14 items-center justify-center rounded-full border border-app-border bg-app-cardSoft">
               <AppIcon name="Shield" size={22} color="#19C7FF" />
             </View>
-            <Text className="text-app-textSecondary">Face ID</Text>
+            <Text className="text-app-textSecondary">{t("auth.login.faceId")}</Text>
           </View>
 
           <Text className="text-center text-sm text-app-textSecondary">
-            Don’t have an account?{" "}
+            {t("auth.login.noAccount")} {" "}
             <Link href="/signup" className="font-bold text-app-primary">
-              Sign Up
+              {t("auth.login.signUp")}
             </Link>
           </Text>
         </View>

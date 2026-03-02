@@ -1,4 +1,5 @@
 import { Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
 import { AppIcon } from "../shared/AppIcon";
 
 import { CashFlowMetric } from "../../types/dashboard";
@@ -8,11 +9,12 @@ type CashFlowSectionProps = {
 };
 
 export function CashFlowSection({ metrics }: CashFlowSectionProps) {
+  const { t } = useTranslation();
   return (
     <View className="mb-6">
       <View className="mb-3 flex-row items-center justify-between">
-        <Text className="text-2xl font-bold text-app-textPrimary">Cash Flow</Text>
-        <Text className="text-sm text-app-primary">View Report</Text>
+        <Text className="text-2xl font-bold text-app-textPrimary">{t("home.cashFlow.title")}</Text>
+        <Text className="text-sm text-app-primary">{t("home.cashFlow.viewReport")}</Text>
       </View>
 
       <View className="flex-row gap-3">

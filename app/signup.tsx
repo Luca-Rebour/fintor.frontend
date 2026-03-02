@@ -2,6 +2,7 @@ import { Link, useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import { Platform, Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { useTranslation } from "react-i18next";
 
 import { AuthInput } from "../components/auth/AuthInput";
 import { AuthPrimaryButton } from "../components/auth/AuthPrimaryButton";
@@ -12,6 +13,13 @@ import { APP_GRADIENTS } from "../constants/colors";
 import { CurrencyOption, loadCurrencyOptions } from "../services/currencies.service";
 import { signUpWithEmail } from "../services/auth.service";
 
+type PasswordStrengthLabelKey =
+  | ""
+  | "auth.passwordStrength.weak"
+  | "auth.passwordStrength.medium"
+  | "auth.passwordStrength.strong"
+  | "auth.passwordStrength.veryStrong";
+
 function getPasswordStrength(password: string) {
   let score = 0;
 
@@ -21,25 +29,26 @@ function getPasswordStrength(password: string) {
   if (/[^A-Za-z0-9]/.test(password)) score += 1;
 
   if (password.length === 0) {
-    return { score: 0, label: "", colorClass: "text-app-textSecondary" };
+    return { score: 0, labelKey: "" as PasswordStrengthLabelKey, colorClass: "text-app-textSecondary" };
   }
 
   if (score <= 1) {
-    return { score: 1, label: "Weak", colorClass: "text-app-primary" };
+    return { score: 1, labelKey: "auth.passwordStrength.weak" as PasswordStrengthLabelKey, colorClass: "text-app-primary" };
   }
 
   if (score === 2) {
-    return { score: 2, label: "Medium", colorClass: "text-app-primaryStrong" };
+    return { score: 2, labelKey: "auth.passwordStrength.medium" as PasswordStrengthLabelKey, colorClass: "text-app-primaryStrong" };
   }
 
   if (score === 3) {
-    return { score: 3, label: "Strong", colorClass: "text-app-primaryStrong" };
+    return { score: 3, labelKey: "auth.passwordStrength.strong" as PasswordStrengthLabelKey, colorClass: "text-app-primaryStrong" };
   }
 
-  return { score: 4, label: "Very Strong", colorClass: "text-app-success" };
+  return { score: 4, labelKey: "auth.passwordStrength.veryStrong" as PasswordStrengthLabelKey, colorClass: "text-app-success" };
 }
 
 export default function SignupScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const [step, setStep] = useState<1 | 2>(1);
   const [firstName, setFirstName] = useState("");
@@ -122,7 +131,7 @@ export default function SignupScreen() {
 
   function handleGoToStepTwo() {
     if (!canGoToStepTwo) {
-      setAuthMessage("❌ Completa nombre, apellido y email válido para continuar");
+      setAuthMessage(`❌ ${t("auth.errors.completeStepOne")}`);
       return;
     }
 
@@ -145,10 +154,10 @@ export default function SignupScreen() {
       );
       const displayName = `${session.user.name ?? ""} ${session.user.lastName ?? ""}`.trim() || session.user.email;
 
-      setAuthMessage(`✅ Account created for ${displayName}`);
+      setAuthMessage(`✅ ${t("auth.signup.accountCreatedFor", { name: displayName })}`);
       router.replace("/tabs/home");
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Unable to create account";
+      const message = error instanceof Error ? error.message : t("auth.errors.unableToCreateAccount");
       setAuthMessage(`❌ ${message}`);
     } finally {
       setIsSubmitting(false);
@@ -175,7 +184,7 @@ export default function SignupScreen() {
           >
             <AppIcon name="ArrowLeft" size={22} color="#FFFFFF" />
           </Pressable>
-          <Text className="text-xl font-bold text-app-textPrimary">Sign Up</Text>
+          <Text className="text-xl font-bold text-app-textPrimary">{t("auth.signup.title")}</Text>
           <View className="w-10" />
         </View>
 
@@ -186,30 +195,30 @@ export default function SignupScreen() {
 
         {step === 1 ? (
           <>
-            <Text className="text-4xl font-bold text-app-textPrimary">Create Your Account</Text>
+            <Text className="text-4xl font-bold text-app-textPrimary">{t("auth.signup.createAccountTitle")}</Text>
             <Text className="mt-3 mb-8 text-base leading-6 text-app-textSecondary">
-              Start tracking your finances with neon precision today.
+              {t("auth.signup.createAccountSubtitle")}
             </Text>
 
             <AuthInput
-              label="Nombre"
-              placeholder="Ex. John"
+              label={t("auth.signup.firstNameLabel")}
+              placeholder={t("auth.signup.firstNamePlaceholder")}
               icon="User"
               value={firstName}
               onChangeText={setFirstName}
             />
 
             <AuthInput
-              label="Apellido"
-              placeholder="Ex. Doe"
+              label={t("auth.signup.lastNameLabel")}
+              placeholder={t("auth.signup.lastNamePlaceholder")}
               icon="User"
               value={lastName}
               onChangeText={setLastName}
             />
 
             <AuthInput
-              label="Email Address"
-              placeholder="name@example.com"
+              label={t("auth.signup.emailLabel")}
+              placeholder={t("auth.signup.emailPlaceholder")}
               icon="Mail"
               value={email}
               onChangeText={setEmail}
@@ -222,7 +231,7 @@ export default function SignupScreen() {
             ) : null}
 
             <AuthPrimaryButton
-              label="Siguiente"
+              label={t("auth.signup.next")}
               colors={APP_GRADIENTS.actionSecondary}
               onPress={handleGoToStepTwo}
               disabled={!canGoToStepTwo}
@@ -230,14 +239,14 @@ export default function SignupScreen() {
           </>
         ) : (
           <>
-            <Text className="text-4xl font-bold text-app-textPrimary">Security & Currency</Text>
+            <Text className="text-4xl font-bold text-app-textPrimary">{t("auth.signup.securityTitle")}</Text>
             <Text className="mt-3 mb-8 text-base leading-6 text-app-textSecondary">
-              Define tu contraseña, fecha de nacimiento y moneda principal.
+              {t("auth.signup.securitySubtitle")}
             </Text>
 
             <AuthInput
-              label="Password"
-              placeholder="••••••••"
+              label={t("auth.signup.passwordLabel")}
+              placeholder={t("auth.signup.passwordPlaceholder")}
               icon="Lock"
               value={password}
               onChangeText={setPassword}
@@ -265,17 +274,17 @@ export default function SignupScreen() {
                   );
                 })}
               </View>
-              {passwordStrength.label ? (
+              {passwordStrength.labelKey ? (
                 <Text className={`self-end text-xs font-semibold ${passwordStrength.colorClass}`}>
-                  {passwordStrength.label}
+                  {t(passwordStrength.labelKey)}
                 </Text>
               ) : null}
             </View>
 
             <View className="relative mb-1">
               <AuthInput
-                label="Date of birth"
-                placeholder="YYYY-MM-DD"
+                label={t("auth.signup.dateOfBirthLabel")}
+                placeholder={t("auth.signup.dateOfBirthPlaceholder")}
                 icon="Calendar"
                 value={dateOfBirth}
                 onChangeText={() => undefined}
@@ -305,14 +314,14 @@ export default function SignupScreen() {
                     onPress={() => setIsDatePickerOpen(false)}
                     className="mt-2 self-end rounded-lg border border-[#1E2A47] px-3 py-1"
                   >
-                    <Text className="text-sm text-app-primary">Done</Text>
+                    <Text className="text-sm text-app-primary">{t("common.done")}</Text>
                   </Pressable>
                 ) : null}
               </View>
             ) : null}
 
             <View className="mb-5">
-              <Text className="mb-2 text-sm font-semibold text-app-textPrimary">Main currency</Text>
+              <Text className="mb-2 text-sm font-semibold text-app-textPrimary">{t("auth.signup.mainCurrencyLabel")}</Text>
               <View className="relative">
                 <Pressable
                   onPress={() => setIsCurrencyPickerOpen((previous) => !previous)}
@@ -335,7 +344,7 @@ export default function SignupScreen() {
                         <TextInput
                           value={currencySearchText}
                           onChangeText={setCurrencySearchText}
-                          placeholder="Buscar por código o nombre"
+                          placeholder={t("auth.signup.currencySearchPlaceholder")}
                           placeholderTextColor="#64748B"
                           autoCapitalize="none"
                           className="ml-2 flex-1 text-sm text-app-textPrimary"
@@ -366,7 +375,7 @@ export default function SignupScreen() {
 
                       {filteredCurrencyOptions.length === 0 ? (
                         <View className="px-4 py-4">
-                          <Text className="text-center text-sm text-app-textSecondary">No se encontraron monedas</Text>
+                          <Text className="text-center text-sm text-app-textSecondary">{t("auth.signup.noCurrenciesFound")}</Text>
                         </View>
                       ) : null}
                     </ScrollView>
@@ -376,8 +385,8 @@ export default function SignupScreen() {
             </View>
 
             <Text className="mb-8 text-sm text-app-textSecondary">
-              I agree to the <Text className="font-semibold text-app-primaryStrong">Terms of Service</Text> and
-              <Text className="font-semibold text-app-primaryStrong"> Privacy Policy</Text>
+              {t("auth.signup.termsPrefix")} <Text className="font-semibold text-app-primaryStrong">{t("auth.signup.termsOfService")}</Text> {t("auth.signup.and")}
+              <Text className="font-semibold text-app-primaryStrong"> {t("auth.signup.privacyPolicy")}</Text>
             </Text>
 
             {authMessage ? (
@@ -385,7 +394,7 @@ export default function SignupScreen() {
             ) : null}
 
             <AuthPrimaryButton
-              label={isSubmitting ? "Creating Account..." : "Create Account"}
+              label={isSubmitting ? t("auth.signup.creatingAccount") : t("auth.signup.createAccount")}
               colors={APP_GRADIENTS.actionSecondary}
               onPress={handleSignUp}
               disabled={isSubmitting || passwordStrength.score < 2 || !dateOfBirth.trim()}
@@ -394,16 +403,16 @@ export default function SignupScreen() {
         )}
 
         <View className="mt-8">
-          <Text className="mb-4 text-center text-sm text-app-textSecondary">Or continue with</Text>
+          <Text className="mb-4 text-center text-sm text-app-textSecondary">{t("auth.signup.orContinueWith")}</Text>
           <View className="mb-8 flex-row gap-3">
             <AuthSocialButton label="Google" />
             <AuthSocialButton label="Apple" />
           </View>
 
           <Text className="text-center text-sm text-app-textSecondary">
-            Already have an account?{" "}
+            {t("auth.signup.alreadyHaveAccount")} {" "}
             <Link href="/" className="font-bold text-app-primaryStrong">
-              Sign In
+              {t("auth.signup.signIn")}
             </Link>
           </Text>
         </View>

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import Svg, { Circle, G } from "react-native-svg";
+import { useTranslation } from "react-i18next";
 
 import { APP_COLORS } from "../../constants/colors";
 import {
@@ -20,11 +21,11 @@ type ChartSegment = ExpenseByCategory & {
   segmentOffset: number;
 };
 
-const FILTER_OPTIONS: { days: ReportFilterDays; label: string }[] = [
-  { days: 7, label: "1 semana" },
-  { days: 30, label: "1 mes" },
-  { days: 182, label: "6 meses" },
-  { days: 365, label: "12 meses" },
+const FILTER_OPTIONS: { days: ReportFilterDays; key: "week1" | "month1" | "months6" | "months12" }[] = [
+  { days: 7, key: "week1" },
+  { days: 30, key: "month1" },
+  { days: 182, key: "months6" },
+  { days: 365, key: "months12" },
 ];
 
 const CHART_SIZE = 190;
@@ -41,6 +42,7 @@ type NetWorthSectionProps = {
 };
 
 export function NetWorthSection({ refreshKey = 0 }: NetWorthSectionProps) {
+  const { t } = useTranslation();
   const [overviewByDays, setOverviewByDays] = useState<Record<ReportFilterDays, ExpenseByCategory[]>>({
     7: [],
     30: [],
@@ -150,7 +152,7 @@ export function NetWorthSection({ refreshKey = 0 }: NetWorthSectionProps) {
 
   return (
     <View className="mb-4 rounded-3xl bg-app-card/50 p-4">
-      <Text className="text-sm text-app-textSecondary">Gastos por categoría</Text>
+      <Text className="text-sm text-app-textSecondary">{t("home.expenseChart.title")}</Text>
 
       <View className="mt-4 flex-row flex-wrap gap-2">
         {FILTER_OPTIONS.map((option) => {
@@ -162,7 +164,7 @@ export function NetWorthSection({ refreshKey = 0 }: NetWorthSectionProps) {
               className={`rounded-full px-3 py-1.5 ${isSelected ? "bg-app-primary" : "bg-app-cardSoft"}`}
             >
               <Text className={`text-xs font-semibold ${isSelected ? "text-app-surface" : "text-app-textSecondary"}`}>
-                {option.label}
+                {t(`home.expenseChart.filters.${option.key}`)}
               </Text>
             </Pressable>
           );
@@ -175,7 +177,7 @@ export function NetWorthSection({ refreshKey = 0 }: NetWorthSectionProps) {
         </View>
       ) : expensesByCategory.length === 0 ? (
         <View className="mt-6 items-center justify-center rounded-2xl bg-app-cardSoft px-4 py-8">
-          <Text className="text-center text-sm text-app-textSecondary">No hay gastos en este periodo.</Text>
+          <Text className="text-center text-sm text-app-textSecondary">{t("home.expenseChart.noExpensesInPeriod")}</Text>
         </View>
       ) : (
         <>
@@ -220,7 +222,7 @@ export function NetWorthSection({ refreshKey = 0 }: NetWorthSectionProps) {
                   justifyContent: "center",
                 }}
               >
-                <Text className="text-xs text-app-textSecondary">Total</Text>
+                <Text className="text-xs text-app-textSecondary">{t("home.expenseChart.total")}</Text>
                 <Text className="mt-1 text-base font-bold text-app-textPrimary">{formatMoney(totalExpenses)}</Text>
                 <Text className="mt-1 text-[11px] font-semibold text-app-textSecondary">{baseCurrencyCode}</Text>
               </View>

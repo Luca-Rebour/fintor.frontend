@@ -1,4 +1,5 @@
 import { Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
 import { AppIcon } from "../shared/AppIcon";
 
 import { GoalProgress } from "../../types/dashboard";
@@ -8,11 +9,12 @@ type GoalSectionProps = {
 };
 
 export function GoalSection({ goal }: GoalSectionProps) {
+  const { t } = useTranslation();
   return (
     <View className="mb-8">
       <View className="mb-3 flex-row items-center justify-between">
-        <Text className="text-2xl font-bold text-app-textPrimary">Goals</Text>
-        <Text className="text-sm text-app-primary">See all</Text>
+        <Text className="text-2xl font-bold text-app-textPrimary">{t("home.goals.title")}</Text>
+        <Text className="text-sm text-app-primary">{t("home.goals.seeAll")}</Text>
       </View>
 
       <View className="rounded-2xl bg-app-cardSoft p-4">

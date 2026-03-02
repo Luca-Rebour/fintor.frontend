@@ -1,6 +1,7 @@
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
 
 import { GoalTargetCard } from "../../components/goals/GoalTargetCard";
 import { GoalsHeader } from "../../components/goals/GoalsHeader";
@@ -9,6 +10,7 @@ import { getGoalsData } from "../../services/goals.service";
 import { GoalsData } from "../../types/goals.types";
 
 export default function GoalsScreen() {
+	const { t } = useTranslation();
 	const router = useRouter();
 	const [goalsData, setGoalsData] = useState<GoalsData | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
@@ -24,7 +26,7 @@ export default function GoalsScreen() {
 			const message =
 				loadError instanceof Error
 					? loadError.message
-					: "Failed to load goals";
+					: t("goals.errors.failedToLoad");
 			setError(message);
 		} finally {
 			setIsLoading(false);
@@ -37,7 +39,7 @@ export default function GoalsScreen() {
 
 	return (
 		<View className="flex-1 bg-[#060F24]">
-			<GoalsHeader title="Financial Goals" />
+			<GoalsHeader title={t("goals.title")} />
 
 			{isLoading ? (
 				<View className="flex-1 items-center justify-center">
@@ -50,7 +52,7 @@ export default function GoalsScreen() {
 						onPress={loadGoals}
 						className="mt-4 rounded-xl bg-[#111C33] border border-[#1E2A47] px-4 py-2"
 					>
-						<Text className="text-app-primary font-semibold">Retry</Text>
+						<Text className="text-app-primary font-semibold">{t("common.retry")}</Text>
 					</Pressable>
 				</View>
 			) : goalsData ? (
@@ -70,8 +72,8 @@ export default function GoalsScreen() {
 					/>
 
 					<View className="mt-6 mb-3 flex-row items-center justify-between">
-						<Text className="text-2xl font-bold text-app-textPrimary">Your Targets</Text>
-						<Text className="text-sm font-medium text-app-primary">View All</Text>
+						<Text className="text-2xl font-bold text-app-textPrimary">{t("goals.targetsTitle")}</Text>
+						<Text className="text-sm font-medium text-app-primary">{t("common.viewAll")}</Text>
 					</View>
 
 					<View className="gap-4">
