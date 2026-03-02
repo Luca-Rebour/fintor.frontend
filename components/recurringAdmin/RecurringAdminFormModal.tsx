@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Modal, Pressable, ScrollView, Text, TextInput, View, KeyboardAvoidingView, Platform } from "react-native";
 import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
+import { useTranslation } from "react-i18next";
 import { Frequency } from "../../types/enums/frequency";
 import { TransactionType } from "../../types/enums/transactionType";
 import { CreateRecurringTransactionInput } from "../../types/recurring";
@@ -19,13 +20,13 @@ type RecurringAdminFormModalProps = {
   onSubmit: () => void;
 };
 
-const FREQUENCY_OPTIONS: { value: Frequency; label: string }[] = [
-  { value: Frequency.Daily, label: "Daily" },
-  { value: Frequency.Weekly, label: "Weekly" },
-  { value: Frequency.BiWeekly, label: "Bi-Weekly" },
-  { value: Frequency.Monthly, label: "Monthly" },
-  { value: Frequency.Quarterly, label: "Quarterly" },
-  { value: Frequency.Yearly, label: "Yearly" },
+const FREQUENCY_OPTIONS: { value: Frequency; labelKey: string }[] = [
+  { value: Frequency.Daily, labelKey: "recurringAdmin.item.frequency.daily" },
+  { value: Frequency.Weekly, labelKey: "recurringAdmin.item.frequency.weekly" },
+  { value: Frequency.BiWeekly, labelKey: "recurringAdmin.item.frequency.biWeekly" },
+  { value: Frequency.Monthly, labelKey: "recurringAdmin.item.frequency.monthly" },
+  { value: Frequency.Quarterly, labelKey: "recurringAdmin.item.frequency.quarterly" },
+  { value: Frequency.Yearly, labelKey: "recurringAdmin.item.frequency.yearly" },
 ];
 
 function FieldLabel({ children }: { children: string }) {
@@ -79,6 +80,7 @@ export function RecurringAdminFormModal({
   onChange,
   onSubmit,
 }: RecurringAdminFormModalProps) {
+  const { t } = useTranslation();
   const [activeDateField, setActiveDateField] = useState<"startDate" | "endDate" | null>(null);
   const [draftDate, setDraftDate] = useState(new Date());
 
@@ -140,7 +142,7 @@ export function RecurringAdminFormModal({
           <View className="max-h-[88%] rounded-t-3xl border border-[#1E2A47] bg-[#060F24] p-4">
             <View className="mb-4 flex-row items-center justify-between">
               <Text className="text-lg font-bold text-app-textPrimary">
-                {mode === "create" ? "Create recurring" : "Edit recurring"}
+                {mode === "create" ? t("recurringAdmin.form.createTitle") : t("recurringAdmin.form.editTitle")}
               </Text>
               <Pressable onPress={onClose} className="h-8 w-8 items-center justify-center rounded-full bg-[#111C33]">
                 <Text className="text-base font-bold text-[#94A3B8]">×</Text>
@@ -153,28 +155,28 @@ export function RecurringAdminFormModal({
               keyboardShouldPersistTaps="handled"
               keyboardDismissMode="on-drag"
             >
-            <FieldLabel>NAME</FieldLabel>
+            <FieldLabel>{t("recurringAdmin.form.fields.name")}</FieldLabel>
             <InputField
               value={form.name}
               onChangeText={(name) => onChange({ ...form, name })}
-              placeholder="Spotify"
+              placeholder={t("recurringAdmin.form.placeholders.name")}
             />
 
             <View className="mt-4">
-              <FieldLabel>DESCRIPTION</FieldLabel>
+              <FieldLabel>{t("recurringAdmin.form.fields.description")}</FieldLabel>
               <InputField
                 value={form.description}
                 onChangeText={(description) => onChange({ ...form, description })}
-                placeholder="Monthly recurring transaction"
+                placeholder={t("recurringAdmin.form.placeholders.description")}
               />
             </View>
 
             <View className="mt-4">
-              <FieldLabel>AMOUNT</FieldLabel>
+              <FieldLabel>{t("recurringAdmin.form.fields.amount")}</FieldLabel>
               <InputField
                 value={form.amount}
                 onChangeText={(amount) => onChange({ ...form, amount: Number(amount) })}
-                placeholder="15.99"
+                placeholder={t("recurringAdmin.form.placeholders.amount")}
                 keyboardType="numeric"
               />
             </View>
@@ -191,7 +193,7 @@ export function RecurringAdminFormModal({
                     form.transactionType === TransactionType.Income ? "text-[#060F24]" : "text-[#94A3B8]"
                   }`}
                 >
-                  Income
+                  {t("recurringAdmin.form.transactionType.income")}
                 </Text>
               </Pressable>
 
@@ -206,13 +208,13 @@ export function RecurringAdminFormModal({
                     form.transactionType === TransactionType.Expense ? "text-white" : "text-[#94A3B8]"
                   }`}
                 >
-                  Expense
+                  {t("recurringAdmin.form.transactionType.expense")}
                 </Text>
               </Pressable>
             </View>
 
             <View className="mt-4">
-              <FieldLabel>FREQUENCY</FieldLabel>
+              <FieldLabel>{t("recurringAdmin.form.fields.frequency")}</FieldLabel>
               <View className="flex-row flex-wrap gap-2">
                 {FREQUENCY_OPTIONS.map((option) => {
                   const isActive = option.value === form.frequency;
@@ -224,7 +226,7 @@ export function RecurringAdminFormModal({
                       className={`rounded-full px-3 py-2 ${isActive ? "bg-[#18C8FF]" : "bg-[#111C33]"}`}
                     >
                       <Text className={`text-xs font-semibold ${isActive ? "text-[#060F24]" : "text-[#94A3B8]"}`}>
-                        {option.label}
+                        {t(option.labelKey as any)}
                       </Text>
                     </Pressable>
                   );
@@ -233,7 +235,7 @@ export function RecurringAdminFormModal({
             </View>
 
             <View className="mt-4">
-              <FieldLabel>ACCOUNT</FieldLabel>
+              <FieldLabel>{t("recurringAdmin.form.fields.account")}</FieldLabel>
               <View className="rounded-xl border border-[#1E2A47] bg-[#111C33] p-2">
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                   {accountOptions.map((account) => {
@@ -256,7 +258,7 @@ export function RecurringAdminFormModal({
             </View>
 
             <View className="mt-4">
-              <FieldLabel>CATEGORY</FieldLabel>
+              <FieldLabel>{t("recurringAdmin.form.fields.category")}</FieldLabel>
               <View className="rounded-xl border border-[#1E2A47] bg-[#111C33] p-2">
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                   {categoryOptions.map((category) => {
@@ -281,25 +283,25 @@ export function RecurringAdminFormModal({
 
 
             <View className="mt-4">
-              <FieldLabel>START DATE</FieldLabel>
+              <FieldLabel>{t("recurringAdmin.form.fields.startDate")}</FieldLabel>
               <Pressable
                 onPress={() => openDatePicker("startDate")}
                 className="rounded-xl border border-[#1E2A47] bg-[#111C33] px-3 py-3"
               >
                 <Text className={`text-base ${form.startDate ? "text-white" : "text-[#64748B]"}`}>
-                  {form.startDate || "Select start date"}
+                  {form.startDate || t("recurringAdmin.form.placeholders.selectStartDate")}
                 </Text>
               </Pressable>
             </View>
 
             <View className="mt-4">
-              <FieldLabel>END DATE</FieldLabel>
+              <FieldLabel>{t("recurringAdmin.form.fields.endDate")}</FieldLabel>
               <Pressable
                 onPress={() => openDatePicker("endDate")}
                 className="rounded-xl border border-[#1E2A47] bg-[#111C33] px-3 py-3"
               >
                 <Text className={`text-base ${form.endDate ? "text-white" : "text-[#64748B]"}`}>
-                  {form.endDate || "Select end date"}
+                  {form.endDate || t("recurringAdmin.form.placeholders.selectEndDate")}
                 </Text>
               </Pressable>
             </View>
@@ -311,7 +313,7 @@ export function RecurringAdminFormModal({
                 disabled={isSubmitting}
                 className="flex-1 rounded-xl bg-[#111C33] px-4 py-3"
               >
-                <Text className="text-center text-sm font-semibold text-[#94A3B8]">Cancel</Text>
+                <Text className="text-center text-sm font-semibold text-[#94A3B8]">{t("common.cancel")}</Text>
               </Pressable>
 
               <Pressable
@@ -320,7 +322,7 @@ export function RecurringAdminFormModal({
                 className="flex-1 rounded-xl bg-[#18C8FF] px-4 py-3"
               >
                 <Text className="text-center text-sm font-semibold text-[#060F24]">
-                  {isSubmitting ? "Saving..." : mode === "create" ? "Create" : "Save"}
+                  {isSubmitting ? t("recurringAdmin.form.actions.saving") : mode === "create" ? t("recurringAdmin.form.actions.create") : t("recurringAdmin.form.actions.save")}
                 </Text>
               </Pressable>
             </View>
@@ -343,11 +345,11 @@ export function RecurringAdminFormModal({
             <View className="rounded-t-3xl border border-[#1E2A47] bg-[#060F24] px-4 pb-6 pt-3">
               <View className="mb-2 flex-row items-center justify-between">
                 <Pressable onPress={() => setActiveDateField(null)} className="px-2 py-2">
-                  <Text className="text-sm font-semibold text-[#94A3B8]">Cancel</Text>
+                  <Text className="text-sm font-semibold text-[#94A3B8]">{t("common.cancel")}</Text>
                 </Pressable>
 
                 <Text className="text-sm font-semibold text-app-textPrimary">
-                  {activeDateField === "startDate" ? "Start date" : "End date"}
+                  {activeDateField === "startDate" ? t("recurringAdmin.form.iosDatePicker.startDate") : t("recurringAdmin.form.iosDatePicker.endDate")}
                 </Text>
 
                 <Pressable
@@ -357,7 +359,7 @@ export function RecurringAdminFormModal({
                   }}
                   className="px-2 py-2"
                 >
-                  <Text className="text-sm font-semibold text-[#18C8FF]">Done</Text>
+                  <Text className="text-sm font-semibold text-[#18C8FF]">{t("common.done")}</Text>
                 </Pressable>
               </View>
 

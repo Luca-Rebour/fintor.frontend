@@ -1,4 +1,5 @@
 import { Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
 import { AppIcon } from "../shared/AppIcon";
 
 type TransactionSummaryCardsProps = {
@@ -14,6 +15,7 @@ export function TransactionSummaryCards({
   balance,
   currencyCode,
 }: TransactionSummaryCardsProps) {
+  const { t } = useTranslation();
   const normalizedCurrencyCode = currencyCode?.trim().toUpperCase() || "USD";
 
   return (
@@ -22,7 +24,7 @@ export function TransactionSummaryCards({
         <View className="flex-1 bg-[#111C33] rounded-xl p-4">
           <View className="flex-row items-center justify-between mb-2">
             <Text className="text-app-textSecondary text-xs uppercase">
-              Monthly Spending
+              {t("transactions.summary.monthlySpending")}
             </Text>
             <AppIcon name="ArrowDown" size={16} color="#EF4444" />
           </View>
@@ -35,7 +37,7 @@ export function TransactionSummaryCards({
         <View className="flex-1 bg-[#111C33] rounded-xl p-4">
           <View className="flex-row items-center justify-between mb-2">
             <Text className="text-app-textSecondary text-xs uppercase">
-              Monthly Income
+              {t("transactions.summary.monthlyIncome")}
             </Text>
             <AppIcon name="ArrowUp" size={16} color="#22C55E" />
           </View>
@@ -49,7 +51,7 @@ export function TransactionSummaryCards({
       <View className="bg-[#111C33] rounded-xl p-4">
         <View className="flex-row items-center justify-between mb-2">
           <Text className="text-app-textSecondary text-xs uppercase">
-            Balance
+            {t("transactions.summary.balance")}
           </Text>
           <AppIcon
             name={balance >= 0 ? "TrendingUp" : "TrendingDown"}

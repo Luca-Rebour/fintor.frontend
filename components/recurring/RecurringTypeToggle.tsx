@@ -1,4 +1,5 @@
 import { Pressable, Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
 import { TransactionType } from "../../types/enums/transactionType";
 
 type RecurringTypeToggleProps = {
@@ -8,15 +9,16 @@ type RecurringTypeToggleProps = {
 
 type ToggleOption = {
   value: TransactionType;
-  label: string;
+  labelKey: "recurring.type.income" | "recurring.type.expense";
 };
 
 const OPTIONS: ToggleOption[] = [
-  { value: TransactionType.Income, label: "Income" },
-  { value: TransactionType.Expense, label: "Expenses" },
+  { value: TransactionType.Income, labelKey: "recurring.type.income" },
+  { value: TransactionType.Expense, labelKey: "recurring.type.expense" },
 ];
 
 export function RecurringTypeToggle({ value, onChange }: RecurringTypeToggleProps) {
+  const { t } = useTranslation();
   return (
     <View className="mb-4 mt-1 flex-row rounded-full bg-[#111C33] p-1">
       {OPTIONS.map((option) => {
@@ -33,7 +35,7 @@ export function RecurringTypeToggle({ value, onChange }: RecurringTypeToggleProp
                 isActive ? "text-white" : "text-[#94A3B8]"
               }`}
             >
-              {option.label}
+              {t(option.labelKey)}
             </Text>
           </Pressable>
         );

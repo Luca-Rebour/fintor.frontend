@@ -1,4 +1,5 @@
 import { Pressable, Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
 import { AppIcon } from "../shared/AppIcon";
 import { RecurringTransactionApiDTO } from "../../types/api/recurring";
 import { TransactionType } from "../../types/enums/transactionType";
@@ -27,6 +28,7 @@ function formatChargeDate(dateInput: string) {
 }
 
 export function RecurringTransactionItem({ recurringTransaction, onPress }: RecurringTransactionItemProps) {
+  const { t } = useTranslation();
   const isExpense = Number(recurringTransaction.transactionType) === TransactionType.Expense;
 
   return (
@@ -41,7 +43,10 @@ export function RecurringTransactionItem({ recurringTransaction, onPress }: Recu
       <View className="flex-1">
         <Text className="text-base font-semibold text-app-textPrimary">{recurringTransaction.name}</Text>
         <Text className="mt-0.5 text-xs text-[#94A3B8]">
-          {`Next: ${formatChargeDate(recurringTransaction.nextChargeDate)} · ${recurringTransaction.accountName}`}
+          {t("recurring.labels.next", {
+            date: formatChargeDate(recurringTransaction.nextChargeDate),
+            account: recurringTransaction.accountName,
+          })}
         </Text>
       </View>
 

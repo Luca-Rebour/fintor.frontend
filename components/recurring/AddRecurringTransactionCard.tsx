@@ -1,4 +1,5 @@
 import { Pressable, Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
 import { AppIcon } from "../shared/AppIcon";
 
 type AddRecurringTransactionCardProps = {
@@ -6,6 +7,7 @@ type AddRecurringTransactionCardProps = {
 };
 
 export function AddRecurringTransactionCard({ onPress }: AddRecurringTransactionCardProps) {
+  const { t } = useTranslation();
   return (
     <Pressable
       onPress={onPress}
@@ -14,7 +16,7 @@ export function AddRecurringTransactionCard({ onPress }: AddRecurringTransaction
       <View className="h-10 w-10 items-center justify-center rounded-full bg-[#1A243B]">
         <AppIcon name="Plus" color="#94A3B8" size={18} />
       </View>
-      <Text className="mt-3 text-base font-semibold text-[#94A3B8]">Add New Recurring Transaction</Text>
+      <Text className="mt-3 text-base font-semibold text-[#94A3B8]">{t("recurring.addCard.title")}</Text>
     </Pressable>
   );
 }

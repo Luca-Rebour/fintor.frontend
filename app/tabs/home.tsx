@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Alert, RefreshControl, ScrollView, Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
 
 import { CashFlowSection } from "../../components/home/CashFlowSection";
 import { DashboardHeader } from "../../components/home/DashboardHeader";
@@ -34,6 +35,7 @@ function isPendingStatus(value: unknown): boolean {
 }
 
 export default function HomeScreen() {
+	const { t } = useTranslation();
 	const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
 	const [recurringData, setRecurringData] = useState<RecurringTransactionsData>(getRecurringTransactionsSnapshot());
 	const [authUser, setAuthUser] = useState<User | null>(getAuthUserSnapshot());
@@ -55,7 +57,7 @@ export default function HomeScreen() {
 			]);
 			setDashboardData(data);
 		} catch (loadError) {
-			const message = loadError instanceof Error ? loadError.message : "Failed to load dashboard";
+			const message = loadError instanceof Error ? loadError.message : t("home.errors.failedToLoadDashboard");
 			setError(message);
 		} finally {
 			if (showInitialLoader) {
@@ -81,8 +83,8 @@ export default function HomeScreen() {
 			await confirmPendingRecurringApproval(pendingTransaction.id, pendingTransaction.currencyCode);
 			await loadDashboard(false);
 		} catch (confirmError) {
-			const message = confirmError instanceof Error ? confirmError.message : "Could not confirm pending transaction";
-			Alert.alert("Error", message);
+			const message = confirmError instanceof Error ? confirmError.message : t("home.errors.couldNotConfirmPending");
+			Alert.alert(t("home.errors.genericTitle"), message);
 		} finally {
 			setIsConfirmingPending(false);
 		}
@@ -126,7 +128,7 @@ export default function HomeScreen() {
 	if (error || !dashboardData) {
 		return (
 			<View className="flex-1 items-center justify-center bg-[#060F24] px-6">
-				<Text className="text-center text-base text-app-textPrimary">{error || "No dashboard data available"}</Text>
+				<Text className="text-center text-base text-app-textPrimary">{error || t("home.errors.noDashboardData")}</Text>
 			</View>
 		);
 	}

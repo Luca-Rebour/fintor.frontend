@@ -2,6 +2,7 @@ import { Stack, usePathname } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context";
 import { View } from "react-native";
+import "../i18n";
 import "../global.css";
 
 function LayoutWithInsets() {

@@ -8,11 +8,13 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useTranslation } from "react-i18next";
 import { AppIcon } from "../../components/shared/AppIcon";
 
 import { getStoredJwt, loadAuthenticatedUser } from "../../services/auth.service";
 
 export default function ProtectedTabsLayout() {
+  const { t } = useTranslation();
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isMoreMenuVisible, setIsMoreMenuVisible] = useState(false);
@@ -81,7 +83,7 @@ export default function ProtectedTabsLayout() {
         <Tabs.Screen
           name="home"
           options={{
-            title: "Home",
+            title: t("tabs.home"),
             tabBarIcon: ({ color, size }) => (
               <AppIcon name="House" color={color} size={size} />
             ),
@@ -91,7 +93,7 @@ export default function ProtectedTabsLayout() {
         <Tabs.Screen
           name="transactions"
           options={{
-            title: "Transactions",
+            title: t("tabs.transactions"),
             tabBarIcon: ({ color, size }) => (
               <AppIcon name="DollarSign" color={color} size={size} />
             ),
@@ -101,18 +103,18 @@ export default function ProtectedTabsLayout() {
         <Tabs.Screen
           name="more"
           options={{
-            title: "More",
+            title: t("tabs.more"),
             tabBarButton: () => (
               <Pressable
                 onPress={openMoreMenu}
                 accessibilityRole="button"
-                accessibilityLabel="Open more tab options"
+                accessibilityLabel={t("tabs.openMoreTabOptions")}
                 className="-mt-2 items-center"
               >
                 <View className="h-14 w-14 items-center justify-center rounded-full bg-[#18C8FF]">
                   <AppIcon name="Ellipsis" color="#060F24" size={24} />
                 </View>
-                <Text className="mt-1 text-[11px] font-semibold text-[#94A3B8]">More</Text>
+                <Text className="mt-1 text-[11px] font-semibold text-[#94A3B8]">{t("tabs.more")}</Text>
               </Pressable>
             ),
           }}
@@ -140,7 +142,7 @@ export default function ProtectedTabsLayout() {
         <Tabs.Screen
           name="goals"
           options={{
-            title: "Goals",
+            title: t("tabs.goals"),
             tabBarIcon: ({ color, size }) => (
               <AppIcon name="Target" color={color} size={size} />
             ),
@@ -150,7 +152,7 @@ export default function ProtectedTabsLayout() {
         <Tabs.Screen
           name="profile"
           options={{
-            title: "Profile",
+            title: t("tabs.profile"),
             tabBarIcon: ({ color, size }) => (
               <AppIcon name="User" color={color} size={size} />
             ),
@@ -171,7 +173,7 @@ export default function ProtectedTabsLayout() {
               onPress={() => navigateToTab("/tabs/recurringTransactions")}
             >
               <AppIcon name="Calendar" color="#18C8FF" size={18} />
-              <Text className="ml-2 text-base font-medium text-white">Recurring Transactions</Text>
+              <Text className="ml-2 text-base font-medium text-white">{t("tabs.recurringTransactions")}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -179,7 +181,7 @@ export default function ProtectedTabsLayout() {
               onPress={() => navigateToTab("/tabs/recurringAdmin")}
             >
               <AppIcon name="Settings" color="#18C8FF" size={18} />
-              <Text className="ml-2 text-base font-medium text-white">Manage Recurring</Text>
+              <Text className="ml-2 text-base font-medium text-white">{t("tabs.manageRecurring")}</Text>
             </TouchableOpacity>
           </View>
         </Pressable>

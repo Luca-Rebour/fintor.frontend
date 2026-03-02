@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, Pressable, ScrollView, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
+import { useTranslation } from "react-i18next";
 
 import { ProfileHeader } from "../../components/profile/ProfileHeader";
 import { ProfileMenuSection } from "../../components/profile/ProfileMenuSection";
@@ -11,6 +12,7 @@ import { ProfileData } from "../../types/profile";
 import { User } from "../../types/api/signUp";
 
 export default function ProfileScreen() {
+	const { t, i18n } = useTranslation();
 	const router = useRouter();
 	const [profileData, setProfileData] = useState<ProfileData | null>(null);
 	const [authUser, setAuthUser] = useState<User | null>(getAuthUserSnapshot());
@@ -29,7 +31,7 @@ export default function ProfileScreen() {
 				const data = await getProfileData();
 				setProfileData(data);
 			} catch (loadError) {
-				const message = loadError instanceof Error ? loadError.message : "Failed to load profile";
+				const message = loadError instanceof Error ? loadError.message : t("profile.errors.failedToLoad");
 				setError(message);
 			} finally {
 				setIsLoading(false);
@@ -45,8 +47,14 @@ export default function ProfileScreen() {
 
 	async function handleLogout() {
 		await clearStoredJwt();
-		Alert.alert("Session closed", "You have been logged out.");
+		Alert.alert(t("profile.logout.title"), t("profile.logout.message"));
 		router.replace("/");
+	}
+
+	const currentLanguage = (i18n.resolvedLanguage ?? i18n.language).startsWith("es") ? "es" : "en";
+
+	function handleLanguageChange(language: "es" | "en") {
+		void i18n.changeLanguage(language);
 	}
 
 	if (isLoading) {
@@ -60,7 +68,7 @@ export default function ProfileScreen() {
 	if (error || !profileData) {
 		return (
 			<View className="flex-1 items-center justify-center bg-[#062027] px-6">
-				<Text className="text-center text-base text-app-textPrimary">{error || "No profile data available"}</Text>
+				<Text className="text-center text-base text-app-textPrimary">{error || t("profile.errors.noData")}</Text>
 			</View>
 		);
 	}
@@ -78,6 +86,28 @@ export default function ProfileScreen() {
 					<ProfileMenuSection key={section.id} section={section} />
 				))}
 
+				<View className="mb-4 rounded-2xl bg-app-cardSoft px-4 py-4">
+					<Text className="text-base font-semibold text-app-textPrimary">{t("profile.language.title")}</Text>
+					<View className="mt-3 flex-row gap-2">
+						<Pressable
+							onPress={() => handleLanguageChange("es")}
+							className={`rounded-full px-4 py-2 ${currentLanguage === "es" ? "bg-app-primary" : "bg-app-card"}`}
+						>
+							<Text className={`text-sm font-semibold ${currentLanguage === "es" ? "text-app-surface" : "text-app-textPrimary"}`}>
+								{t("profile.language.spanish")}
+							</Text>
+						</Pressable>
+						<Pressable
+							onPress={() => handleLanguageChange("en")}
+							className={`rounded-full px-4 py-2 ${currentLanguage === "en" ? "bg-app-primary" : "bg-app-card"}`}
+						>
+							<Text className={`text-sm font-semibold ${currentLanguage === "en" ? "text-app-surface" : "text-app-textPrimary"}`}>
+								{t("profile.language.english")}
+							</Text>
+						</Pressable>
+					</View>
+				</View>
+
 				<LinearGradient
 					colors={["#F43F5E", "#9333EA"]}
 					start={{ x: 0, y: 0.5 }}
@@ -85,7 +115,7 @@ export default function ProfileScreen() {
 					style={{ borderRadius: 9999 }}
 				>
 					<Pressable onPress={handleLogout} className="rounded-full py-4">
-						<Text className="text-center text-base font-bold text-app-textPrimary">Logout</Text>
+						<Text className="text-center text-base font-bold text-app-textPrimary">{t("profile.logout.button")}</Text>
 					</Pressable>
 				</LinearGradient>
 
