@@ -1,5 +1,4 @@
-import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 
@@ -7,12 +6,11 @@ import { GoalTargetCard } from "../../components/goals/GoalTargetCard";
 import { GoalsHeader } from "../../components/goals/GoalsHeader";
 import { SavingsOverviewCard } from "../../components/goals/SavingsOverviewCard";
 import { getGoalsData } from "../../services/goals.service";
-import { GoalsData } from "../../types/goals.types";
+import { GoalApi } from "../../types/goals.types";
 
 export default function GoalsScreen() {
 	const { t } = useTranslation();
-	const router = useRouter();
-	const [goalsData, setGoalsData] = useState<GoalsData | null>(null);
+	const [goalsData, setGoalsData] = useState<GoalApi[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState("");
 
@@ -37,6 +35,27 @@ export default function GoalsScreen() {
 		loadGoals();
 	}, []);
 
+	const overview = useMemo(() => {
+		const totalSavings = goalsData.reduce(
+			(sum, goal) => sum + Math.max(0, Number(goal.currentAmount) || 0),
+			0,
+		);
+
+		const totalGoal = goalsData.reduce(
+			(sum, goal) => sum + Math.max(0, Number(goal.targetAmount) || 0),
+			0,
+		);
+
+		const monthlyChangePercent = totalGoal > 0 ? Math.round((totalSavings / totalGoal) * 100) : 0;
+
+		return {
+			totalSavings,
+			monthlyChangePercent,
+			currentValue: totalSavings,
+			goalValue: totalGoal,
+		};
+	}, [goalsData]);
+
 	return (
 		<View className="flex-1 bg-[#060F24]">
 			<GoalsHeader title={t("goals.title")} />
@@ -55,7 +74,7 @@ export default function GoalsScreen() {
 						<Text className="text-app-primary font-semibold">{t("common.retry")}</Text>
 					</Pressable>
 				</View>
-			) : goalsData ? (
+			) : (
 				<ScrollView
 					showsVerticalScrollIndicator={false}
 					contentContainerStyle={{
@@ -65,10 +84,10 @@ export default function GoalsScreen() {
 					}}
 				>
 					<SavingsOverviewCard
-						totalSavings={goalsData.overview.totalSavings}
-						monthlyChangePercent={goalsData.overview.monthlyChangePercent}
-						currentValue={goalsData.overview.currentValue}
-						goalValue={goalsData.overview.goalValue}
+						totalSavings={overview.totalSavings}
+						monthlyChangePercent={overview.monthlyChangePercent}
+						currentValue={overview.currentValue}
+						goalValue={overview.goalValue}
 					/>
 
 					<View className="mt-6 mb-3 flex-row items-center justify-between">
@@ -77,12 +96,12 @@ export default function GoalsScreen() {
 					</View>
 
 					<View className="gap-4">
-						{goalsData.targets.map((goal) => (
+						{goalsData.map((goal) => (
 							<GoalTargetCard key={goal.id} goal={goal} />
 						))}
 					</View>
 				</ScrollView>
-			) : null}
+			)}
 		</View>
 	);
 }
