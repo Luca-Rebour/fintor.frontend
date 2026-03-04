@@ -1,7 +1,6 @@
 import { Link, useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
-import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
-import { Platform, Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { useTranslation } from "react-i18next";
 
 import { AuthInput } from "../components/auth/AuthInput";
@@ -9,6 +8,7 @@ import { AuthPrimaryButton } from "../components/auth/AuthPrimaryButton";
 import { AuthScreenFrame } from "../components/auth/AuthScreenFrame";
 import { AuthSocialButton } from "../components/auth/AuthSocialButton";
 import { AppIcon } from "../components/shared/AppIcon";
+import { AppDatePicker } from "../components/shared/DatePicker";
 import { APP_GRADIENTS } from "../constants/colors";
 import { CurrencyOption, loadCurrencyOptions } from "../services/currencies.service";
 import { signUpWithEmail } from "../services/auth.service";
@@ -56,8 +56,6 @@ export default function SignupScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState("");
-  const [dateOfBirthValue, setDateOfBirthValue] = useState<Date | null>(null);
-  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [mainCurrencyCode, setMainCurrencyCode] = useState("USD");
   const [currencyOptions, setCurrencyOptions] = useState<CurrencyOption[]>([]);
   const [isCurrencyPickerOpen, setIsCurrencyPickerOpen] = useState(false);
@@ -94,30 +92,6 @@ export default function SignupScreen() {
       return normalizedCode.includes(normalizedQuery) || normalizedName.includes(normalizedQuery);
     });
   }, [currencyOptions, currencySearchText]);
-
-  function formatDate(value: Date) {
-    const year = value.getFullYear();
-    const month = `${value.getMonth() + 1}`.padStart(2, "0");
-    const day = `${value.getDate()}`.padStart(2, "0");
-
-    return `${year}-${month}-${day}`;
-  }
-
-  function handleDateChange(event: DateTimePickerEvent, selectedDate?: Date) {
-    if (event.type === "dismissed") {
-      setIsDatePickerOpen(false);
-      return;
-    }
-
-    if (selectedDate) {
-      setDateOfBirthValue(selectedDate);
-      setDateOfBirth(formatDate(selectedDate));
-    }
-
-    if (Platform.OS === "android") {
-      setIsDatePickerOpen(false);
-    }
-  }
 
   function isValidEmail(value: string) {
     const normalizedEmail = value.trim();
@@ -174,7 +148,6 @@ export default function SignupScreen() {
                 setStep(1);
                 setIsCurrencyPickerOpen(false);
                 setCurrencySearchText("");
-                setIsDatePickerOpen(false);
                 return;
               }
 
@@ -281,44 +254,19 @@ export default function SignupScreen() {
               ) : null}
             </View>
 
-            <View className="relative mb-1">
-              <AuthInput
+            <View className="mb-4">
+              <AppDatePicker
                 label={t("auth.signup.dateOfBirthLabel")}
-                placeholder={t("auth.signup.dateOfBirthPlaceholder")}
-                icon="Calendar"
                 value={dateOfBirth}
-                onChangeText={() => undefined}
-              />
-
-              <Pressable
-                onPress={() => setIsDatePickerOpen(true)}
-                className="absolute left-0 right-0 bottom-0 h-14"
+                placeholder={t("auth.signup.dateOfBirthPlaceholder")}
+                initialDate={new Date(2000, 0, 1)}
+                maximumDate={new Date()}
+                iosTitle={t("auth.signup.dateOfBirthLabel")}
+                cancelLabel={t("common.cancel")}
+                doneLabel={t("common.done")}
+                onChange={setDateOfBirth}
               />
             </View>
-
-            {isDatePickerOpen ? (
-              <View className="mb-4 rounded-2xl border border-[#1E2A47] bg-[#0C1830] px-3 py-2">
-                <DateTimePicker
-                  value={dateOfBirthValue ?? new Date(2000, 0, 1)}
-                  mode="date"
-                  display={Platform.OS === "ios" ? "spinner" : "default"}
-                  onChange={handleDateChange}
-                  maximumDate={new Date()}
-                  themeVariant={Platform.OS === "ios" ? "dark" : undefined}
-                  textColor={Platform.OS === "ios" ? "#E2E8F0" : undefined}
-                  accentColor={Platform.OS === "ios" ? "#18C8FF" : undefined}
-                />
-
-                {Platform.OS === "ios" ? (
-                  <Pressable
-                    onPress={() => setIsDatePickerOpen(false)}
-                    className="mt-2 self-end rounded-lg border border-[#1E2A47] px-3 py-1"
-                  >
-                    <Text className="text-sm text-app-primary">{t("common.done")}</Text>
-                  </Pressable>
-                ) : null}
-              </View>
-            ) : null}
 
             <View className="mb-5">
               <Text className="mb-2 text-sm font-semibold text-app-textPrimary">{t("auth.signup.mainCurrencyLabel")}</Text>
