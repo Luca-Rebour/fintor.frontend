@@ -148,6 +148,7 @@ const es = {
       couldNotConfirm: "No se pudo confirmar la transacción recurrente",
       couldNotReschedule: "No se pudo reprogramar la transacción recurrente",
       couldNotCancel: "No se pudo cancelar la transacción recurrente",
+      couldNotDelete: "No se pudo eliminar la transacción recurrente",
       invalidDateTitle: "Fecha inválida",
       invalidDateMessage: "Seleccioná una fecha posterior a hoy.",
       genericTitle: "Error",
@@ -167,6 +168,7 @@ const es = {
       reschedule: "Reprogramar",
       keep: "Mantener",
       cancelTransaction: "Cancelar transacción",
+      deleteRecurring: "Eliminar",
       saveDate: "Guardar fecha",
     },
     reschedule: {

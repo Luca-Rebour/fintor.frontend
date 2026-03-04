@@ -22,6 +22,7 @@ import { RecurringTypeToggle } from "../../components/recurring/RecurringTypeTog
 import {
 	cancelPendingRecurringApproval,
 	confirmPendingRecurringApproval,
+	deleteRecurringTransaction,
 	getRecurringTransactionsSnapshot,
 	refreshRecurringTransactionsData,
 	reschedulePendingRecurringApproval,
@@ -254,6 +255,32 @@ export default function RecurringTransactionsScreen() {
 		Alert.alert(
 			t("recurring.alerts.detailTitle"),
 			t("recurring.alerts.detailMessage", { name: recurringTransaction.name }),
+			[
+				{ text: t("common.cancel"), style: "cancel" },
+				{
+					text: t("recurring.actions.deleteRecurring"),
+					style: "destructive",
+					onPress: async () => {
+						if (isSubmittingAction) {
+							return;
+						}
+
+						try {
+							setIsSubmittingAction(true);
+							await deleteRecurringTransaction(recurringTransaction.id);
+							await loadRecurringTransactions(false);
+						} catch (actionError) {
+							const message =
+								actionError instanceof Error
+									? actionError.message
+									: t("recurring.errors.couldNotDelete");
+							Alert.alert(t("recurring.errors.genericTitle"), message);
+						} finally {
+							setIsSubmittingAction(false);
+						}
+					},
+				},
+			],
 		);
 	}
 
