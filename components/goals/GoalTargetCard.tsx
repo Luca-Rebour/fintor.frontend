@@ -8,13 +8,25 @@ type GoalTargetCardProps = {
   goal: GoalApi;
 };
 
-function formatCurrency(amount: number) {
-  return `$${amount.toLocaleString("en-US")}`;
+function formatCurrency(amount: number, currencyCode: string) {
+  const normalizedCurrency = currencyCode?.trim().toUpperCase() || "USD";
+
+  try {
+    return new Intl.NumberFormat(undefined, {
+      style: "currency",
+      currency: normalizedCurrency,
+      currencyDisplay: "code",
+      maximumFractionDigits: 2,
+    }).format(amount);
+  } catch {
+    return `${normalizedCurrency} ${amount.toFixed(2)}`;
+  }
 }
 
 export function GoalTargetCard({ goal }: GoalTargetCardProps) {
   const normalizedTargetAmount = Math.max(0, Number(goal.targetAmount) || 0);
   const normalizedCurrentAmount = Math.max(0, Number(goal.currentAmount) || 0);
+  const currencyCode = goal.currencyCode?.trim().toUpperCase() || "USD";
   const progressPercent = normalizedTargetAmount > 0
     ? Math.round((normalizedCurrentAmount / normalizedTargetAmount) * 100)
     : 0;
@@ -60,10 +72,10 @@ export function GoalTargetCard({ goal }: GoalTargetCardProps) {
 
       <View className="mt-4 flex-row items-center justify-between">
         <Text className="text-sm font-medium text-app-textPrimary">
-          {formatCurrency(normalizedCurrentAmount)}
+          {formatCurrency(normalizedCurrentAmount, currencyCode)}
         </Text>
         <Text className="text-sm text-app-textSecondary">
-          {formatCurrency(normalizedTargetAmount)}
+          {formatCurrency(normalizedTargetAmount, currencyCode)}
         </Text>
       </View>
 

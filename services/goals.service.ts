@@ -14,6 +14,7 @@ const MOCK_GOALS_DATA: GoalApi[] = [
     targetDate: "2026-12-01",
     accentColor: "#8B5CF6",
     accountName: "Cuenta principal",
+    currencyCode: "USD",
   },
   {
     id: "goal-house",
@@ -25,6 +26,7 @@ const MOCK_GOALS_DATA: GoalApi[] = [
     targetDate: "2027-08-01",
     accentColor: "#EC4899",
     accountName: "Cuenta principal",
+    currencyCode: "USD",
   },
 ];
 
@@ -42,6 +44,7 @@ function normalizeGoal(goal: GoalApi): GoalApi {
     targetDate: goal.targetDate || new Date().toISOString(),
     accentColor: goal.accentColor?.trim() || "#8B5CF6",
     accountName: goal.accountName?.trim() || "Cuenta principal",
+    currencyCode: goal.currencyCode?.trim().toUpperCase() || "USD",
   };
 }
 

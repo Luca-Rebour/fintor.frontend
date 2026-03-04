@@ -8,6 +8,7 @@ export type GoalApi = {
     targetDate: string;
     accentColor: string;
     accountName: string;
+    currencyCode: string;
 };
 
 export type CreateGoalDTO = {
