@@ -1,22 +1,24 @@
-export type GoalTarget = {
-  id: string;
+export type GoalApi = {
+    id: string;
+    title: string;
+    description: string;
+    targetAmount: number;
+    currentAmount: number;
+    icon: string;
+    targetDate: string;
+    accentColor: string;
+    accountName: string;
+    currencyCode: string;
+};
+
+export type CreateGoalDTO = {
   title: string;
-  subtitle: string;
-  currentAmount: number;
+  description: string;
   targetAmount: number;
+  currentAmount: number;
+  icon: string;
   targetDate: string;
-  icon: "Truck" | "House";
   accentColor: string;
-};
-
-export type GoalsOverview = {
-  totalSavings: number;
-  monthlyChangePercent: number;
-  currentValue: number;
-  goalValue: number;
-};
-
-export type GoalsData = {
-  overview: GoalsOverview;
-  targets: GoalTarget[];
+  accountId: string;
+  exchangeRate: number;
 };
