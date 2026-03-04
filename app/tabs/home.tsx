@@ -9,6 +9,7 @@ import { NetWorthSection } from "../../components/home/ExpenseByCategoryChart";
 import { PendingIncomeCard } from "../../components/home/PendingIncomeCard";
 import { getAuthUserSnapshot, subscribeToAuthUser } from "../../services/auth.service";
 import { getDashboardData } from "../../services/dashboard.service";
+import { getGoalsData } from "../../services/goals.service";
 import {
 	getTransactionsData,
 	getTransactionsSnapshot,
@@ -23,6 +24,7 @@ import {
 import { DashboardData } from "../../types/dashboard";
 import { User } from "../../types/api/signUp";
 import { RecurringPendingApprovalApiDTO } from "../../types/api/recurring";
+import { GoalApi } from "../../types/goals.types";
 import { RecurringTransactionsData } from "../../types/recurring";
 import { PendingTransactionStatus } from "../../types/enums/pendingTransactionStatus";
 import { TransactionDTO } from "../../types/transaction";
@@ -80,6 +82,7 @@ function formatCurrencyAmount(amount: number, currencyCode: string): string {
 export default function HomeScreen() {
 	const { t } = useTranslation();
 	const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
+	const [goalsData, setGoalsData] = useState<GoalApi[]>([]);
 	const [recurringData, setRecurringData] = useState<RecurringTransactionsData>(getRecurringTransactionsSnapshot());
 	const [transactionsData, setTransactionsData] = useState<TransactionDTO[]>(getTransactionsSnapshot());
 	const [authUser, setAuthUser] = useState<User | null>(getAuthUserSnapshot());
@@ -95,12 +98,14 @@ export default function HomeScreen() {
 				setIsLoading(true);
 			}
 			setError("");
-			const [data] = await Promise.all([
+			const [data, goals] = await Promise.all([
 				getDashboardData(),
+				getGoalsData(),
 				refreshRecurringTransactionsData(),
 				getTransactionsData(),
 			]);
 			setDashboardData(data);
+			setGoalsData(goals);
 		} catch (loadError) {
 			const message = loadError instanceof Error ? loadError.message : t("home.errors.failedToLoadDashboard");
 			setError(message);
@@ -204,6 +209,35 @@ export default function HomeScreen() {
 		[recurringData],
 	);
 
+	const topGoalForHome = useMemo(() => {
+		if (!goalsData.length) {
+			return null;
+		}
+
+		const goalWithHighestProgress = goalsData.reduce((bestGoal, candidateGoal) => {
+			const candidateTarget = Math.max(0, Number(candidateGoal.targetAmount) || 0);
+			const candidateCurrent = Math.max(0, Number(candidateGoal.currentAmount) || 0);
+			const candidateProgress = candidateTarget > 0 ? (candidateCurrent / candidateTarget) * 100 : 0;
+
+			const bestTarget = Math.max(0, Number(bestGoal.targetAmount) || 0);
+			const bestCurrent = Math.max(0, Number(bestGoal.currentAmount) || 0);
+			const bestProgress = bestTarget > 0 ? (bestCurrent / bestTarget) * 100 : 0;
+
+			return candidateProgress > bestProgress ? candidateGoal : bestGoal;
+		});
+
+		const current = Math.max(0, Number(goalWithHighestProgress.currentAmount) || 0);
+		const target = Math.max(0, Number(goalWithHighestProgress.targetAmount) || 0);
+		const progressPercent = target > 0 ? Math.min(100, Math.round((current / target) * 100)) : 0;
+
+		return {
+			title: goalWithHighestProgress.title,
+			current,
+			target,
+			progressPercent,
+		};
+	}, [goalsData]);
+
 	const userDisplayName = `${authUser?.name ?? ""} ${authUser?.lastName ?? ""}`.trim() || dashboardData?.userName || "";
 
 	if (isLoading) {
@@ -247,7 +281,14 @@ export default function HomeScreen() {
 				/>
 
 				<CashFlowSection metrics={cashFlowMetrics} />
-				<GoalSection goal={dashboardData.goal} />
+				{topGoalForHome ? (
+					<GoalSection goal={topGoalForHome} />
+				) : (
+					<View className="mb-8 rounded-2xl bg-app-cardSoft p-4">
+						<Text className="text-base font-semibold text-app-textPrimary">Sin metas activas</Text>
+						<Text className="mt-1 text-sm text-app-textSecondary">Todavía no creaste ninguna goal.</Text>
+					</View>
+				)}
 			</ScrollView>
 		</View>
 	);

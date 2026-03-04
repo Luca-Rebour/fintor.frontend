@@ -24,7 +24,6 @@ const en = {
     login: {
       title: "Secure Login",
       subtitle: "Welcome back to your financial hub.",
-      demoCredentials: "Demo: emilys / emilyspass",
       emailLabel: "Email Address",
       emailPlaceholder: "john@finance.com",
       passwordLabel: "Password",

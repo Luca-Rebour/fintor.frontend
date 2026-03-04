@@ -50,9 +50,6 @@ export default function Index() {
           <Text className="mt-3 text-center text-base text-app-textSecondary">
             {t("auth.login.subtitle")}
           </Text>
-          <Text className="mt-2 text-center text-xs text-app-textSecondary">
-            {t("auth.login.demoCredentials")}
-          </Text>
 
           <View className="mt-10">
             <AuthInput

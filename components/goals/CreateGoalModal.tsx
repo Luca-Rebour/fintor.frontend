@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   KeyboardAvoidingView,
   Modal,
@@ -77,6 +77,9 @@ export function CreateGoalModal({
   onClose,
   onCreateTarget,
 }: CreateGoalModalProps) {
+  const targetDateInitial = useMemo(() => new Date(), []);
+  const targetDateMinimum = useMemo(() => new Date(1970, 0, 1), []);
+  const targetDateMaximum = useMemo(() => new Date(2100, 11, 31), []);
   const [accountOptions, setAccountOptions] = useState<AccountOption[]>([]);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -290,6 +293,9 @@ export function CreateGoalModal({
                 label="Fecha objetivo"
                 value={targetDate}
                 placeholder="Seleccionar fecha objetivo"
+                initialDate={targetDateInitial}
+                minimumDate={targetDateMinimum}
+                maximumDate={targetDateMaximum}
                 iosTitle="Fecha objetivo"
                 cancelLabel="Cancelar"
                 doneLabel="Listo"

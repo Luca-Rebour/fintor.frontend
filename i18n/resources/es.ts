@@ -24,7 +24,6 @@ const es = {
     login: {
       title: "Inicio seguro",
       subtitle: "Te damos la bienvenida a tu centro financiero.",
-      demoCredentials: "Demo: emilys / emilyspass",
       emailLabel: "Correo electrónico",
       emailPlaceholder: "john@finance.com",
       passwordLabel: "Contraseña",

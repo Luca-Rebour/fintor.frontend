@@ -3,33 +3,6 @@ import { apiGet, apiPost } from "./api.client";
 
 type GoalsResponse = GoalApi[] | { goals: GoalApi[] } | GoalApi;
 
-const MOCK_GOALS_DATA: GoalApi[] = [
-  {
-    id: "goal-car",
-    title: "Comprar Auto",
-    description: "Tesla Model 3",
-    targetAmount: 20000,
-    currentAmount: 13000,
-    icon: "Truck",
-    targetDate: "2026-12-01",
-    accentColor: "#8B5CF6",
-    accountName: "Cuenta principal",
-    currencyCode: "USD",
-  },
-  {
-    id: "goal-house",
-    title: "Comprar Casa",
-    description: "Down payment",
-    targetAmount: 100000,
-    currentAmount: 28000,
-    icon: "House",
-    targetDate: "2027-08-01",
-    accentColor: "#EC4899",
-    accountName: "Cuenta principal",
-    currencyCode: "USD",
-  },
-];
-
 function normalizeGoal(goal: GoalApi): GoalApi {
   const normalizedTargetAmount = Number(goal.targetAmount);
   const normalizedCurrentAmount = Number(goal.currentAmount);
@@ -68,19 +41,12 @@ function unwrapGoalsResponse(response: GoalsResponse): GoalApi[] {
   return [];
 }
 
-function wait(ms: number) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-}
-
 export async function getGoalsData(): Promise<GoalApi[]> {
   try {
     const response = await apiGet<GoalsResponse>("/goals");
     return normalizeGoals(unwrapGoalsResponse(response));
   } catch {
-    await wait(650);
-    return normalizeGoals(MOCK_GOALS_DATA);
+    return [];
   }
 }
 

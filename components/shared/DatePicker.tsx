@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Modal, Platform, Pressable, Text, View } from "react-native";
 import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 
@@ -7,6 +7,9 @@ type AppDatePickerProps = {
 	value: string;
 	placeholder: string;
 	disabled?: boolean;
+	initialDate?: Date;
+	minimumDate?: Date;
+	maximumDate?: Date;
 	iosTitle?: string;
 	cancelLabel?: string;
 	doneLabel?: string;
@@ -21,11 +24,29 @@ function formatDateForForm(date: Date): string {
 	return `${year}-${month}-${day}`;
 }
 
-function resolveDateFromForm(value: string): Date {
-	const parsedDate = new Date(`${value}T00:00:00`);
+function resolveDateFromForm(value: string, fallbackDate: Date): Date {
+	const normalizedValue = String(value ?? "").trim();
+	const matchedDateParts = normalizedValue.match(/^(\d{4})-(\d{2})-(\d{2})$/);
 
-	if (!value || Number.isNaN(parsedDate.getTime())) {
-		return new Date();
+	if (!matchedDateParts) {
+		return fallbackDate;
+	}
+
+	const year = Number(matchedDateParts[1]);
+	const month = Number(matchedDateParts[2]);
+	const day = Number(matchedDateParts[3]);
+	const parsedDate = new Date(year, month - 1, day);
+
+	if (Number.isNaN(parsedDate.getTime())) {
+		return fallbackDate;
+	}
+
+	if (
+		parsedDate.getFullYear() !== year ||
+		parsedDate.getMonth() !== month - 1 ||
+		parsedDate.getDate() !== day
+	) {
+		return fallbackDate;
 	}
 
 	return parsedDate;
@@ -36,26 +57,36 @@ export function AppDatePicker({
 	value,
 	placeholder,
 	disabled = false,
+	initialDate,
+	minimumDate,
+	maximumDate,
 	iosTitle,
 	cancelLabel = "Cancelar",
 	doneLabel = "Listo",
 	onChange,
 }: AppDatePickerProps) {
+	const fallbackDate = useMemo(() => {
+		if (initialDate instanceof Date && !Number.isNaN(initialDate.getTime())) {
+			return new Date(initialDate.getTime());
+		}
+
+		return new Date();
+	}, [initialDate?.getTime()]);
 	const [isOpen, setIsOpen] = useState(false);
-	const [draftDate, setDraftDate] = useState(resolveDateFromForm(value));
+	const [draftDate, setDraftDate] = useState(resolveDateFromForm(value, fallbackDate));
 
 	useEffect(() => {
 		if (!isOpen) {
-			setDraftDate(resolveDateFromForm(value));
+			setDraftDate(resolveDateFromForm(value, fallbackDate));
 		}
-	}, [value, isOpen]);
+	}, [value, isOpen, fallbackDate]);
 
 	function openPicker() {
 		if (disabled) {
 			return;
 		}
 
-		setDraftDate(resolveDateFromForm(value));
+		setDraftDate(resolveDateFromForm(value, fallbackDate));
 		setIsOpen(true);
 	}
 
@@ -84,6 +115,7 @@ export function AppDatePicker({
 			return;
 		}
 
+		setDraftDate(selectedDate);
 		applySelectedDate(selectedDate);
 		closePicker();
 	}
@@ -103,9 +135,11 @@ export function AppDatePicker({
 
 			{isOpen && Platform.OS !== "ios" ? (
 				<DateTimePicker
-					value={resolveDateFromForm(value)}
+					value={draftDate}
 					mode="date"
 					display="default"
+					minimumDate={minimumDate}
+					maximumDate={maximumDate}
 					onChange={handleDateChange}
 				/>
 			) : null}
@@ -136,7 +170,14 @@ export function AppDatePicker({
 								</Pressable>
 							</View>
 
-							<DateTimePicker value={draftDate} mode="date" display="spinner" onChange={handleDateChange} />
+							<DateTimePicker
+								value={draftDate}
+								mode="date"
+								display="spinner"
+								minimumDate={minimumDate}
+								maximumDate={maximumDate}
+								onChange={handleDateChange}
+							/>
 						</View>
 					</View>
 				</Modal>
