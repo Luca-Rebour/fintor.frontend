@@ -48,8 +48,6 @@ With `EXPO_PUBLIC_API_BASE_URL`, services call these routes:
 - `GET /profile`
 - `GET /transactions`
 
-If `dashboard`, `goals`, `profile`, or `transactions` endpoints are not available yet, the app uses local fallback mock data so screens keep working while backend is being integrated.
-
 ## Internationalization (i18n)
 
 The app uses `i18next` + `react-i18next` with Expo localization.
