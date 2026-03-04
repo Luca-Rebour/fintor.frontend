@@ -15,6 +15,7 @@ import { getExchangeRateForCurrencies } from "../../services/currencies.service"
 import { AccountOption } from "../../types/account";
 import { CreateGoalDTO } from "../../types/goals.types";
 import { AppIcon } from "../shared/AppIcon";
+import { AppDatePicker } from "../shared/DatePicker";
 import { ICON_COLOR_OPTIONS, IconColorPicker } from "../shared/IconColorPicker";
 
 type CreateGoalModalProps = {
@@ -83,7 +84,7 @@ export function CreateGoalModal({
   const [currentAmount, setCurrentAmount] = useState("");
   const [targetDate, setTargetDate] = useState("");
   const [selectedIcon, setSelectedIcon] = useState(DEFAULT_GOAL_ICON);
-  const [selectedColor, setSelectedColor] = useState(DEFAULT_ACCENT_COLOR);
+  const [selectedColor, setSelectedColor] = useState<string>(DEFAULT_ACCENT_COLOR);
   const [accountId, setAccountId] = useState("");
   const [titleError, setTitleError] = useState("");
   const [targetAmountError, setTargetAmountError] = useState("");
@@ -157,7 +158,6 @@ export function CreateGoalModal({
   async function handleCreate() {
     const parsedTargetAmount = Number(targetAmount.replace(",", "."));
     const parsedCurrentAmount = Number((currentAmount || "0").replace(",", "."));
-    const parsedDate = new Date(`${targetDate}T00:00:00`);
 
     const nextTitleError = title.trim() ? "" : "Ingresá un título";
     const nextTargetAmountError =
@@ -168,10 +168,7 @@ export function CreateGoalModal({
       Number.isFinite(parsedCurrentAmount) && parsedCurrentAmount >= 0
         ? ""
         : "Ingresá un monto actual válido";
-    const nextDateError =
-      /^\d{4}-\d{2}-\d{2}$/.test(targetDate) && !Number.isNaN(parsedDate.getTime())
-        ? ""
-        : "Usá formato YYYY-MM-DD";
+    const nextDateError = targetDate ? "" : "Seleccioná una fecha objetivo";
     const nextAccountError = accountId ? "" : "Seleccioná una cuenta";
 
     setTitleError(nextTitleError);
@@ -257,15 +254,6 @@ export function CreateGoalModal({
                 className="bg-[#0C1830] border border-[#1E2A47] rounded-xl px-3 py-3 text-app-textPrimary"
               />
 
-              <IconColorPicker
-                selectedIcon={selectedIcon}
-                selectedColor={selectedColor}
-                onChangeIcon={setSelectedIcon}
-                onChangeColor={setSelectedColor}
-                selectedIconLabel="Ícono seleccionado"
-                colorSectionLabel="Color"
-              />
-
               <Text className="text-app-textSecondary text-xs uppercase mt-3 mb-2">Monto objetivo</Text>
               <TextInput
                 value={targetAmount}
@@ -298,18 +286,19 @@ export function CreateGoalModal({
               />
               {currentAmountError ? <Text className="text-red-400 text-xs mt-2">{currentAmountError}</Text> : null}
 
-              <Text className="text-app-textSecondary text-xs uppercase mt-3 mb-2">Fecha objetivo</Text>
-              <TextInput
+              <AppDatePicker
+                label="Fecha objetivo"
                 value={targetDate}
-                onChangeText={(text) => {
-                  setTargetDate(text);
+                placeholder="Seleccionar fecha objetivo"
+                iosTitle="Fecha objetivo"
+                cancelLabel="Cancelar"
+                doneLabel="Listo"
+                onChange={(nextDate) => {
+                  setTargetDate(nextDate);
                   if (dateError) {
                     setDateError("");
                   }
                 }}
-                placeholder="YYYY-MM-DD"
-                placeholderTextColor="#64748B"
-                className="bg-[#0C1830] border border-[#1E2A47] rounded-xl px-3 py-3 text-app-textPrimary"
               />
               {dateError ? <Text className="text-red-400 text-xs mt-2">{dateError}</Text> : null}
 
@@ -323,6 +312,15 @@ export function CreateGoalModal({
                 <AppIcon name={isAccountOpen ? "ChevronUp" : "ChevronDown"} size={16} color="#94A3B8" />
               </Pressable>
               {accountError ? <Text className="text-red-400 text-xs mt-2">{accountError}</Text> : null}
+
+              <IconColorPicker
+                selectedIcon={selectedIcon}
+                selectedColor={selectedColor}
+                onChangeIcon={setSelectedIcon}
+                onChangeColor={setSelectedColor}
+                selectedIconLabel="Ícono seleccionado"
+                colorSectionLabel="Color"
+              />
             </ScrollView>
 
             <View className="px-5 py-4 border-t border-[#1E2A47]">
