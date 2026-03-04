@@ -148,6 +148,7 @@ const en = {
       couldNotConfirm: "Could not confirm recurring transaction",
       couldNotReschedule: "Could not reschedule recurring transaction",
       couldNotCancel: "Could not cancel recurring transaction",
+      couldNotDelete: "Could not delete recurring transaction",
       invalidDateTitle: "Invalid date",
       invalidDateMessage: "Please select a date after today.",
       genericTitle: "Error",
@@ -167,6 +168,7 @@ const en = {
       reschedule: "Reschedule",
       keep: "Keep",
       cancelTransaction: "Cancel transaction",
+      deleteRecurring: "Delete",
       saveDate: "Save date",
     },
     reschedule: {
