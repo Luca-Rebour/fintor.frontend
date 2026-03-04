@@ -32,7 +32,15 @@ export function CashFlowSection({ metrics }: CashFlowSectionProps) {
               />
             </View>
             <Text className="text-xs text-app-textSecondary">{metric.label}</Text>
-            <Text className="mt-1 text-3xl font-bold text-app-textPrimary">{metric.amount}</Text>
+            <Text
+              className="mt-1 text-3xl font-bold text-app-textPrimary"
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.65}
+              ellipsizeMode="tail"
+            >
+              {metric.amount}
+            </Text>
           </View>
         ))}
       </View>

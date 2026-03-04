@@ -10,6 +10,11 @@ import { PendingIncomeCard } from "../../components/home/PendingIncomeCard";
 import { getAuthUserSnapshot, subscribeToAuthUser } from "../../services/auth.service";
 import { getDashboardData } from "../../services/dashboard.service";
 import {
+	getTransactionsData,
+	getTransactionsSnapshot,
+	subscribeToTransactions,
+} from "../../services/transactions.service";
+import {
 	confirmPendingRecurringApproval,
 	getRecurringTransactionsSnapshot,
 	refreshRecurringTransactionsData,
@@ -20,6 +25,7 @@ import { User } from "../../types/api/signUp";
 import { RecurringPendingApprovalApiDTO } from "../../types/api/recurring";
 import { RecurringTransactionsData } from "../../types/recurring";
 import { PendingTransactionStatus } from "../../types/enums/pendingTransactionStatus";
+import { TransactionDTO } from "../../types/transaction";
 
 function isPendingStatus(value: unknown): boolean {
 	if (typeof value === "number") {
@@ -34,10 +40,48 @@ function isPendingStatus(value: unknown): boolean {
 	return false;
 }
 
+function isDateInCurrentMonth(dateValue: string, now: Date): boolean {
+	const transactionDate = new Date(dateValue);
+
+	if (Number.isNaN(transactionDate.getTime())) {
+		return false;
+	}
+
+	return (
+		transactionDate.getFullYear() === now.getFullYear() &&
+		transactionDate.getMonth() === now.getMonth()
+	);
+}
+
+function getUserBaseCurrencyCode(user: User | null): string {
+	const rawCode =
+		(user as unknown as { baseCurrencyCode?: string; BaseCurrencyCode?: string })?.baseCurrencyCode ??
+		(user as unknown as { baseCurrencyCode?: string; BaseCurrencyCode?: string })?.BaseCurrencyCode;
+
+	if (typeof rawCode === "string" && rawCode.trim()) {
+		return rawCode.trim().toUpperCase();
+	}
+
+	return "USD";
+}
+
+function formatCurrencyAmount(amount: number, currencyCode: string): string {
+	try {
+		return new Intl.NumberFormat(undefined, {
+			style: "currency",
+			currency: currencyCode,
+			maximumFractionDigits: 2,
+		}).format(amount);
+	} catch {
+		return `${currencyCode} ${amount.toFixed(2)}`;
+	}
+}
+
 export default function HomeScreen() {
 	const { t } = useTranslation();
 	const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
 	const [recurringData, setRecurringData] = useState<RecurringTransactionsData>(getRecurringTransactionsSnapshot());
+	const [transactionsData, setTransactionsData] = useState<TransactionDTO[]>(getTransactionsSnapshot());
 	const [authUser, setAuthUser] = useState<User | null>(getAuthUserSnapshot());
 	const [isLoading, setIsLoading] = useState(true);
 	const [isRefreshing, setIsRefreshing] = useState(false);
@@ -54,6 +98,7 @@ export default function HomeScreen() {
 			const [data] = await Promise.all([
 				getDashboardData(),
 				refreshRecurringTransactionsData(),
+				getTransactionsData(),
 			]);
 			setDashboardData(data);
 		} catch (loadError) {
@@ -95,6 +140,10 @@ export default function HomeScreen() {
 			setAuthUser(user);
 		});
 
+		const unsubscribeTransactions = subscribeToTransactions((transactions) => {
+			setTransactionsData(transactions);
+		});
+
 		const unsubscribeRecurring = subscribeToRecurringTransactions((data) => {
 			setRecurringData(data);
 		});
@@ -103,9 +152,49 @@ export default function HomeScreen() {
 
 		return () => {
 			unsubscribeAuth();
+			unsubscribeTransactions();
 			unsubscribeRecurring();
 		};
 	}, []);
+
+	const cashFlowMetrics = useMemo(() => {
+		const now = new Date();
+		let totalIncome = 0;
+		let totalExpenses = 0;
+
+		for (const transaction of transactionsData) {
+			if (!isDateInCurrentMonth(transaction.date, now)) {
+				continue;
+			}
+
+			const amount = Math.abs(Number(transaction.amount) || 0);
+
+			if (transaction.transactionType === 0) {
+				totalIncome += amount;
+			}
+
+			if (transaction.transactionType === 1) {
+				totalExpenses += amount;
+			}
+		}
+
+		const currencyCode = getUserBaseCurrencyCode(authUser);
+
+		return [
+			{
+				id: "income",
+				label: t("transactions.summary.monthlyIncome"),
+				amount: formatCurrencyAmount(totalIncome, currencyCode),
+				trend: "up" as const,
+			},
+			{
+				id: "expenses",
+				label: t("transactions.summary.monthlySpending"),
+				amount: formatCurrencyAmount(totalExpenses, currencyCode),
+				trend: "down" as const,
+			},
+		];
+	}, [transactionsData, authUser, t]);
 
 	const pendingTransactions = useMemo(
 		() =>
@@ -157,7 +246,7 @@ export default function HomeScreen() {
 					isSubmitting={isConfirmingPending}
 				/>
 
-				<CashFlowSection metrics={dashboardData.cashFlow} />
+				<CashFlowSection metrics={cashFlowMetrics} />
 				<GoalSection goal={dashboardData.goal} />
 			</ScrollView>
 		</View>
