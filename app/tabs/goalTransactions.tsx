@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 import { AppIcon } from "../../components/shared/AppIcon";
 import { TransactionListItem } from "../../components/transactions/TransactionListItem";
 import { getGoalTransactionsData } from "../../services/goals.service";
-import { TransactionDTO } from "../../types/transaction";
+import { TransactionModel as TransactionDTO } from "../../types/models/transaction.model";
 
 function resolveParamValue(input: string | string[] | undefined): string {
   if (Array.isArray(input)) {

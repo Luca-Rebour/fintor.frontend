@@ -2,7 +2,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Pressable, Text, View } from "react-native";
 import { AppIcon } from "../shared/AppIcon";
 
-import { GoalApi } from "../../types/goals.types";
+import { GoalModel as GoalApi } from "../../types/models/goal.model";
 
 type GoalTargetCardProps = {
   goal: GoalApi;

@@ -1,12 +1,12 @@
-import { CreateTransactionRequestDTO } from "./api/transaction";
+export type TransactionTypeModel = 0 | 1;
 
-export type TransactionDTO = {
+export type TransactionModel = {
   id: string;
   date: string;
   amount: number;
   description: string;
   categoryName: string;
-  transactionType: 0 | 1;
+  transactionType: TransactionTypeModel;
   icon: string;
   accountName: string;
   categoryColor: string;
@@ -17,14 +17,14 @@ export type TransactionDTO = {
   goalTitle?: string;
 };
 
-
-export type CreateTransactionDTO = Omit<
-  CreateTransactionRequestDTO,
-  "exchangeRate" | "recurringTransactionId" | "goalId" | "transactionType"
-> & {
-  transactionType: 0 | 1;
-  exchangeRate: number | null;
+export type CreateTransactionInputModel = {
+  accountId: string;
+  categoryId: string;
   recurringTransactionId?: string | null;
   goalId?: string | null;
+  amount: number;
+  description: string;
+  exchangeRate: number | null;
+  transactionType: TransactionTypeModel;
   icon?: string;
 };

@@ -22,12 +22,11 @@ import {
 	subscribeToRecurringTransactions,
 } from "../../services/recurringTransactions.service";
 import { DashboardData } from "../../types/dashboard";
-import { User } from "../../types/api/signUp";
-import { RecurringPendingApprovalApiDTO } from "../../types/api/recurring";
-import { GoalApi } from "../../types/goals.types";
-import { RecurringTransactionsData } from "../../types/recurring";
+import { AuthUserModel as User } from "../../types/models/auth.model";
+import { GoalModel as GoalApi } from "../../types/models/goal.model";
+import { RecurringPendingApprovalApiDTO, RecurringTransactionsData } from "../../types/recurring";
 import { PendingTransactionStatus } from "../../types/enums/pendingTransactionStatus";
-import { TransactionDTO } from "../../types/transaction";
+import { TransactionModel as TransactionDTO } from "../../types/models/transaction.model";
 
 function isPendingStatus(value: unknown): boolean {
 	if (typeof value === "number") {

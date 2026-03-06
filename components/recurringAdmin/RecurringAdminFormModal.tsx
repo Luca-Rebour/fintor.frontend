@@ -5,8 +5,8 @@ import { useTranslation } from "react-i18next";
 import { Frequency } from "../../types/enums/frequency";
 import { TransactionType } from "../../types/enums/transactionType";
 import { CreateRecurringTransactionInput } from "../../types/recurring";
-import { AccountOption } from "../../types/account";
-import { CategoryOption } from "../../types/category";
+import { AccountOptionModel as AccountOption } from "../../types/models/account.model";
+import { CategoryOptionModel as CategoryOption } from "../../types/models/category.model";
 
 type RecurringAdminFormModalProps = {
   visible: boolean;

@@ -1,21 +1,9 @@
 import { TransactionDTO } from "./transaction";
-
-export type AccountApiItem = {
-    id: string;
-    name: string;
-    balance: number;
-    currency: {
-      id: string;
-      code: string;
-      symbol: string;
-      name: string;
-    };
-};
-
-export type AccountsResponse =
-	| AccountApiItem[]
-	| { accounts: AccountApiItem[] }
-  | { data: AccountApiItem[] };
+import {
+  CreateAccountRequestDTO,
+  CreateAccountResponseDTO,
+  GetAccountDetailResponseDTODTO,
+} from "./api/account";
 
 export type AccountOption = {
   label: string;
@@ -28,23 +16,10 @@ export type AccountSummary = AccountOption & {
   currencySymbol: string;
 };
 
-export type CreateAccountDTO = {
-  name: string;
-  initialBalance: number;
-  exchangeRate: number;
-  currencyCode: string;
+export type CreateAccountDTO = CreateAccountRequestDTO;
+
+export type CreateAccountResponse = CreateAccountResponseDTO;
+
+export type AccountDetail = Omit<GetAccountDetailResponseDTODTO, "transactions"> & {
+  transactions: TransactionDTO[];
 };
-
-export type CreateAccountResponse = AccountApiItem;
-
-export type AccountDetail = {
-  id: string,
-  name: string,
-  currencyCode: string,
-  availableBalance: number,
-  allocatedToGoalsBalance: number,
-  totalBalance: number,
-  monthlyIncome: number,
-  monthlyExpense: number,
-  transactions: TransactionDTO[],
-}

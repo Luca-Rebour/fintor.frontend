@@ -9,7 +9,7 @@ import { ProfileMenuSection } from "../../components/profile/ProfileMenuSection"
 import { clearStoredJwt, getAuthUserSnapshot, subscribeToAuthUser } from "../../services/auth.service";
 import { getProfileData } from "../../services/profile.service";
 import { ProfileData } from "../../types/profile";
-import { User } from "../../types/api/signUp";
+import { AuthUserModel as User } from "../../types/models/auth.model";
 
 export default function ProfileScreen() {
 	const { t, i18n } = useTranslation();

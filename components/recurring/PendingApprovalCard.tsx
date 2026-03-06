@@ -1,7 +1,7 @@
 import { Pressable, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { AppIcon } from "../shared/AppIcon";
-import { RecurringPendingApprovalApiDTO } from "../../types/api/recurring";
+import { RecurringPendingApprovalApiDTO } from "../../types/recurring";
 import { PendingTransactionStatus } from "../../types/enums/pendingTransactionStatus";
 
 type PendingApprovalCardProps = {

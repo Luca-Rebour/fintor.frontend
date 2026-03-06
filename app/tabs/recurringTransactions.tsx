@@ -28,8 +28,7 @@ import {
 	reschedulePendingRecurringApproval,
 	subscribeToRecurringTransactions,
 } from "../../services/recurringTransactions.service";
-import { RecurringTransactionsData } from "../../types/recurring";
-import { RecurringPendingApprovalApiDTO, RecurringTransactionApiDTO } from "../../types/api/recurring";
+import { RecurringPendingApprovalApiDTO, RecurringTransactionApiDTO, RecurringTransactionsData } from "../../types/recurring";
 import { PendingTransactionStatus } from "../../types/enums/pendingTransactionStatus";
 import { TransactionType } from "../../types/enums/transactionType";
 

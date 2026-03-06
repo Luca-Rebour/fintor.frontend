@@ -2,17 +2,20 @@ import { apiDelete, apiGet, apiPost, apiPut } from "./api.client";
 import { getAuthUserSnapshot, loadAuthenticatedUser } from "./auth.service";
 import { getExchangeRateForCurrencies } from "./currencies.service";
 import {
+  CreateRecurringTransactionInput,
   RecurringPendingApprovalApiDTO,
-  RecurringTransactionApiDTO
-} from "../types/api/recurring";
-import { RecurringTransactionsData, UpdateRecurringTransactionInput, CreateRecurringTransactionInput } from "../types/recurring";
+  RecurringTransactionApiDTO,
+  RecurringTransactionsData,
+  UpdateRecurringTransactionInput,
+} from "../types/recurring";
 
 const RECURRING_ENDPOINT_PATH = "/recurring-transactions";
 const RECURRING_PENDING_ACTIONS_PATH = "/pending-approval-transactions";
 
-type RecurringTransactionsResponse = RecurringTransactionApiDTO[] | null;
-type PendingApprovalsResponse = RecurringPendingApprovalApiDTO[] | null;
 type RecurringTransactionsObserver = (data: RecurringTransactionsData) => void;
+
+type RecurringTransactionsResponse = RecurringTransactionApiDTO[];
+type PendingApprovalsResponse = RecurringPendingApprovalApiDTO[];
 
 let recurringTransactionsStore: RecurringTransactionsData = {
   recurringTransactions: [],
@@ -114,12 +117,8 @@ export async function getRecurringTransactionsData(): Promise<RecurringTransacti
   ]);
 
   const data: RecurringTransactionsData = {
-    recurringTransactions: Array.isArray(recurringTransactionsResponse)
-      ? recurringTransactionsResponse
-      : [],
-    pendingApprovals: Array.isArray(pendingApprovalsResponse)
-      ? pendingApprovalsResponse
-      : [],
+    recurringTransactions: recurringTransactionsResponse,
+    pendingApprovals: pendingApprovalsResponse,
   };
 
   setRecurringTransactionsStore(data);
@@ -133,12 +132,12 @@ export async function refreshRecurringTransactionsData(): Promise<RecurringTrans
 
 export async function getRecurringTransactionsList(): Promise<RecurringTransactionApiDTO[]> {
   const response = await apiGet<RecurringTransactionsResponse>(RECURRING_ENDPOINT_PATH);
-  return Array.isArray(response) ? response : [];
+  return response;
 }
 
 export async function getPendingRecurringApprovalsList(): Promise<RecurringPendingApprovalApiDTO[]> {
   const response = await apiGet<PendingApprovalsResponse>(RECURRING_PENDING_ACTIONS_PATH);
-  return Array.isArray(response) ? response : [];
+  return response;
 }
 
 function ensurePendingApprovalId(approvalId: string): string {

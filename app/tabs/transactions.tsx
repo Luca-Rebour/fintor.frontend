@@ -10,11 +10,17 @@ import {
 import { createAccount, getAccountsData } from "../../services/account.service";
 import { getExchangeRateForCurrencies, loadCurrencyOptions } from "../../services/currencies.service";
 import { getAuthUserSnapshot, subscribeToAuthUser } from "../../services/auth.service";
-import { CreateTransactionDTO, TransactionDTO } from "../../types/transaction";
-import { AccountOption, CreateAccountDTO } from "../../types/account";
-import { User } from "../../types/api/signUp";
+import {
+  CreateTransactionInputModel as CreateTransactionDTO,
+  TransactionModel as TransactionDTO,
+} from "../../types/models/transaction.model";
+import {
+  AccountOptionModel as AccountOption,
+  CreateAccountInputModel as CreateAccountDTO,
+} from "../../types/models/account.model";
+import { AuthUserModel as User } from "../../types/models/auth.model";
 import { createCategory } from "../../services/categories.service";
-import { CreateCategoryDTO } from "../../types/category";
+import { CreateCategoryInputModel as CreateCategoryDTO } from "../../types/models/category.model";
 import {
   CreateExpenseModal,
 } from "../../components/transactions/CreateExpenseModal";

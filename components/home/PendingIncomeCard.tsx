@@ -1,5 +1,5 @@
 import { Pressable, Text, View } from "react-native";
-import { RecurringPendingApprovalApiDTO } from "../../types/api/recurring";
+import { RecurringPendingApprovalApiDTO } from "../../types/recurring";
 import { AppIcon } from "../shared/AppIcon";
 
 type PendingIncomeCardProps = {

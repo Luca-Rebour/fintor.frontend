@@ -1,6 +1,7 @@
 import { CATEGORY_COLOR_BY_NAME } from "../constants/colors";
+import { mapFinancialSummaryDtoToModel } from "../mappers/report.mapper";
+import { FinancialSummaryDTO, GetFinancialSummaryResponseDTO } from "../types/api/report";
 import { apiGet } from "./api.client";
-import { OverviewDetailedResponseDTO, OverviewResponseListDTO } from "../types/api/reports";
 
 export type ReportFilterDays = 7 | 30 | 182 | 365;
 
@@ -19,7 +20,7 @@ function toValidFilterDays(filterDays: number): ReportFilterDays {
   return 365;
 }
 
-function createEmptyOverview(daysAgo: 7 | 30 | 182 | 365): OverviewDetailedResponseDTO {
+function createEmptyOverview(daysAgo: ReportFilterDays): FinancialSummaryDTO {
   return {
     daysAgo,
     totalBalance: 0,
@@ -30,27 +31,15 @@ function createEmptyOverview(daysAgo: 7 | 30 | 182 | 365): OverviewDetailedRespo
   };
 }
 
-type OverviewDataset = Record<ReportFilterDays, OverviewDetailedResponseDTO>;
+type OverviewDataset = Record<ReportFilterDays, FinancialSummaryDTO>;
 
-function pickOverviewByDays(
-  response: OverviewDetailedResponseDTO | OverviewResponseListDTO,
-  daysAgo: 7 | 30 | 182 | 365,
-): OverviewDetailedResponseDTO | null {
-  if (Array.isArray(response)) {
-    return response.find((item) => item.daysAgo === daysAgo) ?? response[0] ?? null;
-  }
-
-  return response;
+function pickOverviewByDays(response: GetFinancialSummaryResponseDTO, daysAgo: ReportFilterDays): FinancialSummaryDTO | null {
+  return response.find((item) => item.daysAgo === daysAgo) ?? response[0] ?? null;
 }
 
-function toOverviewList(response: OverviewDetailedResponseDTO | OverviewResponseListDTO) {
-  return Array.isArray(response) ? response : [response];
-}
-
-export async function getOverviewByFilter(filterDays: number): Promise<OverviewDetailedResponseDTO> {
+export async function getOverviewByFilter(filterDays: number): Promise<FinancialSummaryDTO> {
   try {
     const safeFilterDays = toValidFilterDays(filterDays);
-
     const dataset = await getOverviewDataset();
     return dataset[safeFilterDays] ?? createEmptyOverview(safeFilterDays);
   } catch (error) {
@@ -63,10 +52,7 @@ export async function getOverviewDataset(): Promise<OverviewDataset> {
   const filters: ReportFilterDays[] = [7, 30, 182, 365];
 
   try {
-    const response = await apiGet<OverviewDetailedResponseDTO | OverviewResponseListDTO>(
-      "/reports/overview",
-    );
-    
+    const response = await apiGet<GetFinancialSummaryResponseDTO>("/reports/overview");
 
     const dataset: OverviewDataset = {
       7: createEmptyOverview(7),
@@ -75,14 +61,17 @@ export async function getOverviewDataset(): Promise<OverviewDataset> {
       365: createEmptyOverview(365),
     };
 
-    const list = toOverviewList(response);
-
     for (const daysAgo of filters) {
-      const overview = pickOverviewByDays(list, daysAgo);
+      const overview = pickOverviewByDays(response, daysAgo);
       if (overview) {
+        const model = mapFinancialSummaryDtoToModel(overview);
         dataset[daysAgo] = {
-          ...overview,
           daysAgo,
+          totalBalance: model.totalBalance,
+          totalIncome: model.totalIncome,
+          totalExpense: model.totalExpense,
+          categorySpending: model.categorySpending,
+          categoryEarning: model.categoryEarning,
         };
       }
     }
@@ -100,7 +89,7 @@ export async function getOverviewDataset(): Promise<OverviewDataset> {
 }
 
 export function mapOverviewSpendingToChartData(
-  overview: OverviewDetailedResponseDTO,
+  overview: FinancialSummaryDTO,
 ): OverviewCategoryExpense[] {
   return overview.categorySpending
     .map((item) => {

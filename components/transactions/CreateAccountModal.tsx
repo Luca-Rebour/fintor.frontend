@@ -16,7 +16,7 @@ import {
 	getCurrencyOptionsSnapshot,
 	subscribeToCurrencyOptions,
 } from "../../services/currencies.service";
-import { CreateAccountDTO } from "../../types/account";
+import { CreateAccountInputModel as CreateAccountDTO } from "../../types/models/account.model";
 import { getTransactionsData } from "../../services/transactions.service";
 import { AppIcon } from "../shared/AppIcon";
 
