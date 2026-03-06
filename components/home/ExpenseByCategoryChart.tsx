@@ -12,7 +12,7 @@ import {
 } from "../../services/reports.service";
 import { getAuthUserSnapshot, subscribeToAuthUser } from "../../services/auth.service";
 import { subscribeToExpenseCreated, subscribeToTransactionDeleted } from "../../services/transactions.service";
-import { User } from "../../types/api/signUp";
+import { AuthUserModel as User } from "../../types/models/auth.model";
 
 type ExpenseByCategory = OverviewCategoryExpense;
 

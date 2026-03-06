@@ -1,9 +1,21 @@
-import {
-  RecurringPendingApprovalApiDTO,
-  RecurringTransactionApiDTO,
-} from "./api/recurring";
+import { GetRecurringTransactionDTO } from "./api/recurringTransaction";
 import { Frequency } from "./enums/frequency";
 import { TransactionType } from "./enums/transactionType";
+
+export type RecurringPendingApprovalApiDTO = {
+  id: string;
+  dueDate: string;
+  status: number;
+  description: string;
+  transactionType: TransactionType;
+  amount: number;
+  categoryName: string;
+  icon: string;
+  accountName: string;
+  currencyCode: string;
+};
+
+export type RecurringTransactionApiDTO = GetRecurringTransactionDTO;
 
 export type RecurringTransactionsData = {
   pendingApprovals: RecurringPendingApprovalApiDTO[];

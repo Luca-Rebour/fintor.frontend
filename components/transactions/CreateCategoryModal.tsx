@@ -12,7 +12,7 @@ import {
 
 import { AppIcon } from "../shared/AppIcon";
 import { ICON_COLOR_OPTIONS, IconColorPicker } from "../shared/IconColorPicker";
-import { CreateCategoryDTO } from "../../types/category";
+import { CreateCategoryInputModel as CreateCategoryDTO } from "../../types/models/category.model";
 
 type CreateCategoryModalProps = {
   visible: boolean;

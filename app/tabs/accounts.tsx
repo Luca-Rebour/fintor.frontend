@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 
 import { AppIcon } from "../../components/shared/AppIcon";
 import { getAccountsSummaryData } from "../../services/account.service";
-import { AccountSummary } from "../../types/account";
+import { AccountSummaryModel as AccountSummary } from "../../types/models/account.model";
 
 function formatCurrency(amount: number, currencyCode: string) {
   const normalizedCurrency = currencyCode?.trim().toUpperCase() || "USD";

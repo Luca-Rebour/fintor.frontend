@@ -12,8 +12,8 @@ import {
 import { getAccountsData } from "../../services/account.service";
 import { getAuthUserSnapshot } from "../../services/auth.service";
 import { getExchangeRateForCurrencies } from "../../services/currencies.service";
-import { AccountOption } from "../../types/account";
-import { CreateGoalDTO } from "../../types/goals.types";
+import { AccountOptionModel as AccountOption } from "../../types/models/account.model";
+import { CreateGoalInputModel as CreateGoalDTO } from "../../types/models/goal.model";
 import { AppIcon } from "../shared/AppIcon";
 import { AppDatePicker } from "../shared/DatePicker";
 import { ICON_COLOR_OPTIONS, IconColorPicker } from "../shared/IconColorPicker";

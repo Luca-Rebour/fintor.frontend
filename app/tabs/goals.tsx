@@ -8,7 +8,10 @@ import { GoalTargetCard } from "../../components/goals/GoalTargetCard";
 import { GoalsHeader } from "../../components/goals/GoalsHeader";
 import { SavingsOverviewCard } from "../../components/goals/SavingsOverviewCard";
 import { createGoal, getGoalsData } from "../../services/goals.service";
-import { CreateGoalDTO, GoalApi } from "../../types/goals.types";
+import {
+	CreateGoalInputModel as CreateGoalDTO,
+	GoalModel as GoalApi,
+} from "../../types/models/goal.model";
 
 export default function GoalsScreen() {
 	const { t } = useTranslation();

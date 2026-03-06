@@ -2,7 +2,7 @@ import { useMemo, useRef } from "react";
 import { Animated, PanResponder, Pressable, Text, View } from "react-native";
 import { AppIcon } from "../shared/AppIcon";
 
-import { TransactionDTO } from "../../types/transaction";
+import { TransactionModel as TransactionDTO } from "../../types/models/transaction.model";
 
 type TransactionListItemProps = {
   transaction: TransactionDTO;

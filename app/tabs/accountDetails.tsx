@@ -7,8 +7,8 @@ import { AppIcon } from "../../components/shared/AppIcon";
 import { TransactionListItem } from "../../components/transactions/TransactionListItem";
 import { getAccountDetailData } from "../../services/account.service";
 import { deleteTransactionById, getTransactionsData } from "../../services/transactions.service";
-import { AccountDetail } from "../../types/account";
-import { TransactionDTO } from "../../types/transaction";
+import { AccountDetailModel as AccountDetail } from "../../types/models/account.model";
+import { TransactionModel as TransactionDTO } from "../../types/models/transaction.model";
 
 function resolveParamValue(input: string | string[] | undefined): string {
   if (Array.isArray(input)) {

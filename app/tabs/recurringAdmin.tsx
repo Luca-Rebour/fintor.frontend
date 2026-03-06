@@ -14,12 +14,11 @@ import {
 } from "../../services/recurringTransactions.service";
 import { getAccountsData } from "../../services/account.service";
 import { getCategoriesData } from "../../services/categories.service";
-import { RecurringTransactionApiDTO } from "../../types/api/recurring";
 import { Frequency } from "../../types/enums/frequency";
 import { TransactionType } from "../../types/enums/transactionType";
-import { CreateRecurringTransactionInput, UpdateRecurringTransactionInput } from "../../types/recurring";
-import { AccountOption } from "../../types/account";
-import { CategoryOption } from "../../types/category";
+import { CreateRecurringTransactionInput, RecurringTransactionApiDTO, UpdateRecurringTransactionInput } from "../../types/recurring";
+import { AccountOptionModel as AccountOption } from "../../types/models/account.model";
+import { CategoryOptionModel as CategoryOption } from "../../types/models/category.model";
 
 const DEFAULT_FORM: CreateRecurringTransactionInput = {
   name: "",

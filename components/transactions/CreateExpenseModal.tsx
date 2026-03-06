@@ -11,9 +11,9 @@ import {
 } from "react-native";
 import { getAccountsData } from "../../services/account.service";
 import { getCategoriesData } from "../../services/categories.service";
-import { AccountOption } from "../../types/account";
-import { CategoryOption } from "../../types/category";
-import { CreateTransactionDTO } from "../../types/transaction";
+import { AccountOptionModel as AccountOption } from "../../types/models/account.model";
+import { CategoryOptionModel as CategoryOption } from "../../types/models/category.model";
+import { CreateTransactionInputModel as CreateTransactionDTO } from "../../types/models/transaction.model";
 import { AppIcon } from "../shared/AppIcon";
 
 type CreateExpenseModalProps = {
@@ -49,6 +49,10 @@ function formatAccountOptionLabel(option: AccountOption) {
 function getSelectedAccountLabel(options: AccountOption[], value: string) {
   const selected = options.find((option) => option.value === value);
   return selected ? formatAccountOptionLabel(selected) : value;
+}
+
+function isAccountOption(option: CategoryOption | AccountOption): option is AccountOption {
+  return typeof (option as AccountOption).currencyCode === "string";
 }
 
 function SelectField({
@@ -321,7 +325,7 @@ export function CreateExpenseModal({
                 {activeSelectOptions.map((option) => {
                   const isSelected = option.value === activeSelectValue;
                   const optionLabel =
-                    activeSelectType === "account" && "currencyCode" in option
+                    activeSelectType === "account" && isAccountOption(option)
                       ? formatAccountOptionLabel(option)
                       : option.label;
                   return (

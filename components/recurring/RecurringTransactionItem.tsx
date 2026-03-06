@@ -1,7 +1,7 @@
 import { Pressable, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { AppIcon } from "../shared/AppIcon";
-import { RecurringTransactionApiDTO } from "../../types/api/recurring";
+import { RecurringTransactionApiDTO } from "../../types/recurring";
 import { TransactionType } from "../../types/enums/transactionType";
 
 type RecurringTransactionItemProps = {

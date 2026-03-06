@@ -1,6 +1,6 @@
 import { Pressable, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
-import { RecurringTransactionApiDTO } from "../../types/api/recurring";
+import { RecurringTransactionApiDTO } from "../../types/recurring";
 import { Frequency } from "../../types/enums/frequency";
 import { TransactionType } from "../../types/enums/transactionType";
 
