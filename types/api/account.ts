@@ -30,6 +30,8 @@ export type GetAccountDTO = {
   balance: number;
   currency: GetAccountsCurrencyResponseDTO;
   icon: string;
+  totalBalance: number;
+  availableBalance: number;
 }
 
 export type GetAccountsCurrencyResponseDTO = {

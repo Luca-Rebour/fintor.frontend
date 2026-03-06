@@ -48,7 +48,10 @@ export async function getAccountDetailData(accountId: string): Promise<AccountDe
 
   try {
     const response = await apiGet<GetAccountDetailResponseDTODTO>(`/accounts/${encodeURIComponent(normalizedAccountId)}/detail`);
+    console.log(response);
     return mapAccountDetailDtoToModel(response);
+    
+    
   } catch (error) {
     console.error("Error fetching account detail:", error);
     return null;

@@ -9,6 +9,8 @@ export type AccountOptionModel = {
 
 export type AccountSummaryModel = AccountOptionModel & {
   balance: number;
+  totalBalance: number;
+  availableBalance: number;
   currencySymbol: string;
 };
 
