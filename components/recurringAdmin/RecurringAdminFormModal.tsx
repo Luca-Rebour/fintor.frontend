@@ -43,7 +43,7 @@ function InputField(props: {
   value: string | number;
   onChangeText: (value: string) => void;
   placeholder: string;
-  keyboardType?: "default" | "numeric";
+  keyboardType?: "default" | "numeric" | "decimal-pad";
 }) {
   return (
     <TextInput
@@ -90,6 +90,55 @@ export function RecurringAdminFormModal({
   const { t } = useTranslation();
   const [activeDateField, setActiveDateField] = useState<"startDate" | "endDate" | null>(null);
   const [draftDate, setDraftDate] = useState(new Date());
+  const [amountInput, setAmountInput] = useState("");
+
+  function toSafeAmountString(value: unknown): string {
+    if (typeof value === "number") {
+      return Number.isFinite(value) ? String(value) : "";
+    }
+
+    if (typeof value === "string") {
+      const normalized = normalizeAmountInput(value);
+      return normalized;
+    }
+
+    return "";
+  }
+
+  useEffect(() => {
+    if (!visible) {
+      return;
+    }
+
+    setAmountInput(toSafeAmountString(form.amount));
+  }, [visible, mode]);
+
+  function normalizeAmountInput(rawValue: string): string {
+    const normalizedDecimal = rawValue.replace(/,/g, ".");
+    const digitsAndDotsOnly = normalizedDecimal.replace(/[^\d.]/g, "");
+
+    const [integerPart = "", ...fractionParts] = digitsAndDotsOnly.split(".");
+    if (fractionParts.length === 0) {
+      return integerPart;
+    }
+
+    return `${integerPart}.${fractionParts.join("")}`;
+  }
+
+  function handleAmountChange(rawValue: string) {
+    const normalizedValue = normalizeAmountInput(rawValue);
+    setAmountInput(normalizedValue);
+
+    if (!normalizedValue || normalizedValue === ".") {
+      onChange({ ...form, amount: 0 });
+      return;
+    }
+
+    const parsedAmount = Number(normalizedValue);
+    if (Number.isFinite(parsedAmount)) {
+      onChange({ ...form, amount: parsedAmount });
+    }
+  }
 
   useEffect(() => {
     if (!visible) {
@@ -181,10 +230,10 @@ export function RecurringAdminFormModal({
             <View className="mt-4">
               <FieldLabel>{t("recurringAdmin.form.fields.amount")}</FieldLabel>
               <InputField
-                value={form.amount}
-                onChangeText={(amount) => onChange({ ...form, amount: Number(amount) })}
+                value={amountInput}
+                onChangeText={handleAmountChange}
                 placeholder={t("recurringAdmin.form.placeholders.amount")}
-                keyboardType="numeric"
+                keyboardType="decimal-pad"
               />
             </View>
 

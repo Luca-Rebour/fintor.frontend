@@ -20,6 +20,7 @@ import { TransactionType } from "../../types/enums/transactionType";
 import { CreateRecurringTransactionInput, RecurringTransactionApiDTO, UpdateRecurringTransactionInput } from "../../types/recurring";
 import { AccountOptionModel as AccountOption } from "../../types/models/account.model";
 import { CategoryOptionModel as CategoryOption } from "../../types/models/category.model";
+import { AppIcon } from "../../components/shared/AppIcon";
 
 type GoalOption = {
   value: string;
@@ -88,6 +89,15 @@ function toUpsertPayload(form: CreateRecurringTransactionInput): CreateRecurring
   };
 }
 
+function sanitizeForm(next: CreateRecurringTransactionInput): CreateRecurringTransactionInput {
+  const safeAmount = Number.isFinite(next.amount) ? next.amount : 0;
+
+  return {
+    ...next,
+    amount: safeAmount,
+  };
+}
+
 export default function RecurringAdminScreen() {
   const { t } = useTranslation();
   const router = useRouter();
@@ -103,8 +113,14 @@ export default function RecurringAdminScreen() {
   const [categoryOptions, setCategoryOptions] = useState<CategoryOption[]>([]);
   const [goalOptions, setGoalOptions] = useState<GoalOption[]>([{ value: NO_GOAL_VALUE, label: NO_GOAL_LABEL }]);
   const [error, setError] = useState("");
+  const [selectedType, setSelectedType] = useState<TransactionType>(TransactionType.Expense);
 
   const formMode = useMemo(() => (editingTransactionId ? "edit" : "create"), [editingTransactionId]);
+
+  const filteredTransactions = useMemo(
+    () => transactions.filter((transaction) => Number(transaction.transactionType) === selectedType),
+    [transactions, selectedType],
+  );
 
   async function loadRecurringList(showInitialLoader = true) {
     try {
@@ -269,7 +285,7 @@ export default function RecurringAdminScreen() {
       <RecurringAdminHeader
         title={t("recurringAdmin.title")}
         onBackPress={() => router.push("/tabs/recurringTransactions")}
-        onCreatePress={openCreateModal}
+        onActionPress={() => {}}
       />
 
       <ScrollView
@@ -284,8 +300,26 @@ export default function RecurringAdminScreen() {
           />
         }
       >
-        {transactions.length ? (
-          transactions.map((transaction) => (
+        <View className="mb-4 mt-1 flex-row border-b border-[#1E2A47]">
+          <Pressable onPress={() => setSelectedType(TransactionType.Expense)} className="mr-6 pb-2">
+            <Text className={`text-sm font-semibold ${selectedType === TransactionType.Expense ? "text-white" : "text-[#64748B]"}`}>
+              {t("recurring.type.expense")}
+            </Text>
+            <View className={`mt-2 h-0.5 rounded-full ${selectedType === TransactionType.Expense ? "bg-[#2563EB]" : "bg-transparent"}`} />
+          </Pressable>
+
+          <Pressable onPress={() => setSelectedType(TransactionType.Income)} className="pb-2">
+            <Text className={`text-sm font-semibold ${selectedType === TransactionType.Income ? "text-white" : "text-[#64748B]"}`}>
+              {t("recurring.type.income")}
+            </Text>
+            <View className={`mt-2 h-0.5 rounded-full ${selectedType === TransactionType.Income ? "bg-[#2563EB]" : "bg-transparent"}`} />
+          </Pressable>
+        </View>
+
+        <Text className="mb-3 text-xs font-semibold tracking-widest text-[#64748B]">UPCOMING THIS MONTH</Text>
+
+        {filteredTransactions.length ? (
+          filteredTransactions.map((transaction) => (
             <RecurringAdminItem
               key={transaction.id}
               transaction={transaction}
@@ -295,9 +329,19 @@ export default function RecurringAdminScreen() {
           ))
         ) : (
           <View className="rounded-2xl border border-[#1E2A47] bg-[#111C33] px-4 py-5">
-            <Text className="text-center text-sm text-[#94A3B8]">{t("recurring.empty.list")}</Text>
+            <Text className="text-center text-sm text-[#94A3B8]">{t("recurring.empty.filtered")}</Text>
           </View>
         )}
+
+        <Pressable
+          onPress={openCreateModal}
+          className="mb-20 mt-3 flex-row items-center justify-center rounded-2xl bg-[#2563EB] px-4 py-4"
+        >
+          <View className="mr-2 h-5 w-5 items-center justify-center rounded-full border border-[#BFDBFE]">
+            <AppIcon name="Plus" color="#DBEAFE" size={12} />
+          </View>
+          <Text className="text-base font-semibold text-white">Add New Recurring</Text>
+        </Pressable>
       </ScrollView>
 
       <RecurringAdminFormModal
@@ -309,7 +353,7 @@ export default function RecurringAdminScreen() {
         goalOptions={goalOptions}
         isSubmitting={isSubmitting}
         onClose={closeModal}
-        onChange={setForm}
+        onChange={(next) => setForm(sanitizeForm(next))}
         onSubmit={handleSubmit}
       />
     </View>
