@@ -97,6 +97,7 @@ function normalizeTransaction(transaction: TransactionDTO): TransactionDTO {
     categoryColor,
     currencyCode: currencyCode || "USD",
     exchangeRate,
+    goalId: transaction.goalId
   };
 }
 

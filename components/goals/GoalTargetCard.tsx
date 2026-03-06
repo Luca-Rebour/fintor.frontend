@@ -1,11 +1,12 @@
 import { LinearGradient } from "expo-linear-gradient";
-import { Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { AppIcon } from "../shared/AppIcon";
 
 import { GoalApi } from "../../types/goals.types";
 
 type GoalTargetCardProps = {
   goal: GoalApi;
+  onPress?: (goal: GoalApi) => void;
 };
 
 function formatCurrency(amount: number, currencyCode: string) {
@@ -23,7 +24,7 @@ function formatCurrency(amount: number, currencyCode: string) {
   }
 }
 
-export function GoalTargetCard({ goal }: GoalTargetCardProps) {
+export function GoalTargetCard({ goal, onPress }: GoalTargetCardProps) {
   const normalizedTargetAmount = Math.max(0, Number(goal.targetAmount) || 0);
   const normalizedCurrentAmount = Math.max(0, Number(goal.currentAmount) || 0);
   const currencyCode = goal.currencyCode?.trim().toUpperCase() || "USD";
@@ -44,7 +45,7 @@ export function GoalTargetCard({ goal }: GoalTargetCardProps) {
   })();
 
   return (
-    <View className="rounded-3xl bg-[#111C33] p-4">
+    <Pressable className="rounded-3xl bg-[#111C33] p-4" onPress={() => onPress?.(goal)}>
       <View className="flex-row items-center justify-between">
         <View className="flex-row items-center gap-3">
           <View
@@ -95,6 +96,6 @@ export function GoalTargetCard({ goal }: GoalTargetCardProps) {
       <Text className="mt-2 text-right text-xs text-app-textSecondary">
         Target: {targetDateLabel}
       </Text>
-    </View>
+    </Pressable>
   );
 }

@@ -10,6 +10,8 @@ export type TransactionDTO = {
   categoryColor: string;
   currencyCode: string;
   exchangeRate?: number | null;
+  goalId?: string;
+  goalTitle?: string;
 };
 
 

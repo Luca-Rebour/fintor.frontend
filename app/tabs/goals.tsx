@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Alert, Pressable, ScrollView, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
+import { useRouter } from "expo-router";
 
 import { CreateGoalModal } from "../../components/goals/CreateGoalModal";
 import { GoalTargetCard } from "../../components/goals/GoalTargetCard";
@@ -11,6 +12,7 @@ import { CreateGoalDTO, GoalApi } from "../../types/goals.types";
 
 export default function GoalsScreen() {
 	const { t } = useTranslation();
+	const router = useRouter();
 	const [goalsData, setGoalsData] = useState<GoalApi[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const [isCreatingTarget, setIsCreatingTarget] = useState(false);
@@ -77,6 +79,16 @@ export default function GoalsScreen() {
 		};
 	}, [goalsData]);
 
+	function handleGoalPress(goal: GoalApi) {
+		router.push({
+			pathname: "/tabs/goalTransactions",
+			params: {
+				goalId: goal.id,
+				goalTitle: goal.title,
+			},
+		});
+	}
+
 	return (
 		<View className="flex-1 bg-[#060F24]">
 			<GoalsHeader title={t("goals.title")} />
@@ -123,7 +135,7 @@ export default function GoalsScreen() {
 
 					<View className="gap-4">
 						{goalsData.map((goal) => (
-							<GoalTargetCard key={goal.id} goal={goal} />
+							<GoalTargetCard key={goal.id} goal={goal} onPress={handleGoalPress} />
 						))}
 					</View>
 				</ScrollView>
