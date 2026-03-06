@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   KeyboardAvoidingView,
-  Modal,
   Platform,
   Pressable,
   ScrollView,
@@ -17,6 +16,7 @@ import { CreateGoalInputModel as CreateGoalDTO } from "../../types/models/goal.m
 import { AppIcon } from "../shared/AppIcon";
 import { AppDatePicker } from "../shared/DatePicker";
 import { ICON_COLOR_OPTIONS, IconColorPicker } from "../shared/IconColorPicker";
+import { AppBottomSheetModal } from "../shared/AppBottomSheetModal";
 
 type CreateGoalModalProps = {
   visible: boolean;
@@ -206,20 +206,13 @@ export function CreateGoalModal({
   }
 
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={handleClose}>
+    <AppBottomSheetModal visible={visible} onClose={handleClose} snapPoints={["92%"]} debugName="CreateGoalModal">
       <KeyboardAvoidingView
         className="flex-1"
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={20}
       >
-        <View className="flex-1 justify-end bg-black/60">
-          <Pressable className="flex-1" onPress={handleClose} />
-
-          <View className="max-h-[92%] rounded-t-3xl border-t border-[#1E2A47] bg-[#111C33]">
-            <View className="items-center pt-3">
-              <View className="h-1.5 w-12 rounded-full bg-[#334155]" />
-            </View>
-
+          <View className="h-full max-h-[92%] rounded-t-3xl border-t border-[#1E2A47] bg-[#111C33]">
             <View className="px-5 pt-4 pb-3 border-b border-[#1E2A47] flex-row items-center justify-between">
               <Text className="text-app-textPrimary text-xl font-bold">Crear target</Text>
               <Pressable onPress={handleClose} className="p-1">
@@ -397,8 +390,7 @@ export function CreateGoalModal({
               </View>
             </>
           ) : null}
-        </View>
       </KeyboardAvoidingView>
-    </Modal>
+    </AppBottomSheetModal>
   );
 }

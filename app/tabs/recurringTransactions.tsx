@@ -2,7 +2,6 @@ import { useMemo, useEffect, useState } from "react";
 import {
 	ActivityIndicator,
 	Alert,
-	Modal,
 	Platform,
 	Pressable,
 	RefreshControl,
@@ -19,6 +18,7 @@ import { PendingApprovalCard } from "../../components/recurring/PendingApprovalC
 import { RecurringHeader } from "../../components/recurring/RecurringHeader";
 import { RecurringTransactionItem } from "../../components/recurring/RecurringTransactionItem";
 import { RecurringTypeToggle } from "../../components/recurring/RecurringTypeToggle";
+import { AppBottomSheetModal } from "../../components/shared/AppBottomSheetModal";
 import {
 	cancelPendingRecurringApproval,
 	confirmPendingRecurringApproval,
@@ -476,53 +476,44 @@ export default function RecurringTransactionsScreen() {
 				<AddRecurringTransactionCard onPress={handleAddRecurringTransaction} />
 			</ScrollView>
 
-			<Modal
-				visible={!!rescheduleApproval}
-				transparent
-				animationType="fade"
-				onRequestClose={() => setRescheduleApproval(null)}
-			>
-				<View className="flex-1 justify-end bg-[#060F24]/70">
-					<Pressable className="flex-1" onPress={() => setRescheduleApproval(null)} />
+			<AppBottomSheetModal visible={!!rescheduleApproval} onClose={() => setRescheduleApproval(null)} snapPoints={["52%"]} debugName="RecurringTransactions:Reschedule">
+				<View className="rounded-t-3xl border border-[#1E2A47] bg-[#060F24] px-4 pb-6 pt-4">
+					<Text className="mb-1 text-base font-bold text-app-textPrimary">{t("recurring.reschedule.title")}</Text>
+					<Text className="mb-3 text-sm text-[#94A3B8]">
+						{t("recurring.reschedule.message", {
+							description: rescheduleApproval?.description ?? t("recurring.reschedule.fallbackDescription"),
+						})}
+					</Text>
 
-					<View className="rounded-t-3xl border border-[#1E2A47] bg-[#060F24] px-4 pb-6 pt-4">
-						<Text className="mb-1 text-base font-bold text-app-textPrimary">{t("recurring.reschedule.title")}</Text>
-						<Text className="mb-3 text-sm text-[#94A3B8]">
-							{t("recurring.reschedule.message", {
-								description: rescheduleApproval?.description ?? t("recurring.reschedule.fallbackDescription"),
-							})}
-						</Text>
+					<DateTimePicker
+						value={rescheduleDate}
+						mode="date"
+						display={Platform.OS === "ios" ? "spinner" : "default"}
+						minimumDate={minimumRescheduleDate}
+						onChange={handleRescheduleDateChange}
+					/>
 
-						<DateTimePicker
-							value={rescheduleDate}
-							mode="date"
-							display={Platform.OS === "ios" ? "spinner" : "default"}
-							minimumDate={minimumRescheduleDate}
-							onChange={handleRescheduleDateChange}
-						/>
+					<View className="mt-4 flex-row gap-3">
+						<Pressable
+							onPress={() => setRescheduleApproval(null)}
+							disabled={isSubmittingAction}
+							className="flex-1 rounded-2xl border border-[#334155] bg-[#1A243B] px-4 py-3"
+						>
+							<Text className="text-center text-sm font-semibold text-[#94A3B8]">{t("common.cancel")}</Text>
+						</Pressable>
 
-						<View className="mt-4 flex-row gap-3">
-							<Pressable
-								onPress={() => setRescheduleApproval(null)}
-								disabled={isSubmittingAction}
-								className="flex-1 rounded-2xl border border-[#334155] bg-[#1A243B] px-4 py-3"
-							>
-								<Text className="text-center text-sm font-semibold text-[#94A3B8]">{t("common.cancel")}</Text>
-							</Pressable>
-
-							<Pressable
-								onPress={submitRescheduleApproval}
-								disabled={isSubmittingAction}
-								className="flex-1 rounded-2xl bg-[#1D4ED8] px-4 py-3"
-							>
-								<Text className="text-center text-sm font-semibold text-white">
-									{isSubmittingAction ? t("recurringAdmin.form.actions.saving") : t("recurring.actions.saveDate")}
-								</Text>
-							</Pressable>
-						</View>
+						<Pressable
+							onPress={submitRescheduleApproval}
+							disabled={isSubmittingAction}
+							className="flex-1 rounded-2xl bg-[#1D4ED8] px-4 py-3"
+						>
+							<Text className="text-center text-sm font-semibold text-white">
+								{isSubmittingAction ? t("recurringAdmin.form.actions.saving") : t("recurring.actions.saveDate")}
+							</Text>
+						</Pressable>
 					</View>
 				</View>
-			</Modal>
+			</AppBottomSheetModal>
 		</View>
 	);
 }

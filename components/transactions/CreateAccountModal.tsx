@@ -3,7 +3,6 @@ import {
 	ActivityIndicator,
 	FlatList,
 	KeyboardAvoidingView,
-	Modal,
 	Platform,
 	Pressable,
 	Text,
@@ -20,6 +19,7 @@ import { CreateAccountInputModel as CreateAccountDTO } from "../../types/models/
 import { getTransactionsData } from "../../services/transactions.service";
 import { AppIcon } from "../shared/AppIcon";
 import { IconColorPicker } from "../shared/IconColorPicker";
+import { AppBottomSheetModal } from "../shared/AppBottomSheetModal";
 
 type CreateAccountModalProps = {
 	visible: boolean;
@@ -132,20 +132,13 @@ export function CreateAccountModal({
 	}
 
 	return (
-		<Modal visible={visible} transparent animationType="slide" onRequestClose={handleClose}>
+		<AppBottomSheetModal visible={visible} onClose={handleClose} snapPoints={["92%"]} debugName="CreateAccountModal">
 			<KeyboardAvoidingView
 				className="flex-1"
 				behavior={Platform.OS === "ios" ? "padding" : "height"}
 				keyboardVerticalOffset={20}
 			>
-				<View className="flex-1 justify-end bg-black/60">
-					<Pressable className="flex-1" onPress={handleClose} />
-
-					<View className="max-h-[92%] rounded-t-3xl border-t border-[#1E2A47] bg-[#111C33] px-5 pt-3 pb-6">
-						<View className="mb-5 items-center">
-							<View className="h-1.5 w-12 rounded-full bg-[#334155]" />
-						</View>
-
+					<View className="h-full max-h-[92%] rounded-t-3xl border-t border-[#1E2A47] bg-[#111C33] px-5 pt-3 pb-6">
 						<Text className="text-3xl font-bold text-app-textPrimary">Add New Account</Text>
 						<Text className="mt-1 text-sm text-app-textSecondary">
 							Connect a new funding source to your wallet
@@ -301,8 +294,7 @@ export function CreateAccountModal({
 							}
 						/>
 					</View>
-				</View>
 			</KeyboardAvoidingView>
-		</Modal>
+		</AppBottomSheetModal>
 	);
 }
