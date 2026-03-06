@@ -11,10 +11,19 @@ import {
 } from "react-native";
 import { getAccountsData } from "../../services/account.service";
 import { getCategoriesData } from "../../services/categories.service";
+import { getGoalsData } from "../../services/goals.service";
 import { AccountOptionModel as AccountOption } from "../../types/models/account.model";
 import { CategoryOptionModel as CategoryOption } from "../../types/models/category.model";
 import { CreateTransactionInputModel as CreateTransactionDTO } from "../../types/models/transaction.model";
 import { AppIcon } from "../shared/AppIcon";
+
+type GoalOption = {
+  value: string;
+  label: string;
+};
+
+const NO_GOAL_VALUE = "";
+const NO_GOAL_LABEL = "No goal";
 
 type CreateExpenseModalProps = {
   visible: boolean;
@@ -51,7 +60,7 @@ function getSelectedAccountLabel(options: AccountOption[], value: string) {
   return selected ? formatAccountOptionLabel(selected) : value;
 }
 
-function isAccountOption(option: CategoryOption | AccountOption): option is AccountOption {
+function isAccountOption(option: CategoryOption | AccountOption | GoalOption): option is AccountOption {
   return typeof (option as AccountOption).currencyCode === "string";
 }
 
@@ -90,15 +99,19 @@ export function CreateExpenseModal({
 }: CreateExpenseModalProps) {
   const [accountOptions, setAccountOptions] = useState<AccountOption[]>([]);
   const [categoryOptions, setCategoryOptions] = useState<CategoryOption[]>([]);
+  const [goalOptions, setGoalOptions] = useState<GoalOption[]>([{ value: NO_GOAL_VALUE, label: NO_GOAL_LABEL }]);
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
   const [account, setAccount] = useState("");
+  const [goal, setGoal] = useState(NO_GOAL_VALUE);
   const [amountError, setAmountError] = useState("");
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [isAccountOpen, setIsAccountOpen] = useState(false);
+  const [isGoalOpen, setIsGoalOpen] = useState(false);
   const categoryTriggerRef = useRef<View>(null);
   const accountTriggerRef = useRef<View>(null);
+  const goalTriggerRef = useRef<View>(null);
   const [dropdownPosition, setDropdownPosition] = useState({
     top: 0,
     left: 0,
@@ -109,14 +122,30 @@ export function CreateExpenseModal({
     ? "category"
     : isAccountOpen
       ? "account"
+      : isGoalOpen
+        ? "goal"
       : null;
 
   const activeSelectOptions =
-    activeSelectType === "category" ? categoryOptions : accountOptions;
+    activeSelectType === "category"
+      ? categoryOptions
+      : activeSelectType === "account"
+        ? accountOptions
+        : goalOptions;
 
-  const activeSelectValue = activeSelectType === "category" ? category : account;
+  const activeSelectValue =
+    activeSelectType === "category"
+      ? category
+      : activeSelectType === "account"
+        ? account
+        : goal;
 
-  const activeSelectLabel = activeSelectType === "category" ? "Category" : "Account";
+  const activeSelectLabel =
+    activeSelectType === "category"
+      ? "Category"
+      : activeSelectType === "account"
+        ? "Account"
+        : "Goal";
 
   useEffect(() => {
     if (!visible) {
@@ -126,9 +155,10 @@ export function CreateExpenseModal({
     let isActive = true;
 
     async function loadSelectData() {
-      const [categoriesData, accountsData] = await Promise.all([
+      const [categoriesData, accountsData, goalsData] = await Promise.all([
         getCategoriesData(),
         getAccountsData(),
+        getGoalsData(),
       ]);
 
       if (!isActive) {
@@ -148,6 +178,21 @@ export function CreateExpenseModal({
           ? previous
           : accountsData[0]?.value ?? "",
       );
+
+      const goalSelectOptions: GoalOption[] = [
+        { value: NO_GOAL_VALUE, label: NO_GOAL_LABEL },
+        ...goalsData.map((goalItem) => ({
+          value: goalItem.id,
+          label: goalItem.title,
+        })),
+      ];
+
+      setGoalOptions(goalSelectOptions);
+      setGoal((previous) =>
+        goalSelectOptions.some((option) => option.value === previous)
+          ? previous
+          : NO_GOAL_VALUE,
+      );
     }
 
     loadSelectData();
@@ -159,6 +204,7 @@ export function CreateExpenseModal({
 
   function openCategorySelect() {
     setIsAccountOpen(false);
+    setIsGoalOpen(false);
     categoryTriggerRef.current?.measureInWindow((x, y, width, height) => {
       const estimatedHeight = getEstimatedDropdownHeight(categoryOptions.length);
       const top = Math.max(12, y - estimatedHeight - DROPDOWN_OFFSET);
@@ -169,6 +215,7 @@ export function CreateExpenseModal({
 
   function openAccountSelect() {
     setIsCategoryOpen(false);
+    setIsGoalOpen(false);
     accountTriggerRef.current?.measureInWindow((x, y, width, height) => {
       const estimatedHeight = getEstimatedDropdownHeight(accountOptions.length);
       const top = Math.max(12, y - estimatedHeight - DROPDOWN_OFFSET);
@@ -177,14 +224,27 @@ export function CreateExpenseModal({
     });
   }
 
+  function openGoalSelect() {
+    setIsCategoryOpen(false);
+    setIsAccountOpen(false);
+    goalTriggerRef.current?.measureInWindow((x, y, width, height) => {
+      const estimatedHeight = getEstimatedDropdownHeight(goalOptions.length);
+      const top = Math.max(12, y - estimatedHeight - DROPDOWN_OFFSET);
+      setDropdownPosition({ top, left: x, width });
+      setIsGoalOpen((prev) => !prev);
+    });
+  }
+
   function resetForm() {
     setAmount("");
     setDescription("");
     setCategory(categoryOptions[0]?.value ?? "");
     setAccount(accountOptions[0]?.value ?? "");
+    setGoal(NO_GOAL_VALUE);
     setAmountError("");
     setIsCategoryOpen(false);
     setIsAccountOpen(false);
+    setIsGoalOpen(false);
   }
 
   function handleClose() {
@@ -206,6 +266,7 @@ export function CreateExpenseModal({
       categoryId: category,
       icon: DEFAULT_EXPENSE_ICON,
       accountId: account,
+      goalId: goal || null,
       exchangeRate: null,
     });
 
@@ -281,6 +342,14 @@ export function CreateExpenseModal({
               onToggle={openAccountSelect}
               triggerRef={accountTriggerRef}
             />
+
+            <SelectField
+              label="Goal (optional)"
+              value={getOptionLabel(goalOptions, goal)}
+              isOpen={isGoalOpen}
+              onToggle={openGoalSelect}
+              triggerRef={goalTriggerRef}
+            />
           </ScrollView>
 
             <View className="px-5 py-4 border-t border-[#1E2A47]">
@@ -299,6 +368,7 @@ export function CreateExpenseModal({
                 onPress={() => {
                   setIsCategoryOpen(false);
                   setIsAccountOpen(false);
+                  setIsGoalOpen(false);
                 }}
                 style={{ position: "absolute", top: 0, right: 0, bottom: 0, left: 0 }}
               />
@@ -334,11 +404,14 @@ export function CreateExpenseModal({
                       onPress={() => {
                         if (activeSelectType === "category") {
                           setCategory(option.value);
-                        } else {
+                        } else if (activeSelectType === "account") {
                           setAccount(option.value);
+                        } else {
+                          setGoal(option.value);
                         }
                         setIsCategoryOpen(false);
                         setIsAccountOpen(false);
+                        setIsGoalOpen(false);
                       }}
                       className="px-3 py-3 flex-row items-center justify-between border-b border-[#1E2A47]"
                     >

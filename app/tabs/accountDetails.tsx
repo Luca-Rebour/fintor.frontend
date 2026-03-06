@@ -72,7 +72,14 @@ function MetricCard({
         <AppIcon name={icon} size={18} color={iconColor} />
       </View>
       <Text className="text-xs font-medium text-app-textSecondary">{label}</Text>
-      <Text className="mt-1 text-3xl font-semibold text-app-textPrimary">{value}</Text>
+      <Text
+        className="mt-1 text-3xl font-semibold text-app-textPrimary"
+        numberOfLines={1}
+        adjustsFontSizeToFit
+        minimumFontScale={0.55}
+      >
+        {value}
+      </Text>
     </View>
   );
 }
