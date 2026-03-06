@@ -676,7 +676,6 @@ export default function TransactionsScreen() {
       <TransactionActionButtons
         onAddExpense={() => setIsCreateExpenseModalVisible(true)}
         onAddIncome={() => setIsCreateIncomeModalVisible(true)}
-        onAddAccount={() => setIsCreateAccountModalVisible(true)}
         onAddCategory={() => setIsCreateCategoryModalVisible(true)}
         onMenuOpen={() => {
           loadCurrencyOptions();

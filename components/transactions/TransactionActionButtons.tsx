@@ -8,7 +8,6 @@ import { APP_COLORS } from "../../constants/colors";
 type TransactionActionButtonsProps = {
   onAddExpense?: () => void;
   onAddIncome?: () => void;
-  onAddAccount?: () => void;
   onAddCategory?: () => void;
   onMenuOpen?: () => void;
 };
@@ -16,7 +15,6 @@ type TransactionActionButtonsProps = {
 export function TransactionActionButtons({
   onAddExpense,
   onAddIncome,
-  onAddAccount,
   onAddCategory,
   onMenuOpen,
 }: TransactionActionButtonsProps) {
@@ -54,14 +52,6 @@ export function TransactionActionButtons({
             >
               <AppIcon name="CircleMinus" size={18} color="#EF4444" />
               <Text className="ml-3 text-base font-semibold text-app-textPrimary">{t("transactions.actions.addExpense")}</Text>
-            </Pressable>
-
-            <Pressable
-              onPress={() => handleActionPress(onAddAccount)}
-              className="px-4 py-3.5 min-h-14 flex-row items-center rounded-xl"
-            >
-              <AppIcon name="CreditCard" size={18} color={APP_COLORS.actionPrimary} />
-              <Text className="ml-3 text-base font-semibold text-app-textPrimary">{t("transactions.actions.addAccount")}</Text>
             </Pressable>
 
             <Pressable

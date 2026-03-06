@@ -95,7 +95,7 @@ export default function ProtectedTabsLayout() {
           options={{
             title: t("tabs.transactions"),
             tabBarIcon: ({ color, size }) => (
-              <AppIcon name="DollarSign" color={color} size={size} />
+              <AppIcon name="arrow-left-right" color={color} size={size} />
             ),
           }}
         />
@@ -149,7 +149,10 @@ export default function ProtectedTabsLayout() {
         <Tabs.Screen
           name="accounts"
           options={{
-            href: null,
+            title: t("tabs.accounts"),
+            tabBarIcon: ({ color, size }) => (
+              <AppIcon name="CreditCard" color={color} size={size} />
+            ),
           }}
         />
 
@@ -163,10 +166,7 @@ export default function ProtectedTabsLayout() {
         <Tabs.Screen
           name="goals"
           options={{
-            title: t("tabs.goals"),
-            tabBarIcon: ({ color, size }) => (
-              <AppIcon name="Target" color={color} size={size} />
-            ),
+            href: null,
           }}
         />
 
@@ -201,10 +201,10 @@ export default function ProtectedTabsLayout() {
 
             <TouchableOpacity
               className="mt-2 flex-row items-center rounded-xl bg-[#1A243B] px-3 py-3"
-              onPress={() => navigateToTab("/tabs/accounts")}
+              onPress={() => navigateToTab("/tabs/goals")}
             >
-              <AppIcon name="CreditCard" color="#18C8FF" size={18} />
-              <Text className="ml-2 text-base font-medium text-white">{t("tabs.accounts")}</Text>
+              <AppIcon name="Target" color="#18C8FF" size={18} />
+              <Text className="ml-2 text-base font-medium text-white">{t("tabs.goals")}</Text>
             </TouchableOpacity>
           </View>
       </AppBottomSheetModal>
