@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { ActivityIndicator, Alert, FlatList, Pressable, Text, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { useFocusEffect } from "@react-navigation/native";
 import { useTranslation } from "react-i18next";
 
 import { AppIcon } from "../../components/shared/AppIcon";
@@ -105,55 +106,57 @@ export default function AccountDetailsScreen() {
   const [expandedTransactionId, setExpandedTransactionId] = useState<string | null>(null);
   const [isItemSwipeActive, setIsItemSwipeActive] = useState(false);
 
-  useEffect(() => {
-    let isMounted = true;
+  useFocusEffect(
+    useCallback(() => {
+      let isActive = true;
 
-    async function loadData() {
-      setIsLoading(true);
+      async function loadData() {
+        setIsLoading(true);
 
-      if (!accountId) {
-        if (isMounted) {
-          setTransactions([]);
-          setAccountDetail(null);
-          setIsLoading(false);
-        }
-        return;
-      }
-
-      const detail = await getAccountDetailData(accountId);
-
-      if (!detail) {
-        const transactionsData = await getTransactionsData();
-        if (!isMounted) {
+        if (!accountId) {
+          if (isActive) {
+            setTransactions([]);
+            setAccountDetail(null);
+            setIsLoading(false);
+          }
           return;
         }
 
-        const normalizedAccountName = accountName.trim().toLowerCase();
-        const accountTransactions = transactionsData
-          .filter((item) => item.accountName?.trim().toLowerCase() === normalizedAccountName)
-          .sort((a, b) => +new Date(b.date) - +new Date(a.date));
+        const detail = await getAccountDetailData(accountId);
 
-        setAccountDetail(null);
-        setTransactions(accountTransactions);
+        if (!detail) {
+          const transactionsData = await getTransactionsData();
+          if (!isActive) {
+            return;
+          }
+
+          const normalizedAccountName = accountName.trim().toLowerCase();
+          const accountTransactions = transactionsData
+            .filter((item) => item.accountName?.trim().toLowerCase() === normalizedAccountName)
+            .sort((a, b) => +new Date(b.date) - +new Date(a.date));
+
+          setAccountDetail(null);
+          setTransactions(accountTransactions);
+          setIsLoading(false);
+          return;
+        }
+
+        if (!isActive) {
+          return;
+        }
+
+        setAccountDetail(detail);
+        setTransactions((detail.transactions ?? []).slice().sort((a, b) => +new Date(b.date) - +new Date(a.date)));
         setIsLoading(false);
-        return;
       }
 
-      if (!isMounted) {
-        return;
-      }
+      loadData();
 
-      setAccountDetail(detail);
-      setTransactions((detail.transactions ?? []).slice().sort((a, b) => +new Date(b.date) - +new Date(a.date)));
-      setIsLoading(false);
-    }
-
-    loadData();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [accountId, accountName]);
+      return () => {
+        isActive = false;
+      };
+    }, [accountId, accountName]),
+  );
 
   const monthlySpending = useMemo(() => {
     if (accountDetail) {

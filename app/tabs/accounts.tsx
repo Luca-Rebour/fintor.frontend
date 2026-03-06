@@ -5,7 +5,6 @@ import { useTranslation } from "react-i18next";
 
 import { AccountListCard } from "../../components/accounts/AccountListCard";
 import { AccountsHeader } from "../../components/accounts/AccountsHeader";
-import { AccountsNetWorthCard } from "../../components/accounts/AccountsNetWorthCard";
 import { AccountsSectionHeader } from "../../components/accounts/AccountsSectionHeader";
 import { ConnectBankAccountButton } from "../../components/accounts/ConnectBankAccountButton";
 import { CreateAccountModal } from "../../components/transactions/CreateAccountModal";
@@ -44,14 +43,10 @@ export default function AccountsScreen() {
         ...account,
         iconName: account.icon,
         subtitle: account.currencyCode,
-        availableBalance: account.balance,
+        totalBalance: account.totalBalance,
+        availableBalance: account.availableBalance,
       })),
     [accounts],
-  );
-
-  const totalNetWorth = useMemo(
-    () => decoratedAccounts.reduce((sum, account) => sum + (Number(account.balance) || 0), 0),
-    [decoratedAccounts],
   );
 
   async function loadAccounts(showInitialLoader = true) {
@@ -150,12 +145,6 @@ export default function AccountsScreen() {
           contentContainerStyle={{ paddingBottom: 24 }}
           ListHeaderComponent={
             <>
-              <AccountsNetWorthCard
-                totalNetWorthLabel="TOTAL NET WORTH"
-                totalNetWorth={formatCurrency(totalNetWorth, "USD")}
-                deltaValue="↗ +2.4%"
-                deltaLabel="vs last month"
-              />
               <AccountsSectionHeader
                 activeAccountsLabel="ACTIVE ACCOUNTS"
                 accountsCountLabel={`${decoratedAccounts.length} ACCOUNTS`}
@@ -177,7 +166,7 @@ export default function AccountsScreen() {
               subtitle={item.subtitle}
               totalBalanceLabel="TOTAL BALANCE"
               availableLabel="AVAILABLE"
-              totalBalance={formatCurrency(item.balance, item.currencyCode)}
+              totalBalance={formatCurrency(item.totalBalance, item.currencyCode)}
               availableBalance={formatCurrency(item.availableBalance, item.currencyCode)}
               onPress={() =>
                 router.push({
@@ -186,7 +175,7 @@ export default function AccountsScreen() {
                     accountId: item.value,
                     accountName: item.label,
                     currencyCode: item.currencyCode,
-                    balance: String(item.balance),
+                    balance: String(item.totalBalance),
                   },
                 })
               }

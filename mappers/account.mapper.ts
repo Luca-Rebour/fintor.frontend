@@ -48,6 +48,16 @@ export function mapAccountsDtoToSummaryModels(items: GetAccountsResponseDTO): Ac
       return {
         ...option,
         balance: Number.isFinite(Number(item.balance)) ? Number(item.balance) : 0,
+        totalBalance: Number.isFinite(Number(item.totalBalance))
+          ? Number(item.totalBalance)
+          : Number.isFinite(Number(item.balance))
+            ? Number(item.balance)
+            : 0,
+        availableBalance: Number.isFinite(Number(item.availableBalance))
+          ? Number(item.availableBalance)
+          : Number.isFinite(Number(item.balance))
+            ? Number(item.balance)
+            : 0,
         currencySymbol: "$",
       };
     })
