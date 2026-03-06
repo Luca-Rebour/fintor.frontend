@@ -272,10 +272,6 @@ export default function AccountDetailsScreen() {
               <Text className="mt-3 text-5xl font-bold text-app-primary">
                 {formatCurrency(resolvedAvailableBalance, resolvedCurrencyCode)}
               </Text>
-              <View className="mt-3 flex-row items-center rounded-full border border-[#1B4B6E] bg-[#06233A] px-4 py-2">
-                <AppIcon name="TrendingUp" size={14} color="#18C8FF" />
-                <Text className="ml-2 text-sm font-semibold text-app-primary">{monthDeltaLabel}</Text>
-              </View>
             </View>
 
             <View className="mb-6 flex-row gap-3">
