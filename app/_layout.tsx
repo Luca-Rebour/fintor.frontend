@@ -1,7 +1,10 @@
+import "react-native-gesture-handler";
 import { Stack, usePathname } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context";
 import { View } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import "../i18n";
 import "../global.css";
 
@@ -43,8 +46,12 @@ function LayoutWithInsets() {
 
 export default function RootLayout() {
   return (
-    <SafeAreaProvider>
-      <LayoutWithInsets />
-    </SafeAreaProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <BottomSheetModalProvider>
+          <LayoutWithInsets />
+        </BottomSheetModalProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }

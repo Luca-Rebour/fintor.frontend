@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Modal, Pressable, ScrollView, Text, TextInput, View, KeyboardAvoidingView, Platform } from "react-native";
+import { Pressable, ScrollView, Text, TextInput, View, KeyboardAvoidingView, Platform } from "react-native";
 import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import { useTranslation } from "react-i18next";
 import { Frequency } from "../../types/enums/frequency";
@@ -7,6 +7,7 @@ import { TransactionType } from "../../types/enums/transactionType";
 import { CreateRecurringTransactionInput } from "../../types/recurring";
 import { AccountOptionModel as AccountOption } from "../../types/models/account.model";
 import { CategoryOptionModel as CategoryOption } from "../../types/models/category.model";
+import { AppBottomSheetModal } from "../shared/AppBottomSheetModal";
 
 type GoalOption = {
   value: string;
@@ -189,13 +190,12 @@ export function RecurringAdminFormModal({
   }
 
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <View className="flex-1 justify-end bg-[#060F24]/70">
+    <AppBottomSheetModal visible={visible} onClose={onClose} snapPoints={["88%"]} debugName="RecurringAdminFormModal">
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : undefined}
           keyboardVerticalOffset={Platform.OS === "ios" ? 24 : 0}
         >
-          <View className="max-h-[88%] rounded-t-3xl border border-[#1E2A47] bg-[#060F24] p-4">
+          <View className="h-full max-h-[88%] rounded-t-3xl border border-[#1E2A47] bg-[#060F24] p-4">
             <View className="mb-4 flex-row items-center justify-between">
               <Text className="text-lg font-bold text-app-textPrimary">
                 {mode === "create" ? t("recurringAdmin.form.createTitle") : t("recurringAdmin.form.editTitle")}
@@ -418,9 +418,7 @@ export function RecurringAdminFormModal({
         </KeyboardAvoidingView>
 
         {activeDateField && Platform.OS === "ios" ? (
-          <View className="absolute inset-0 justify-end bg-[#060F24]/70">
-            <Pressable className="flex-1" onPress={() => setActiveDateField(null)} />
-
+          <AppBottomSheetModal visible={!!activeDateField} onClose={() => setActiveDateField(null)} snapPoints={["40%"]} debugName="RecurringAdminFormModal:IOSDatePicker">
             <View className="rounded-t-3xl border border-[#1E2A47] bg-[#060F24] px-4 pb-6 pt-3">
               <View className="mb-2 flex-row items-center justify-between">
                 <Pressable onPress={() => setActiveDateField(null)} className="px-2 py-2">
@@ -444,9 +442,8 @@ export function RecurringAdminFormModal({
 
               <DateTimePicker value={draftDate} mode="date" display="spinner" onChange={handleDateChange} />
             </View>
-          </View>
+          </AppBottomSheetModal>
         ) : null}
-      </View>
-    </Modal>
+    </AppBottomSheetModal>
   );
 }

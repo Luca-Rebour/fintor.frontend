@@ -2,7 +2,6 @@ import { useState } from "react";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
-  Modal,
   Platform,
   Pressable,
   Text,
@@ -12,6 +11,7 @@ import {
 
 import { AppIcon } from "../shared/AppIcon";
 import { ICON_COLOR_OPTIONS, IconColorPicker } from "../shared/IconColorPicker";
+import { AppBottomSheetModal } from "../shared/AppBottomSheetModal";
 import { CreateCategoryInputModel as CreateCategoryDTO } from "../../types/models/category.model";
 
 type CreateCategoryModalProps = {
@@ -72,20 +72,13 @@ export function CreateCategoryModal({
   }
 
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={handleClose}>
+    <AppBottomSheetModal visible={visible} onClose={handleClose} snapPoints={["92%"]} debugName="CreateCategoryModal">
       <KeyboardAvoidingView
         className="flex-1"
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={20}
       >
-        <View className="flex-1 justify-end bg-black/60">
-          <Pressable className="flex-1" onPress={handleClose} />
-
-          <View className="max-h-[92%] rounded-t-3xl border-t border-[#1E2A47] bg-[#111C33]">
-            <View className="items-center pt-3">
-              <View className="h-1.5 w-12 rounded-full bg-[#334155]" />
-            </View>
-
+          <View className="h-full max-h-[92%] rounded-t-3xl border-t border-[#1E2A47] bg-[#111C33]">
             <View className="px-5 pt-4 pb-3 border-b border-[#1E2A47] flex-row items-center justify-between">
               <Text className="text-app-textPrimary text-xl font-bold">Add Category</Text>
               <Pressable onPress={handleClose} className="p-1">
@@ -131,8 +124,7 @@ export function CreateCategoryModal({
               </Pressable>
             </View>
           </View>
-        </View>
       </KeyboardAvoidingView>
-    </Modal>
+    </AppBottomSheetModal>
   );
 }

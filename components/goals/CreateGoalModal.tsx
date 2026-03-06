@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
+  FlatList,
   KeyboardAvoidingView,
-  Modal,
   Platform,
   Pressable,
   ScrollView,
@@ -17,6 +17,7 @@ import { CreateGoalInputModel as CreateGoalDTO } from "../../types/models/goal.m
 import { AppIcon } from "../shared/AppIcon";
 import { AppDatePicker } from "../shared/DatePicker";
 import { ICON_COLOR_OPTIONS, IconColorPicker } from "../shared/IconColorPicker";
+import { AppBottomSheetModal } from "../shared/AppBottomSheetModal";
 
 type CreateGoalModalProps = {
   visible: boolean;
@@ -94,6 +95,7 @@ export function CreateGoalModal({
   const [currentAmountError, setCurrentAmountError] = useState("");
   const [dateError, setDateError] = useState("");
   const [accountError, setAccountError] = useState("");
+  const [isFormScrollEnabled, setIsFormScrollEnabled] = useState(true);
   const [isAccountOpen, setIsAccountOpen] = useState(false);
   const accountTriggerRef = useRef<View>(null);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
@@ -141,6 +143,7 @@ export function CreateGoalModal({
     setCurrentAmountError("");
     setDateError("");
     setAccountError("");
+    setIsFormScrollEnabled(true);
     setIsAccountOpen(false);
   }
 
@@ -206,20 +209,13 @@ export function CreateGoalModal({
   }
 
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={handleClose}>
+    <AppBottomSheetModal visible={visible} onClose={handleClose} snapPoints={["92%"]} debugName="CreateGoalModal">
       <KeyboardAvoidingView
         className="flex-1"
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={20}
       >
-        <View className="flex-1 justify-end bg-black/60">
-          <Pressable className="flex-1" onPress={handleClose} />
-
-          <View className="max-h-[92%] rounded-t-3xl border-t border-[#1E2A47] bg-[#111C33]">
-            <View className="items-center pt-3">
-              <View className="h-1.5 w-12 rounded-full bg-[#334155]" />
-            </View>
-
+          <View className="h-full max-h-[92%] rounded-t-3xl border-t border-[#1E2A47] bg-[#111C33]">
             <View className="px-5 pt-4 pb-3 border-b border-[#1E2A47] flex-row items-center justify-between">
               <Text className="text-app-textPrimary text-xl font-bold">Crear target</Text>
               <Pressable onPress={handleClose} className="p-1">
@@ -227,107 +223,138 @@ export function CreateGoalModal({
               </Pressable>
             </View>
 
-            <ScrollView
-              className="px-5 py-4"
+            <FlatList
+              className="flex-1 px-5 py-4"
+              data={[]}
+              keyExtractor={(_, index) => `create-goal-form-${index}`}
+              renderItem={() => null}
+              scrollEnabled={isFormScrollEnabled}
+              nestedScrollEnabled
               showsVerticalScrollIndicator={false}
               keyboardShouldPersistTaps="handled"
               keyboardDismissMode="on-drag"
-            >
-              <Text className="text-app-textSecondary text-xs uppercase mb-2">Título</Text>
-              <TextInput
-                value={title}
-                onChangeText={(text) => {
-                  setTitle(text);
-                  if (titleError) {
-                    setTitleError("");
-                  }
-                }}
-                placeholder="Ej: Viaje a Europa"
-                placeholderTextColor="#64748B"
-                className="bg-[#0C1830] border border-[#1E2A47] rounded-xl px-3 py-3 text-app-textPrimary"
-              />
-              {titleError ? <Text className="text-red-400 text-xs mt-2">{titleError}</Text> : null}
+              ListHeaderComponent={
+                <>
+                  <Text className="text-app-textSecondary text-xs uppercase mb-2">Título</Text>
+                  <TextInput
+                    value={title}
+                    onChangeText={(text) => {
+                      setTitle(text);
+                      if (titleError) {
+                        setTitleError("");
+                      }
+                    }}
+                    placeholder="Ej: Viaje a Europa"
+                    placeholderTextColor="#64748B"
+                    className="bg-[#0C1830] border border-[#1E2A47] rounded-xl px-3 py-3 text-app-textPrimary"
+                  />
+                  {titleError ? <Text className="text-red-400 text-xs mt-2">{titleError}</Text> : null}
 
-              <Text className="text-app-textSecondary text-xs uppercase mt-3 mb-2">Descripción (opcional)</Text>
-              <TextInput
-                value={description}
-                onChangeText={setDescription}
-                placeholder="Ej: Summer 2026"
-                placeholderTextColor="#64748B"
-                className="bg-[#0C1830] border border-[#1E2A47] rounded-xl px-3 py-3 text-app-textPrimary"
-              />
+                  <Text className="text-app-textSecondary text-xs uppercase mt-3 mb-2">Descripción (opcional)</Text>
+                  <TextInput
+                    value={description}
+                    onChangeText={setDescription}
+                    placeholder="Ej: Summer 2026"
+                    placeholderTextColor="#64748B"
+                    className="bg-[#0C1830] border border-[#1E2A47] rounded-xl px-3 py-3 text-app-textPrimary"
+                  />
 
-              <Text className="text-app-textSecondary text-xs uppercase mt-3 mb-2">Monto objetivo</Text>
-              <TextInput
-                value={targetAmount}
-                onChangeText={(text) => {
-                  setTargetAmount(text);
-                  if (targetAmountError) {
-                    setTargetAmountError("");
-                  }
-                }}
-                keyboardType="decimal-pad"
-                placeholder="0.00"
-                placeholderTextColor="#64748B"
-                className="bg-[#0C1830] border border-[#1E2A47] rounded-xl px-3 py-3 text-app-textPrimary"
-              />
-              {targetAmountError ? <Text className="text-red-400 text-xs mt-2">{targetAmountError}</Text> : null}
+                  <Text className="text-app-textSecondary text-xs uppercase mt-3 mb-2">Monto objetivo</Text>
+                  <TextInput
+                    value={targetAmount}
+                    onChangeText={(text) => {
+                      setTargetAmount(text);
+                      if (targetAmountError) {
+                        setTargetAmountError("");
+                      }
+                    }}
+                    keyboardType="decimal-pad"
+                    placeholder="0.00"
+                    placeholderTextColor="#64748B"
+                    className="bg-[#0C1830] border border-[#1E2A47] rounded-xl px-3 py-3 text-app-textPrimary"
+                  />
+                  {targetAmountError ? <Text className="text-red-400 text-xs mt-2">{targetAmountError}</Text> : null}
 
-              <Text className="text-app-textSecondary text-xs uppercase mt-3 mb-2">Monto actual</Text>
-              <TextInput
-                value={currentAmount}
-                onChangeText={(text) => {
-                  setCurrentAmount(text);
-                  if (currentAmountError) {
-                    setCurrentAmountError("");
-                  }
-                }}
-                keyboardType="decimal-pad"
-                placeholder="0.00"
-                placeholderTextColor="#64748B"
-                className="bg-[#0C1830] border border-[#1E2A47] rounded-xl px-3 py-3 text-app-textPrimary"
-              />
-              {currentAmountError ? <Text className="text-red-400 text-xs mt-2">{currentAmountError}</Text> : null}
+                  <Text className="text-app-textSecondary text-xs uppercase mt-3 mb-2">Monto actual</Text>
+                  <TextInput
+                    value={currentAmount}
+                    onChangeText={(text) => {
+                      setCurrentAmount(text);
+                      if (currentAmountError) {
+                        setCurrentAmountError("");
+                      }
+                    }}
+                    keyboardType="decimal-pad"
+                    placeholder="0.00"
+                    placeholderTextColor="#64748B"
+                    className="bg-[#0C1830] border border-[#1E2A47] rounded-xl px-3 py-3 text-app-textPrimary"
+                  />
+                  {currentAmountError ? <Text className="text-red-400 text-xs mt-2">{currentAmountError}</Text> : null}
 
-              <AppDatePicker
-                label="Fecha objetivo"
-                value={targetDate}
-                placeholder="Seleccionar fecha objetivo"
-                initialDate={targetDateInitial}
-                minimumDate={targetDateMinimum}
-                maximumDate={targetDateMaximum}
-                iosTitle="Fecha objetivo"
-                cancelLabel="Cancelar"
-                doneLabel="Listo"
-                onChange={(nextDate) => {
-                  setTargetDate(nextDate);
-                  if (dateError) {
-                    setDateError("");
-                  }
-                }}
-              />
-              {dateError ? <Text className="text-red-400 text-xs mt-2">{dateError}</Text> : null}
+                  <AppDatePicker
+                    label="Fecha objetivo"
+                    value={targetDate}
+                    placeholder="Seleccionar fecha objetivo"
+                    initialDate={targetDateInitial}
+                    minimumDate={targetDateMinimum}
+                    maximumDate={targetDateMaximum}
+                    iosTitle="Fecha objetivo"
+                    cancelLabel="Cancelar"
+                    doneLabel="Listo"
+                    onChange={(nextDate) => {
+                      setTargetDate(nextDate);
+                      if (dateError) {
+                        setDateError("");
+                      }
+                    }}
+                  />
+                  {dateError ? <Text className="text-red-400 text-xs mt-2">{dateError}</Text> : null}
 
-              <Text className="text-app-textSecondary text-xs uppercase mt-3 mb-2">Cuenta</Text>
-              <Pressable
-                ref={accountTriggerRef}
-                onPress={openAccountSelect}
-                className="bg-[#0C1830] border border-[#1E2A47] rounded-xl px-3 py-3 flex-row items-center justify-between"
-              >
-                <Text className="text-app-textPrimary text-sm">{getSelectedAccountLabel(accountOptions, accountId)}</Text>
-                <AppIcon name={isAccountOpen ? "ChevronUp" : "ChevronDown"} size={16} color="#94A3B8" />
-              </Pressable>
-              {accountError ? <Text className="text-red-400 text-xs mt-2">{accountError}</Text> : null}
+                  <Text className="text-app-textSecondary text-xs uppercase mt-3 mb-2">Cuenta</Text>
+                  <Pressable
+                    ref={accountTriggerRef}
+                    onPress={openAccountSelect}
+                    className="bg-[#0C1830] border border-[#1E2A47] rounded-xl px-3 py-3 flex-row items-center justify-between"
+                  >
+                    <Text className="text-app-textPrimary text-sm">{getSelectedAccountLabel(accountOptions, accountId)}</Text>
+                    <AppIcon name={isAccountOpen ? "ChevronUp" : "ChevronDown"} size={16} color="#94A3B8" />
+                  </Pressable>
+                  {accountError ? <Text className="text-red-400 text-xs mt-2">{accountError}</Text> : null}
 
-              <IconColorPicker
-                selectedIcon={selectedIcon}
-                selectedColor={selectedColor}
-                onChangeIcon={setSelectedIcon}
-                onChangeColor={setSelectedColor}
-                selectedIconLabel="Ícono seleccionado"
-                colorSectionLabel="Color"
-              />
-            </ScrollView>
+                  <View
+                    onStartShouldSetResponderCapture={() => {
+                      setIsFormScrollEnabled(false);
+                      return false;
+                    }}
+                    onMoveShouldSetResponderCapture={() => {
+                      setIsFormScrollEnabled(false);
+                      return false;
+                    }}
+                    onResponderRelease={() => {
+                      setIsFormScrollEnabled(true);
+                    }}
+                    onResponderTerminate={() => {
+                      setIsFormScrollEnabled(true);
+                    }}
+                  >
+                    <IconColorPicker
+                      selectedIcon={selectedIcon}
+                      selectedColor={selectedColor}
+                      onChangeIcon={setSelectedIcon}
+                      onChangeColor={setSelectedColor}
+                      onIconListTouchStart={() => {
+                        setIsFormScrollEnabled(false);
+                      }}
+                      onIconListTouchEnd={() => {
+                        setIsFormScrollEnabled(true);
+                      }}
+                      selectedIconLabel="Ícono seleccionado"
+                      colorSectionLabel="Color"
+                    />
+                  </View>
+                </>
+              }
+            />
 
             <View className="px-5 py-4 border-t border-[#1E2A47]">
               <Pressable
@@ -397,8 +424,7 @@ export function CreateGoalModal({
               </View>
             </>
           ) : null}
-        </View>
       </KeyboardAvoidingView>
-    </Modal>
+    </AppBottomSheetModal>
   );
 }

@@ -1,12 +1,18 @@
-import { useEffect, useMemo, useState } from "react";
-import { FlatList, Pressable, Text, TextInput, View } from "react-native";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
+import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { AppIcon } from "./AppIcon";
 
-const LucideIcons = require("lucide-react-native/dist/esm/lucide-react-native.js") as Record<string, unknown>;
-
-const ICON_OPTIONS = Object.keys(LucideIcons)
-  .filter((name) => /^[A-Z]/.test(name) && !name.endsWith("Icon"))
-  .sort((a, b) => a.localeCompare(b));
+// Lazy load de iconos - solo se ejecuta cuando se necesita
+let _iconOptionsCache: string[] | null = null;
+function getIconOptions(): string[] {
+  if (!_iconOptionsCache) {
+    const LucideIcons = require("lucide-react-native/dist/esm/lucide-react-native.js") as Record<string, unknown>;
+    _iconOptionsCache = Object.keys(LucideIcons)
+      .filter((name) => /^[A-Z]/.test(name) && !name.endsWith("Icon"))
+      .sort((a, b) => a.localeCompare(b));
+  }
+  return _iconOptionsCache;
+}
 
 export const ICON_COLOR_OPTIONS = [
   "#18C8FF",
@@ -34,6 +40,35 @@ export const ICON_COLOR_OPTIONS = [
 const INITIAL_ICONS_BATCH = 40;
 const ICONS_BATCH_STEP = 40;
 
+// Componente memoizado para cada icono - evita re-renders innecesarios
+const IconItem = memo(function IconItem({
+  iconName,
+  isSelected,
+  onPress,
+}: {
+  iconName: string;
+  isSelected: boolean;
+  onPress: () => void;
+}) {
+  return (
+    <Pressable
+      onPress={onPress}
+      style={{ width: "23%", minWidth: 64, height: 64 }}
+      className={`rounded-xl border items-center justify-center ${
+        isSelected ? "border-[#18C8FF] bg-[#10314A]" : "border-[#1E2A47] bg-[#111C33]"
+      }`}
+    >
+      <AppIcon name={iconName} size={16} color={isSelected ? "#18C8FF" : "#94A3B8"} />
+      <Text
+        numberOfLines={1}
+        className={`mt-1 text-[10px] ${isSelected ? "text-app-primary" : "text-app-textSecondary"}`}
+      >
+        {iconName}
+      </Text>
+    </Pressable>
+  );
+});
+
 type IconColorPickerProps = {
   selectedIcon: string;
   selectedColor: string;
@@ -44,6 +79,9 @@ type IconColorPickerProps = {
   iconSectionLabel?: string;
   colorSectionLabel?: string;
   showColorSection?: boolean;
+  iconListMaxHeight?: number;
+  onIconListTouchStart?: () => void;
+  onIconListTouchEnd?: () => void;
 };
 
 export function IconColorPicker({
@@ -56,19 +94,33 @@ export function IconColorPicker({
   iconSectionLabel = "Icons",
   colorSectionLabel = "Color",
   showColorSection = true,
+  iconListMaxHeight = 260,
+  onIconListTouchStart,
+  onIconListTouchEnd,
 }: IconColorPickerProps) {
   const [iconSearch, setIconSearch] = useState("");
   const [visibleIconCount, setVisibleIconCount] = useState(INITIAL_ICONS_BATCH);
+
+  // Lazy load de iconos
+  const iconOptions = useMemo(() => getIconOptions(), []);
 
   const filteredIcons = useMemo(() => {
     const normalizedSearch = iconSearch.trim().toLowerCase();
 
     if (!normalizedSearch) {
-      return ICON_OPTIONS;
+      return iconOptions;
     }
 
-    return ICON_OPTIONS.filter((iconName) => iconName.toLowerCase().includes(normalizedSearch));
-  }, [iconSearch]);
+    return iconOptions.filter((iconName) => iconName.toLowerCase().includes(normalizedSearch));
+  }, [iconSearch, iconOptions]);
+
+  // Callback estable para evitar re-renders
+  const handleIconPress = useCallback(
+    (iconName: string) => {
+      onChangeIcon(iconName);
+    },
+    [onChangeIcon]
+  );
 
   const visibleIcons = useMemo(() => filteredIcons.slice(0, visibleIconCount), [filteredIcons, visibleIconCount]);
 
@@ -100,55 +152,66 @@ export function IconColorPicker({
 
       <Text className="text-app-textSecondary text-xs uppercase mt-4 mb-2">{iconSectionLabel}</Text>
 
-      <FlatList
-        data={visibleIcons}
-        keyExtractor={(item) => item}
-        numColumns={4}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator
-        initialNumToRender={24}
-        maxToRenderPerBatch={28}
-        windowSize={7}
-        style={{ maxHeight: 260 }}
-        columnWrapperStyle={{ gap: 8, marginBottom: 8 }}
-        contentContainerStyle={{ paddingBottom: 6 }}
-        onEndReachedThreshold={0.35}
-        onEndReached={() => {
-          setVisibleIconCount((current) => {
-            if (current >= filteredIcons.length) {
-              return current;
+      <View style={{ maxHeight: iconListMaxHeight }}>
+        <ScrollView
+          nestedScrollEnabled
+          showsVerticalScrollIndicator
+          keyboardShouldPersistTaps="handled"
+          onTouchStart={() => {
+            onIconListTouchStart?.();
+          }}
+          onTouchCancel={() => {
+            onIconListTouchEnd?.();
+          }}
+          onTouchEnd={() => {
+            onIconListTouchEnd?.();
+          }}
+          onScrollBeginDrag={() => {
+            onIconListTouchStart?.();
+          }}
+          onScrollEndDrag={() => {
+            onIconListTouchEnd?.();
+          }}
+          onMomentumScrollBegin={() => {
+            onIconListTouchStart?.();
+          }}
+          onMomentumScrollEnd={() => {
+            onIconListTouchEnd?.();
+          }}
+          onScroll={({ nativeEvent }) => {
+            const { layoutMeasurement, contentOffset, contentSize } = nativeEvent;
+            const isCloseToBottom =
+              layoutMeasurement.height + contentOffset.y >= contentSize.height - 100;
+            if (isCloseToBottom) {
+              setVisibleIconCount((current) => {
+                if (current >= filteredIcons.length) {
+                  return current;
+                }
+                return Math.min(current + ICONS_BATCH_STEP, filteredIcons.length);
+              });
             }
-
-            return Math.min(current + ICONS_BATCH_STEP, filteredIcons.length);
-          });
-        }}
-        renderItem={({ item: iconName }) => {
-          const isSelected = iconName === selectedIcon;
-
-          return (
-            <Pressable
-              onPress={() => onChangeIcon(iconName)}
-              style={{ width: "23%", minWidth: 64, height: 64 }}
-              className={`rounded-xl border items-center justify-center ${
-                isSelected ? "border-[#18C8FF] bg-[#10314A]" : "border-[#1E2A47] bg-[#111C33]"
-              }`}
-            >
-              <AppIcon name={iconName} size={16} color={isSelected ? "#18C8FF" : "#94A3B8"} />
-              <Text
-                numberOfLines={1}
-                className={`mt-1 text-[10px] ${isSelected ? "text-app-primary" : "text-app-textSecondary"}`}
-              >
-                {iconName}
-              </Text>
-            </Pressable>
-          );
-        }}
-        ListEmptyComponent={
-          <View className="py-6">
-            <Text className="text-center text-sm text-app-textSecondary">No se encontraron iconos</Text>
+          }}
+          scrollEventThrottle={400}
+          contentContainerStyle={{ paddingBottom: 6 }}
+        >
+          <View className="flex-row flex-wrap gap-2">
+            {visibleIcons.length === 0 ? (
+              <View className="w-full py-6">
+                <Text className="text-center text-sm text-app-textSecondary">No se encontraron iconos</Text>
+              </View>
+            ) : (
+              visibleIcons.map((iconName) => (
+                <IconItem
+                  key={iconName}
+                  iconName={iconName}
+                  isSelected={iconName === selectedIcon}
+                  onPress={() => handleIconPress(iconName)}
+                />
+              ))
+            )}
           </View>
-        }
-      />
+        </ScrollView>
+      </View>
 
       {showColorSection ? (
         <>

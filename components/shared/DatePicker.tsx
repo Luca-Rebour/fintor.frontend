@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { Modal, Platform, Pressable, Text, View } from "react-native";
+import { Platform, Pressable, Text, View } from "react-native";
 import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
+import { AppBottomSheetModal } from "./AppBottomSheetModal";
 
 type AppDatePickerProps = {
 	label: string;
@@ -145,42 +146,38 @@ export function AppDatePicker({
 			) : null}
 
 			{isOpen && Platform.OS === "ios" ? (
-				<Modal visible transparent animationType="slide" onRequestClose={closePicker}>
-					<View className="flex-1 justify-end bg-[#060F24]/70">
-						<Pressable className="flex-1" onPress={closePicker} />
+				<AppBottomSheetModal visible={isOpen} onClose={closePicker} snapPoints={["40%"]} debugName="AppDatePicker:IOS">
+					<View className="rounded-t-3xl border border-[#1E2A47] bg-[#060F24] px-4 pb-6 pt-3">
+						<View className="mb-2 flex-row items-center justify-between">
+							<Pressable onPress={closePicker} className="px-2 py-2">
+								<Text className="text-sm font-semibold text-[#94A3B8]">{cancelLabel}</Text>
+							</Pressable>
 
-						<View className="rounded-t-3xl border border-[#1E2A47] bg-[#060F24] px-4 pb-6 pt-3">
-							<View className="mb-2 flex-row items-center justify-between">
-								<Pressable onPress={closePicker} className="px-2 py-2">
-									<Text className="text-sm font-semibold text-[#94A3B8]">{cancelLabel}</Text>
-								</Pressable>
+							<Text className="text-sm font-semibold text-app-textPrimary">
+								{iosTitle || label}
+							</Text>
 
-								<Text className="text-sm font-semibold text-app-textPrimary">
-									{iosTitle || label}
-								</Text>
-
-								<Pressable
-									onPress={() => {
-										applySelectedDate(draftDate);
-										closePicker();
-									}}
-									className="px-2 py-2"
-								>
-									<Text className="text-sm font-semibold text-[#18C8FF]">{doneLabel}</Text>
-								</Pressable>
-							</View>
-
-							<DateTimePicker
-								value={draftDate}
-								mode="date"
-								display="spinner"
-								minimumDate={minimumDate}
-								maximumDate={maximumDate}
-								onChange={handleDateChange}
-							/>
+							<Pressable
+								onPress={() => {
+									applySelectedDate(draftDate);
+									closePicker();
+								}}
+								className="px-2 py-2"
+							>
+								<Text className="text-sm font-semibold text-[#18C8FF]">{doneLabel}</Text>
+							</Pressable>
 						</View>
-					</View>
-				</Modal>
+
+						<DateTimePicker
+							value={draftDate}
+							mode="date"
+							display="spinner"
+							minimumDate={minimumDate}
+							maximumDate={maximumDate}
+							onChange={handleDateChange}
+						/>
+						</View>
+				</AppBottomSheetModal>
 			) : null}
 		</View>
 	);

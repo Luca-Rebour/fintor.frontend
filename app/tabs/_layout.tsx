@@ -2,7 +2,6 @@ import { Redirect, Tabs, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  Modal,
   Pressable,
   Text,
   TouchableOpacity,
@@ -10,6 +9,7 @@ import {
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { AppIcon } from "../../components/shared/AppIcon";
+import { AppBottomSheetModal } from "../../components/shared/AppBottomSheetModal";
 
 import { getStoredJwt, loadAuthenticatedUser } from "../../services/auth.service";
 
@@ -181,14 +181,8 @@ export default function ProtectedTabsLayout() {
         />
       </Tabs>
 
-      <Modal
-        visible={isMoreMenuVisible}
-        transparent
-        animationType="fade"
-        onRequestClose={closeMoreMenu}
-      >
-        <Pressable className="flex-1 bg-[#060F24]/70" onPress={closeMoreMenu}>
-          <View className="absolute bottom-24 left-4 right-4 rounded-2xl border border-[#1A243B] bg-[#111C33] p-4">
+      <AppBottomSheetModal visible={isMoreMenuVisible} onClose={closeMoreMenu} snapPoints={["34%"]} debugName="Tabs:MoreMenu">
+          <View className="rounded-2xl border border-[#1A243B] bg-[#111C33] p-4">
             <TouchableOpacity
               className="mb-2 flex-row items-center rounded-xl bg-[#1A243B] px-3 py-3"
               onPress={() => navigateToTab("/tabs/recurringTransactions")}
@@ -213,8 +207,7 @@ export default function ProtectedTabsLayout() {
               <Text className="ml-2 text-base font-medium text-white">{t("tabs.accounts")}</Text>
             </TouchableOpacity>
           </View>
-        </Pressable>
-      </Modal>
+      </AppBottomSheetModal>
     </>
   );
 }
