@@ -1,3 +1,4 @@
+import { TransactionDTO } from "./transaction";
 
 export type AccountApiItem = {
     id: string;
@@ -35,3 +36,15 @@ export type CreateAccountDTO = {
 };
 
 export type CreateAccountResponse = AccountApiItem;
+
+export type AccountDetail = {
+  id: string,
+  name: string,
+  currencyCode: string,
+  availableBalance: number,
+  allocatedToGoalsBalance: number,
+  totalBalance: number,
+  monthlyIncome: number,
+  monthlyExpense: number,
+  transactions: TransactionDTO[],
+}
