@@ -22,6 +22,11 @@ export type AccountOption = {
   currencyCode: string;
 };
 
+export type AccountSummary = AccountOption & {
+  balance: number;
+  currencySymbol: string;
+};
+
 export type CreateAccountDTO = {
   name: string;
   initialBalance: number;
