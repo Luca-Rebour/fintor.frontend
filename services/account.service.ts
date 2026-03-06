@@ -1,5 +1,6 @@
 import {
 	AccountApiItem,
+	AccountDetail,
 	AccountOption,
 	AccountSummary,
 	AccountsResponse,
@@ -52,6 +53,20 @@ function unwrapAccountsResponse(response: AccountsResponse): AccountApiItem[] {
 			: response.data;
 }
 
+function normalizeAccountDetail(detail: AccountDetail): AccountDetail {
+	return {
+		id: String(detail.id ?? ""),
+		name: String(detail.name ?? "").trim(),
+		currencyCode: String(detail.currencyCode ?? "USD").trim().toUpperCase() || "USD",
+		availableBalance: Number.isFinite(Number(detail.availableBalance)) ? Number(detail.availableBalance) : 0,
+		allocatedToGoalsBalance: Number.isFinite(Number(detail.allocatedToGoalsBalance)) ? Number(detail.allocatedToGoalsBalance) : 0,
+		totalBalance: Number.isFinite(Number(detail.totalBalance)) ? Number(detail.totalBalance) : 0,
+		monthlyIncome: Number.isFinite(Number(detail.monthlyIncome)) ? Number(detail.monthlyIncome) : 0,
+		monthlyExpense: Number.isFinite(Number(detail.monthlyExpense)) ? Number(detail.monthlyExpense) : 0,
+		transactions: Array.isArray(detail.transactions) ? detail.transactions : [],
+	};
+}
+
 export async function getAccountsData(): Promise<AccountOption[]> {
 	try {
 		const response = await apiGet<AccountsResponse>("/accounts");
@@ -77,6 +92,22 @@ export async function getAccountsSummaryData(): Promise<AccountSummary[]> {
 	} catch (error) {
 		console.error("Error fetching account summaries:", error);
 		return [];
+	}
+}
+
+export async function getAccountDetailData(accountId: string): Promise<AccountDetail | null> {
+	const normalizedAccountId = accountId.trim();
+
+	if (!normalizedAccountId) {
+		return null;
+	}
+
+	try {
+		const response = await apiGet<AccountDetail>(`/accounts/${encodeURIComponent(normalizedAccountId)}/detail`);
+		return normalizeAccountDetail(response);
+	} catch (error) {
+		console.error("Error fetching account detail:", error);
+		return null;
 	}
 }
 

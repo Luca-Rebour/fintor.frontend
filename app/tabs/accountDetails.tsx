@@ -5,9 +5,9 @@ import { useTranslation } from "react-i18next";
 
 import { AppIcon } from "../../components/shared/AppIcon";
 import { TransactionListItem } from "../../components/transactions/TransactionListItem";
-import { getGoalsData } from "../../services/goals.service";
+import { getAccountDetailData } from "../../services/account.service";
 import { deleteTransactionById, getTransactionsData } from "../../services/transactions.service";
-import { GoalApi } from "../../types/goals.types";
+import { AccountDetail } from "../../types/account";
 import { TransactionDTO } from "../../types/transaction";
 
 function resolveParamValue(input: string | string[] | undefined): string {
@@ -88,12 +88,13 @@ export default function AccountDetailsScreen() {
   }>();
 
   const accountName = resolveParamValue(params.accountName);
+  const accountId = resolveParamValue(params.accountId);
   const currencyCode = resolveParamValue(params.currencyCode) || "USD";
   const availableBalance = Number(resolveParamValue(params.balance)) || 0;
 
   const [isLoading, setIsLoading] = useState(true);
   const [transactions, setTransactions] = useState<TransactionDTO[]>([]);
-  const [goals, setGoals] = useState<GoalApi[]>([]);
+  const [accountDetail, setAccountDetail] = useState<AccountDetail | null>(null);
   const [expandedTransactionId, setExpandedTransactionId] = useState<string | null>(null);
   const [isItemSwipeActive, setIsItemSwipeActive] = useState(false);
 
@@ -102,18 +103,41 @@ export default function AccountDetailsScreen() {
 
     async function loadData() {
       setIsLoading(true);
-      const [transactionsData, goalsData] = await Promise.all([getTransactionsData(), getGoalsData()]);
+
+      if (!accountId) {
+        if (isMounted) {
+          setTransactions([]);
+          setAccountDetail(null);
+          setIsLoading(false);
+        }
+        return;
+      }
+
+      const detail = await getAccountDetailData(accountId);
+
+      if (!detail) {
+        const transactionsData = await getTransactionsData();
+        if (!isMounted) {
+          return;
+        }
+
+        const normalizedAccountName = accountName.trim().toLowerCase();
+        const accountTransactions = transactionsData
+          .filter((item) => item.accountName?.trim().toLowerCase() === normalizedAccountName)
+          .sort((a, b) => +new Date(b.date) - +new Date(a.date));
+
+        setAccountDetail(null);
+        setTransactions(accountTransactions);
+        setIsLoading(false);
+        return;
+      }
+
       if (!isMounted) {
         return;
       }
 
-      const normalizedAccountName = accountName.trim().toLowerCase();
-      const accountTransactions = transactionsData
-        .filter((item) => item.accountName?.trim().toLowerCase() === normalizedAccountName)
-        .sort((a, b) => +new Date(b.date) - +new Date(a.date));
-
-      setTransactions(accountTransactions);
-      setGoals(goalsData);
+      setAccountDetail(detail);
+      setTransactions((detail.transactions ?? []).slice().sort((a, b) => +new Date(b.date) - +new Date(a.date)));
       setIsLoading(false);
     }
 
@@ -122,9 +146,13 @@ export default function AccountDetailsScreen() {
     return () => {
       isMounted = false;
     };
-  }, [accountName]);
+  }, [accountId, accountName]);
 
   const monthlySpending = useMemo(() => {
+    if (accountDetail) {
+      return Math.abs(Number(accountDetail.monthlyExpense) || 0);
+    }
+
     return transactions.reduce((total, item) => {
       if (item.transactionType !== 1 || !isCurrentMonth(item.date)) {
         return total;
@@ -132,9 +160,13 @@ export default function AccountDetailsScreen() {
 
       return total + Math.abs(item.amount);
     }, 0);
-  }, [transactions]);
+  }, [accountDetail, transactions]);
 
   const monthlyIncome = useMemo(() => {
+    if (accountDetail) {
+      return Math.abs(Number(accountDetail.monthlyIncome) || 0);
+    }
+
     return transactions.reduce((total, item) => {
       if (item.transactionType !== 0 || !isCurrentMonth(item.date)) {
         return total;
@@ -142,19 +174,21 @@ export default function AccountDetailsScreen() {
 
       return total + Math.abs(item.amount);
     }, 0);
-  }, [transactions]);
+  }, [accountDetail, transactions]);
 
   const allocatedToGoals = useMemo(() => {
-    const normalizedAccountName = accountName.trim().toLowerCase();
+    if (accountDetail) {
+      return Math.abs(Number(accountDetail.allocatedToGoalsBalance) || 0);
+    }
 
-    return goals.reduce((total, goal) => {
-      if (goal.accountName?.trim().toLowerCase() !== normalizedAccountName) {
-        return total;
-      }
+    return 0;
+  }, [accountDetail]);
 
-      return total + (Number(goal.currentAmount) || 0);
-    }, 0);
-  }, [goals, accountName]);
+  const resolvedAccountName = accountDetail?.name?.trim() || accountName;
+  const resolvedCurrencyCode = accountDetail?.currencyCode?.trim().toUpperCase() || currencyCode;
+  const resolvedAvailableBalance = Number.isFinite(Number(accountDetail?.availableBalance))
+    ? Number(accountDetail?.availableBalance)
+    : availableBalance;
 
   const monthDeltaPercent = useMemo(
     () => getMonthDeltaPercent(monthlyIncome, monthlySpending),
@@ -180,6 +214,14 @@ export default function AccountDetailsScreen() {
             try {
               await deleteTransactionById(transactionId);
               setTransactions((previous) => previous.filter((transaction) => transaction.id !== transactionId));
+              setAccountDetail((previous) =>
+                previous
+                  ? {
+                      ...previous,
+                      transactions: previous.transactions.filter((transaction) => transaction.id !== transactionId),
+                    }
+                  : previous,
+              );
             } catch (deleteError) {
               const message = deleteError instanceof Error ? deleteError.message : "No se pudo eliminar la transacción";
               Alert.alert("Error", message);
@@ -208,7 +250,7 @@ export default function AccountDetailsScreen() {
           <AppIcon name="ArrowLeft" size={18} color="#FFFFFF" />
         </Pressable>
 
-        <Text className="text-xl font-bold text-app-textPrimary">{accountName || t("accounts.detailsTitle")}</Text>
+        <Text className="text-xl font-bold text-app-textPrimary">{resolvedAccountName || t("accounts.detailsTitle")}</Text>
 
         <View className="h-10 w-10 items-center justify-center rounded-full bg-[#0A1F32]">
           <AppIcon name="Ellipsis" size={18} color="#FFFFFF" />
@@ -228,18 +270,14 @@ export default function AccountDetailsScreen() {
                 {t("accounts.availableBalance")}
               </Text>
               <Text className="mt-3 text-5xl font-bold text-app-primary">
-                {formatCurrency(availableBalance, currencyCode)}
+                {formatCurrency(resolvedAvailableBalance, resolvedCurrencyCode)}
               </Text>
-              <View className="mt-3 flex-row items-center rounded-full border border-[#1B4B6E] bg-[#06233A] px-4 py-2">
-                <AppIcon name="TrendingUp" size={14} color="#18C8FF" />
-                <Text className="ml-2 text-sm font-semibold text-app-primary">{monthDeltaLabel}</Text>
-              </View>
             </View>
 
             <View className="mb-6 flex-row gap-3">
               <MetricCard
                 label={t("accounts.monthlySpending")}
-                value={formatCurrency(monthlySpending, currencyCode)}
+                value={formatCurrency(monthlySpending, resolvedCurrencyCode)}
                 icon="ArrowUpRight"
                 iconColor="#A855F7"
                 iconBackground="#2E1A4D"
@@ -247,7 +285,7 @@ export default function AccountDetailsScreen() {
               />
               <MetricCard
                 label={t("accounts.monthlyIncome")}
-                value={formatCurrency(monthlyIncome, currencyCode)}
+                value={formatCurrency(monthlyIncome, resolvedCurrencyCode)}
                 icon="ArrowDownLeft"
                 iconColor="#22C55E"
                 iconBackground="#0D3B2A"
@@ -258,7 +296,7 @@ export default function AccountDetailsScreen() {
             <View className="mb-8">
               <MetricCard
                 label={t("accounts.allocatedToGoals")}
-                value={formatCurrency(allocatedToGoals, currencyCode)}
+                value={formatCurrency(allocatedToGoals, resolvedCurrencyCode)}
                 icon="Target"
                 iconColor="#18C8FF"
                 iconBackground="#083A4B"
