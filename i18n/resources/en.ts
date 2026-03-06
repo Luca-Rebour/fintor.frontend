@@ -126,6 +126,11 @@ const en = {
       failedToLoad: "Failed to load goals",
     },
     targetsTitle: "Your Targets",
+    details: {
+      title: "Goal Transactions",
+      empty: "No transactions for this goal yet.",
+      unknownGoal: "Goal",
+    },
     overview: {
       totalSavings: "Total Savings",
       thisMonth: "+{{value}}% this month",

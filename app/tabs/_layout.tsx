@@ -140,6 +140,13 @@ export default function ProtectedTabsLayout() {
         />
 
         <Tabs.Screen
+          name="goalTransactions"
+          options={{
+            href: null,
+          }}
+        />
+
+        <Tabs.Screen
           name="goals"
           options={{
             title: t("tabs.goals"),

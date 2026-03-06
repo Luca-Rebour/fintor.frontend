@@ -126,6 +126,11 @@ const es = {
       failedToLoad: "No se pudieron cargar las metas",
     },
     targetsTitle: "Tus objetivos",
+    details: {
+      title: "Transacciones de la meta",
+      empty: "Todavía no hay transacciones para esta meta.",
+      unknownGoal: "Meta",
+    },
     overview: {
       totalSavings: "Ahorro total",
       thisMonth: "+{{value}}% este mes",
