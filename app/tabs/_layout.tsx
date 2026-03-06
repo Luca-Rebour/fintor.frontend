@@ -147,6 +147,20 @@ export default function ProtectedTabsLayout() {
         />
 
         <Tabs.Screen
+          name="accounts"
+          options={{
+            href: null,
+          }}
+        />
+
+        <Tabs.Screen
+          name="accountDetails"
+          options={{
+            href: null,
+          }}
+        />
+
+        <Tabs.Screen
           name="goals"
           options={{
             title: t("tabs.goals"),
@@ -189,6 +203,14 @@ export default function ProtectedTabsLayout() {
             >
               <AppIcon name="Settings" color="#18C8FF" size={18} />
               <Text className="ml-2 text-base font-medium text-white">{t("tabs.manageRecurring")}</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              className="mt-2 flex-row items-center rounded-xl bg-[#1A243B] px-3 py-3"
+              onPress={() => navigateToTab("/tabs/accounts")}
+            >
+              <AppIcon name="CreditCard" color="#18C8FF" size={18} />
+              <Text className="ml-2 text-base font-medium text-white">{t("tabs.accounts")}</Text>
             </TouchableOpacity>
           </View>
         </Pressable>
