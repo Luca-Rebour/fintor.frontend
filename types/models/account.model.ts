@@ -4,6 +4,7 @@ export type AccountOptionModel = {
   label: string;
   value: string;
   currencyCode: string;
+  icon?: string;
 };
 
 export type AccountSummaryModel = AccountOptionModel & {
@@ -16,6 +17,7 @@ export type CreateAccountInputModel = {
   initialBalance: number;
   exchangeRate: number;
   currencyCode: string;
+  icon: string;
 };
 
 export type CreatedAccountModel = {
@@ -23,6 +25,7 @@ export type CreatedAccountModel = {
   name: string;
   balance: number;
   currencyCode: string;
+  icon?: string;
 };
 
 export type AccountDetailModel = {

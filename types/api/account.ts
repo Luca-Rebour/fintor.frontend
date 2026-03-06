@@ -3,7 +3,8 @@ export type CreateAccountRequestDTO = {
     currencyCode: string,
     name: string,
     initialBalance: number,
-    exchangeRate: number
+    exchangeRate: number,
+    icon: string;
 }
 
 export type CreateAccountResponseDTO = {
@@ -11,6 +12,7 @@ export type CreateAccountResponseDTO = {
   name: string;
   balance: number;
   currency: CreateAccountCurrencyResponseDTO;
+  icon: string;
 }
 
 export type CreateAccountCurrencyResponseDTO = {
@@ -27,6 +29,7 @@ export type GetAccountDTO = {
   name: string;
   balance: number;
   currency: GetAccountsCurrencyResponseDTO;
+  icon: string;
 }
 
 export type GetAccountsCurrencyResponseDTO = {

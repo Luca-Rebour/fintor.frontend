@@ -11,6 +11,7 @@ export type CreateRecurringTransactionRequestDTO = {
   endDate: string;   // YYYY-MM-DD
   accountId: string;
   categoryId: string;
+  goalId: string | null;
 };
 
 

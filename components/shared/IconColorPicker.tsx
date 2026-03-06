@@ -43,6 +43,7 @@ type IconColorPickerProps = {
   searchPlaceholder?: string;
   iconSectionLabel?: string;
   colorSectionLabel?: string;
+  showColorSection?: boolean;
 };
 
 export function IconColorPicker({
@@ -54,6 +55,7 @@ export function IconColorPicker({
   searchPlaceholder = "Buscar icono por nombre",
   iconSectionLabel = "Icons",
   colorSectionLabel = "Color",
+  showColorSection = true,
 }: IconColorPickerProps) {
   const [iconSearch, setIconSearch] = useState("");
   const [visibleIconCount, setVisibleIconCount] = useState(INITIAL_ICONS_BATCH);
@@ -148,26 +150,30 @@ export function IconColorPicker({
         }
       />
 
-      <Text className="text-app-textSecondary text-xs uppercase mt-4 mb-2">{colorSectionLabel}</Text>
-      <View className="rounded-xl border border-[#1E2A47] bg-[#0C1830] p-3 mb-2">
-        <View className="flex-row flex-wrap gap-3">
-          {ICON_COLOR_OPTIONS.map((color) => {
-            const isSelected = color === selectedColor;
-            return (
-              <Pressable
-                key={color}
-                onPress={() => onChangeColor(color)}
-                className={`h-10 w-10 rounded-full border-2 items-center justify-center ${
-                  isSelected ? "border-white" : "border-[#1E2A47]"
-                }`}
-                style={{ backgroundColor: color }}
-              >
-                {isSelected ? <AppIcon name="Check" size={14} color="#FFFFFF" /> : null}
-              </Pressable>
-            );
-          })}
-        </View>
-      </View>
+      {showColorSection ? (
+        <>
+          <Text className="text-app-textSecondary text-xs uppercase mt-4 mb-2">{colorSectionLabel}</Text>
+          <View className="rounded-xl border border-[#1E2A47] bg-[#0C1830] p-3 mb-2">
+            <View className="flex-row flex-wrap gap-3">
+              {ICON_COLOR_OPTIONS.map((color) => {
+                const isSelected = color === selectedColor;
+                return (
+                  <Pressable
+                    key={color}
+                    onPress={() => onChangeColor(color)}
+                    className={`h-10 w-10 rounded-full border-2 items-center justify-center ${
+                      isSelected ? "border-white" : "border-[#1E2A47]"
+                    }`}
+                    style={{ backgroundColor: color }}
+                  >
+                    {isSelected ? <AppIcon name="Check" size={14} color="#FFFFFF" /> : null}
+                  </Pressable>
+                );
+              })}
+            </View>
+          </View>
+        </>
+      ) : null}
     </>
   );
 }

@@ -8,12 +8,18 @@ import { CreateRecurringTransactionInput } from "../../types/recurring";
 import { AccountOptionModel as AccountOption } from "../../types/models/account.model";
 import { CategoryOptionModel as CategoryOption } from "../../types/models/category.model";
 
+type GoalOption = {
+  value: string;
+  label: string;
+};
+
 type RecurringAdminFormModalProps = {
   visible: boolean;
   mode: "create" | "edit";
   form: CreateRecurringTransactionInput;
   accountOptions: AccountOption[];
   categoryOptions: CategoryOption[];
+  goalOptions: GoalOption[];
   isSubmitting: boolean;
   onClose: () => void;
   onChange: (next: CreateRecurringTransactionInput) => void;
@@ -75,6 +81,7 @@ export function RecurringAdminFormModal({
   form,
   accountOptions,
   categoryOptions,
+  goalOptions,
   isSubmitting,
   onClose,
   onChange,
@@ -272,6 +279,29 @@ export function RecurringAdminFormModal({
                       >
                         <Text className={`text-xs font-semibold ${isSelected ? "text-[#060F24]" : "text-[#CBD5E1]"}`}>
                           {category.label}
+                        </Text>
+                      </Pressable>
+                    );
+                  })}
+                </ScrollView>
+              </View>
+            </View>
+
+            <View className="mt-4">
+              <FieldLabel>Goal (optional)</FieldLabel>
+              <View className="rounded-xl border border-[#1E2A47] bg-[#111C33] p-2">
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  {goalOptions.map((goal) => {
+                    const isSelected = (form.goalId ?? "") === goal.value;
+
+                    return (
+                      <Pressable
+                        key={goal.value || "no-goal"}
+                        onPress={() => onChange({ ...form, goalId: goal.value || null })}
+                        className={`mr-2 rounded-lg px-3 py-2 ${isSelected ? "bg-[#18C8FF]" : "bg-[#1A243B]"}`}
+                      >
+                        <Text className={`text-xs font-semibold ${isSelected ? "text-[#060F24]" : "text-[#CBD5E1]"}`}>
+                          {goal.label}
                         </Text>
                       </Pressable>
                     );

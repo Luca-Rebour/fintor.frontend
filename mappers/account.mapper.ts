@@ -27,6 +27,7 @@ function mapAccountListItemToOption(item: GetAccountDTO): AccountOptionModel | n
     value: id,
     label: name,
     currencyCode: String(item.currency?.code ?? "USD").trim().toUpperCase() || "USD",
+    icon: String(item.icon ?? "WalletCards").trim() || "WalletCards",
   };
 }
 
@@ -79,6 +80,7 @@ export function mapCreateAccountInputModelToRequestDto(model: CreateAccountInput
     currencyCode: model.currencyCode.trim().toUpperCase(),
     initialBalance: Number(model.initialBalance),
     exchangeRate: Number(model.exchangeRate),
+    icon: String(model.icon ?? "WalletCards").trim() || "WalletCards",
   };
 }
 
@@ -88,5 +90,6 @@ export function mapCreateAccountResponseDtoToModel(dto: CreateAccountResponseDTO
     name: String(dto.name ?? "").trim(),
     balance: Number.isFinite(Number(dto.balance)) ? Number(dto.balance) : 0,
     currencyCode: String(dto.currency?.code ?? "USD").trim().toUpperCase() || "USD",
+    icon: String(dto.icon ?? "WalletCards").trim() || "WalletCards",
   };
 }
