@@ -56,7 +56,7 @@ export async function getAccountDetailData(accountId: string): Promise<AccountDe
 }
 
 export async function createAccount(payload: CreateAccountDTO): Promise<CreateAccountResponse> {
-  const requestDto = mapCreateAccountInputModelToRequestDto(payload);
+  const requestDto = mapCreateAccountInputModelToRequestDto(payload);  
   const response = await apiPost<CreateAccountResponseDTO>("/accounts", requestDto);
   return mapCreateAccountResponseDtoToModel(response);
 }

@@ -107,6 +107,7 @@ function toApiUpsertPayload(input: CreateRecurringTransactionInput): CreateRecur
     endDate: toApiDateString(input.endDate),
     accountId: accountId,
     categoryId: input.categoryId,
+    goalId: input.goalId ? String(input.goalId).trim() : null,
   };
 }
 

@@ -33,6 +33,7 @@ export type UpdateRecurringTransactionInput = {
   lastGeneratedAt: string;
   accountId: string;
   categoryId: string;
+  goalId?: string | null;
 };
 
 export type CreateRecurringTransactionInput = {
@@ -45,4 +46,5 @@ export type CreateRecurringTransactionInput = {
   endDate: string;
   accountId: string;
   categoryId: string;
+  goalId?: string | null;
 };

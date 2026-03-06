@@ -14,11 +14,20 @@ import {
 } from "../../services/recurringTransactions.service";
 import { getAccountsData } from "../../services/account.service";
 import { getCategoriesData } from "../../services/categories.service";
+import { getGoalsData } from "../../services/goals.service";
 import { Frequency } from "../../types/enums/frequency";
 import { TransactionType } from "../../types/enums/transactionType";
 import { CreateRecurringTransactionInput, RecurringTransactionApiDTO, UpdateRecurringTransactionInput } from "../../types/recurring";
 import { AccountOptionModel as AccountOption } from "../../types/models/account.model";
 import { CategoryOptionModel as CategoryOption } from "../../types/models/category.model";
+
+type GoalOption = {
+  value: string;
+  label: string;
+};
+
+const NO_GOAL_VALUE = "";
+const NO_GOAL_LABEL = "No goal";
 
 const DEFAULT_FORM: CreateRecurringTransactionInput = {
   name: "",
@@ -26,6 +35,7 @@ const DEFAULT_FORM: CreateRecurringTransactionInput = {
   amount: 0,
   accountId: "",
   categoryId: "",
+  goalId: NO_GOAL_VALUE,
   startDate: "",
   endDate: "",
   transactionType: TransactionType.Expense,
@@ -46,6 +56,7 @@ function toFormState(transaction: RecurringTransactionApiDTO): CreateRecurringTr
   const maybeTransactionWithIds = transaction as RecurringTransactionApiDTO & {
     accountId?: string;
     categoryId?: string;
+    goalId?: string | null;
   };
 
   return {
@@ -54,6 +65,7 @@ function toFormState(transaction: RecurringTransactionApiDTO): CreateRecurringTr
     amount: Math.abs(Number(transaction.amount) || 0),
     accountId: maybeTransactionWithIds.accountId || "",
     categoryId: maybeTransactionWithIds.categoryId || "",
+    goalId: maybeTransactionWithIds.goalId || NO_GOAL_VALUE,
     startDate: toDateInputValue(transaction.startDate),
     endDate: toDateInputValue(transaction.endDate),
     transactionType: Number(transaction.transactionType) as TransactionType,
@@ -68,6 +80,7 @@ function toUpsertPayload(form: CreateRecurringTransactionInput): CreateRecurring
     amount: form.amount,
     accountId: form.accountId,
     categoryId: form.categoryId,
+    goalId: form.goalId || null,
     startDate: form.startDate,
     endDate: form.endDate,
     transactionType: form.transactionType,
@@ -88,6 +101,7 @@ export default function RecurringAdminScreen() {
   const [form, setForm] = useState<CreateRecurringTransactionInput>(DEFAULT_FORM);
   const [accountOptions, setAccountOptions] = useState<AccountOption[]>([]);
   const [categoryOptions, setCategoryOptions] = useState<CategoryOption[]>([]);
+  const [goalOptions, setGoalOptions] = useState<GoalOption[]>([{ value: NO_GOAL_VALUE, label: NO_GOAL_LABEL }]);
   const [error, setError] = useState("");
 
   const formMode = useMemo(() => (editingTransactionId ? "edit" : "create"), [editingTransactionId]);
@@ -99,14 +113,19 @@ export default function RecurringAdminScreen() {
       }
 
       setError("");
-      const [recurringTransactions, accountOptions, categoryOptions] = await Promise.all([
+      const [recurringTransactions, accountOptions, categoryOptions, goals] = await Promise.all([
         getRecurringTransactionsList(),
         getAccountsData(),
         getCategoriesData(),
+        getGoalsData(),
       ]);
       setTransactions(recurringTransactions);
       setAccountOptions(accountOptions);
       setCategoryOptions(categoryOptions);
+      setGoalOptions([
+        { value: NO_GOAL_VALUE, label: NO_GOAL_LABEL },
+        ...goals.map((goal) => ({ value: goal.id, label: goal.title })),
+      ]);
     } catch (loadError) {
       const message = loadError instanceof Error ? loadError.message : t("recurringAdmin.errors.failedToLoad");
       setError(message);
@@ -129,6 +148,7 @@ export default function RecurringAdminScreen() {
       ...DEFAULT_FORM,
       accountId: accountOptions[0]?.value || "",
       categoryId: categoryOptions[0]?.value || "",
+      goalId: NO_GOAL_VALUE,
     });
     setIsFormVisible(true);
   }
@@ -286,6 +306,7 @@ export default function RecurringAdminScreen() {
         form={form}
         accountOptions={accountOptions}
         categoryOptions={categoryOptions}
+        goalOptions={goalOptions}
         isSubmitting={isSubmitting}
         onClose={closeModal}
         onChange={setForm}
