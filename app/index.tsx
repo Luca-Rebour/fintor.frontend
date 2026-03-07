@@ -1,3 +1,4 @@
+import { APP_COLORS } from "../constants/colors";
 import { Link, useRouter } from "expo-router";
 import { useState } from "react";
 import { Text, View } from "react-native";
@@ -82,7 +83,7 @@ export default function Index() {
           <AuthPrimaryButton
             label={isSubmitting ? t("auth.login.signingIn") : t("auth.login.signIn")}
             colors={APP_GRADIENTS.actionPrimary}
-            iconRight={isSubmitting ? null : <AppIcon name="ArrowRight" size={18} color="#FFFFFF" />}
+            iconRight={isSubmitting ? null : <AppIcon name="ArrowRight" size={18} color={APP_COLORS.textPrimary} />}
             onPress={handleSignIn}
             disabled={isSubmitting}
           />

@@ -1,3 +1,4 @@
+import { APP_COLORS } from "../../constants/colors";
 import { Pressable, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { AppIcon } from "../shared/AppIcon";
@@ -34,15 +35,15 @@ export function RecurringTransactionItem({ recurringTransaction, onPress }: Recu
   return (
     <Pressable
       onPress={() => onPress?.(recurringTransaction)}
-      className="mb-3 flex-row items-center rounded-2xl bg-[#111C33] px-3 py-3"
+      className="mb-3 flex-row items-center rounded-2xl bg-app-bgSecondary px-3 py-3"
     >
-      <View className="mr-3 h-12 w-12 items-center justify-center rounded-full border border-[#1E2A47] bg-[#0F172A]">
-        <AppIcon name={recurringTransaction.icon} color={isExpense ? "#B63BFF" : "#18C8FF"} size={18} />
+      <View className="mr-3 h-12 w-12 items-center justify-center rounded-full border border-app-border bg-app-surface">
+        <AppIcon name={recurringTransaction.icon} color={isExpense ? APP_COLORS.actionSecondary : APP_COLORS.actionPrimary} size={18} />
       </View>
 
       <View className="flex-1">
         <Text className="text-base font-semibold text-app-textPrimary">{recurringTransaction.name}</Text>
-        <Text className="mt-0.5 text-xs text-[#94A3B8]">
+        <Text className="mt-0.5 text-xs text-app-textSecondary">
           {t("recurring.labels.next", {
             date: formatChargeDate(recurringTransaction.nextChargeDate),
             account: recurringTransaction.accountName,
@@ -52,15 +53,16 @@ export function RecurringTransactionItem({ recurringTransaction, onPress }: Recu
 
       <View className="flex-row items-center">
         <View className="items-end mr-1">
-          <Text className={`text-lg font-bold ${isExpense ? "text-[#F43F5E]" : "text-[#18C8FF]"}`}>
+          <Text className={`text-lg font-bold ${isExpense ? "text-app-danger" : "text-app-accentBlue"}`}>
             {formatAmount(recurringTransaction.amount, recurringTransaction.currencyCode, recurringTransaction.transactionType)}
           </Text>
-          <Text className="text-[10px] font-semibold tracking-wide text-[#94A3B8]">
+          <Text className="text-[10px] font-semibold tracking-wide text-app-textSecondary">
             {recurringTransaction.currencyCode}
           </Text>
         </View>
-        <AppIcon name="ChevronRight" color="#334155" size={16} />
+        <AppIcon name="ChevronRight" color={APP_COLORS.border} size={16} />
       </View>
     </Pressable>
   );
 }
+

@@ -1,3 +1,4 @@
+import { APP_COLORS } from "../../constants/colors";
 import { Text, View } from "react-native";
 import { AppIcon } from "../shared/AppIcon";
 
@@ -17,7 +18,7 @@ export function ProfileMenuSection({ section }: ProfileMenuSectionProps) {
         >
           <View className="flex-row items-center gap-3">
             <View className="h-10 w-10 items-center justify-center rounded-full bg-app-primary/20">
-              <AppIcon name={item.icon} size={17} color="#18C8FF" />
+              <AppIcon name={item.icon} size={17} color={APP_COLORS.actionPrimary} />
             </View>
             <Text className="text-lg font-semibold text-app-textPrimary">{item.title}</Text>
           </View>
@@ -28,10 +29,11 @@ export function ProfileMenuSection({ section }: ProfileMenuSectionProps) {
                 {item.badgeText}
               </Text>
             ) : null}
-            <AppIcon name="ChevronRight" size={16} color="#94A3B8" />
+            <AppIcon name="ChevronRight" size={16} color={APP_COLORS.textSecondary} />
           </View>
         </View>
       ))}
     </View>
   );
 }
+

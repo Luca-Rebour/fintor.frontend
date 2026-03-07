@@ -1,3 +1,4 @@
+import { APP_COLORS } from "../../constants/colors";
 import { useCallback, useMemo, useState } from "react";
 import { ActivityIndicator, Alert, FlatList, Pressable, Text, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -65,7 +66,7 @@ function MetricCard({
   className?: string;
 }) {
   return (
-    <View className={`rounded-3xl border border-[#153049] bg-[#071B2A] p-4 ${className ?? ""}`}>
+    <View className={`rounded-3xl border border-app-border bg-app-surface p-4 ${className ?? ""}`}>
       <View
         className="mb-4 h-10 w-10 items-center justify-center rounded-2xl"
         style={{ backgroundColor: iconBackground }}
@@ -244,26 +245,26 @@ export default function AccountDetailsScreen() {
 
   if (isLoading) {
     return (
-      <View className="flex-1 items-center justify-center bg-[#060F24]">
-        <ActivityIndicator size="large" color="#18C8FF" />
+      <View className="flex-1 items-center justify-center bg-app-bgPrimary">
+        <ActivityIndicator size="large" color={APP_COLORS.actionPrimary} />
       </View>
     );
   }
 
   return (
-    <View className="flex-1 bg-[#020B16] px-4 pt-2">
+    <View className="flex-1 bg-app-bgPrimary px-4 pt-2">
       <View className="mb-4 flex-row items-center justify-between">
         <Pressable
           onPress={() => router.back()}
-          className="h-10 w-10 items-center justify-center rounded-full bg-[#0A1F32]"
+          className="h-10 w-10 items-center justify-center rounded-full bg-app-surface"
         >
-          <AppIcon name="ArrowLeft" size={18} color="#FFFFFF" />
+          <AppIcon name="ArrowLeft" size={18} color={APP_COLORS.textPrimary} />
         </Pressable>
 
         <Text className="text-xl font-bold text-app-textPrimary">{resolvedAccountName || t("accounts.detailsTitle")}</Text>
 
-        <View className="h-10 w-10 items-center justify-center rounded-full bg-[#0A1F32]">
-          <AppIcon name="Ellipsis" size={18} color="#FFFFFF" />
+        <View className="h-10 w-10 items-center justify-center rounded-full bg-app-surface">
+          <AppIcon name="Ellipsis" size={18} color={APP_COLORS.textPrimary} />
         </View>
       </View>
 
@@ -275,7 +276,7 @@ export default function AccountDetailsScreen() {
         contentContainerStyle={{ paddingBottom: 24 }}
         ListHeaderComponent={
           <>
-            <View className="mb-7 items-center rounded-3xl border border-[#13314A] bg-[#031523] px-5 py-7">
+            <View className="mb-7 items-center rounded-3xl border border-app-border bg-app-surface px-5 py-7">
               <Text className="text-xs font-semibold uppercase tracking-[2px] text-app-primary">
                 {t("accounts.availableBalance")}
               </Text>
@@ -297,7 +298,7 @@ export default function AccountDetailsScreen() {
                 label={t("accounts.monthlyIncome")}
                 value={formatCurrency(monthlyIncome, resolvedCurrencyCode)}
                 icon="ArrowDownLeft"
-                iconColor="#22C55E"
+                iconColor={APP_COLORS.success}
                 iconBackground="#0D3B2A"
                 className="flex-1"
               />
@@ -308,7 +309,7 @@ export default function AccountDetailsScreen() {
                 label={t("accounts.allocatedToGoals")}
                 value={formatCurrency(allocatedToGoals, resolvedCurrencyCode)}
                 icon="Target"
-                iconColor="#18C8FF"
+                iconColor={APP_COLORS.actionPrimary}
                 iconBackground="#083A4B"
               />
             </View>
@@ -320,7 +321,7 @@ export default function AccountDetailsScreen() {
           </>
         }
         ListEmptyComponent={
-          <View className="rounded-2xl border border-[#1E2A47] bg-[#111C33] p-4">
+          <View className="rounded-2xl border border-app-border bg-app-bgSecondary p-4">
             <Text className="text-center text-app-textSecondary">{t("accounts.noTransactions")}</Text>
           </View>
         }
@@ -340,3 +341,4 @@ export default function AccountDetailsScreen() {
     </View>
   );
 }
+

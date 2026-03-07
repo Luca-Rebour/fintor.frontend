@@ -1,3 +1,4 @@
+import { APP_COLORS } from "../constants/colors";
 import { Link, useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
@@ -155,7 +156,7 @@ export default function SignupScreen() {
             }}
             className="h-10 w-10 items-center justify-center"
           >
-            <AppIcon name="ArrowLeft" size={22} color="#FFFFFF" />
+            <AppIcon name="ArrowLeft" size={22} color={APP_COLORS.textPrimary} />
           </Pressable>
           <Text className="text-xl font-bold text-app-textPrimary">{t("auth.signup.title")}</Text>
           <View className="w-10" />
@@ -283,17 +284,17 @@ export default function SignupScreen() {
 
                 {isCurrencyPickerOpen ? (
                   <View
-                    className="absolute left-0 right-0 bottom-full mb-2 max-h-72 overflow-hidden rounded-2xl border border-app-border bg-[#111C33] z-50"
+                    className="absolute left-0 right-0 bottom-full mb-2 max-h-72 overflow-hidden rounded-2xl border border-app-border bg-app-bgSecondary z-50"
                     style={{ elevation: 24 }}
                   >
-                    <View className="px-3 py-3 border-b border-[#1E2A47]">
-                      <View className="flex-row items-center rounded-xl border border-[#1E2A47] bg-[#0C1830] px-3 py-2">
-                        <AppIcon name="Search" size={15} color="#94A3B8" />
+                    <View className="px-3 py-3 border-b border-app-border">
+                      <View className="flex-row items-center rounded-xl border border-app-border bg-app-surface px-3 py-2">
+                        <AppIcon name="Search" size={15} color={APP_COLORS.textSecondary} />
                         <TextInput
                           value={currencySearchText}
                           onChangeText={setCurrencySearchText}
                           placeholder={t("auth.signup.currencySearchPlaceholder")}
-                          placeholderTextColor="#64748B"
+                          placeholderTextColor={APP_COLORS.textMuted}
                           autoCapitalize="none"
                           className="ml-2 flex-1 text-sm text-app-textPrimary"
                         />
@@ -311,12 +312,12 @@ export default function SignupScreen() {
                               setIsCurrencyPickerOpen(false);
                               setCurrencySearchText("");
                             }}
-                            className="flex-row items-center justify-between border-b border-[#1E2A47] px-4 py-3"
+                            className="flex-row items-center justify-between border-b border-app-border px-4 py-3"
                           >
                             <Text className={`text-sm ${isSelected ? "text-app-primary font-semibold" : "text-app-textPrimary"}`}>
                               {currency.code} - {currency.name}
                             </Text>
-                            {isSelected ? <AppIcon name="Check" size={14} color="#18C8FF" /> : null}
+                            {isSelected ? <AppIcon name="Check" size={14} color={APP_COLORS.actionPrimary} /> : null}
                           </Pressable>
                         );
                       })}
@@ -368,3 +369,4 @@ export default function SignupScreen() {
     </AuthScreenFrame>
   );
 }
+

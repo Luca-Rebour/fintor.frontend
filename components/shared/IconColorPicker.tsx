@@ -1,3 +1,4 @@
+import { APP_COLORS } from "../../constants/colors";
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { AppIcon } from "./AppIcon";
@@ -15,10 +16,10 @@ function getIconOptions(): string[] {
 }
 
 export const ICON_COLOR_OPTIONS = [
-  "#18C8FF",
-  "#B63BFF",
-  "#22C55E",
-  "#EF4444",
+  APP_COLORS.actionPrimary,
+  APP_COLORS.actionSecondary,
+  APP_COLORS.success,
+  APP_COLORS.danger,
   "#F97316",
   "#F59E0B",
   "#14B8A6",
@@ -31,9 +32,9 @@ export const ICON_COLOR_OPTIONS = [
   "#84CC16",
   "#06B6D4",
   "#A855F7",
-  "#F43F5E",
+  APP_COLORS.danger,
   "#3B82F6",
-  "#64748B",
+  APP_COLORS.textMuted,
   "#4ADE80",
 ] as const;
 
@@ -55,10 +56,10 @@ const IconItem = memo(function IconItem({
       onPress={onPress}
       style={{ width: "23%", minWidth: 64, height: 64 }}
       className={`rounded-xl border items-center justify-center ${
-        isSelected ? "border-[#18C8FF] bg-[#10314A]" : "border-[#1E2A47] bg-[#111C33]"
+        isSelected ? "border-app-accentBlue bg-app-accentBlue/20" : "border-app-border bg-app-bgSecondary"
       }`}
     >
-      <AppIcon name={iconName} size={16} color={isSelected ? "#18C8FF" : "#94A3B8"} />
+      <AppIcon name={iconName} size={16} color={isSelected ? APP_COLORS.actionPrimary : APP_COLORS.textSecondary} />
       <Text
         numberOfLines={1}
         className={`mt-1 text-[10px] ${isSelected ? "text-app-primary" : "text-app-textSecondary"}`}
@@ -132,19 +133,19 @@ export function IconColorPicker({
     <>
       <View className="mt-4 flex-row items-center justify-between">
         <Text className="text-app-textSecondary text-xs uppercase">{selectedIconLabel}</Text>
-        <View className="flex-row items-center rounded-xl border border-[#1E2A47] bg-[#0C1830] px-3 py-2">
-          <AppIcon name={selectedIcon} size={16} color="#18C8FF" />
+        <View className="flex-row items-center rounded-xl border border-app-border bg-app-surface px-3 py-2">
+          <AppIcon name={selectedIcon} size={16} color={APP_COLORS.actionPrimary} />
           <Text className="ml-2 text-xs text-app-textPrimary">{selectedIcon}</Text>
         </View>
       </View>
 
-      <View className="mt-3 rounded-xl border border-[#1E2A47] bg-[#0C1830] px-3 py-2 flex-row items-center">
-        <AppIcon name="Search" size={15} color="#94A3B8" />
+      <View className="mt-3 rounded-xl border border-app-border bg-app-surface px-3 py-2 flex-row items-center">
+        <AppIcon name="Search" size={15} color={APP_COLORS.textSecondary} />
         <TextInput
           value={iconSearch}
           onChangeText={setIconSearch}
           placeholder={searchPlaceholder}
-          placeholderTextColor="#64748B"
+          placeholderTextColor={APP_COLORS.textMuted}
           autoCapitalize="none"
           className="ml-2 flex-1 text-sm text-app-textPrimary"
         />
@@ -216,7 +217,7 @@ export function IconColorPicker({
       {showColorSection ? (
         <>
           <Text className="text-app-textSecondary text-xs uppercase mt-4 mb-2">{colorSectionLabel}</Text>
-          <View className="rounded-xl border border-[#1E2A47] bg-[#0C1830] p-3 mb-2">
+          <View className="rounded-xl border border-app-border bg-app-surface p-3 mb-2">
             <View className="flex-row flex-wrap gap-3">
               {ICON_COLOR_OPTIONS.map((color) => {
                 const isSelected = color === selectedColor;
@@ -225,11 +226,11 @@ export function IconColorPicker({
                     key={color}
                     onPress={() => onChangeColor(color)}
                     className={`h-10 w-10 rounded-full border-2 items-center justify-center ${
-                      isSelected ? "border-white" : "border-[#1E2A47]"
+                      isSelected ? "border-white" : "border-app-border"
                     }`}
                     style={{ backgroundColor: color }}
                   >
-                    {isSelected ? <AppIcon name="Check" size={14} color="#FFFFFF" /> : null}
+                    {isSelected ? <AppIcon name="Check" size={14} color={APP_COLORS.textPrimary} /> : null}
                   </Pressable>
                 );
               })}
@@ -240,3 +241,4 @@ export function IconColorPicker({
     </>
   );
 }
+

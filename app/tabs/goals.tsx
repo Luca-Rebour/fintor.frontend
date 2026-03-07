@@ -1,3 +1,4 @@
+import { APP_COLORS } from "../../constants/colors";
 import { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Alert, Pressable, ScrollView, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
@@ -93,19 +94,19 @@ export default function GoalsScreen() {
 	}
 
 	return (
-		<View className="flex-1 bg-[#060F24]">
+		<View className="flex-1 bg-app-bgPrimary">
 			<GoalsHeader title={t("goals.title")} />
 
 			{isLoading ? (
 				<View className="flex-1 items-center justify-center">
-					<ActivityIndicator size="large" color="#18C8FF" />
+					<ActivityIndicator size="large" color={APP_COLORS.actionPrimary} />
 				</View>
 			) : error ? (
 				<View className="flex-1 items-center justify-center px-6">
 					<Text className="text-center text-base text-app-textPrimary">{error}</Text>
 					<Pressable
 						onPress={loadGoals}
-						className="mt-4 rounded-xl bg-[#111C33] border border-[#1E2A47] px-4 py-2"
+						className="mt-4 rounded-xl bg-app-bgSecondary border border-app-border px-4 py-2"
 					>
 						<Text className="text-app-primary font-semibold">{t("common.retry")}</Text>
 					</Pressable>
@@ -130,7 +131,7 @@ export default function GoalsScreen() {
 						<Text className="text-2xl font-bold text-app-textPrimary">{t("goals.targetsTitle")}</Text>
 						<Pressable
 							onPress={() => setIsCreateModalVisible(true)}
-							className="rounded-lg border border-[#1E2A47] bg-[#111C33] px-3 py-2"
+							className="rounded-lg border border-app-border bg-app-bgSecondary px-3 py-2"
 						>
 							<Text className="text-sm font-semibold text-app-primary">Crear target</Text>
 						</Pressable>
@@ -153,3 +154,4 @@ export default function GoalsScreen() {
 		</View>
 	);
 }
+

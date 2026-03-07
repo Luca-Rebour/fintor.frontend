@@ -1,3 +1,4 @@
+import { APP_COLORS } from "../../constants/colors";
 import { useEffect, useState } from "react";
 import { Pressable, ScrollView, Text, TextInput, View, KeyboardAvoidingView, Platform } from "react-native";
 import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
@@ -37,7 +38,7 @@ const FREQUENCY_OPTIONS: { value: Frequency; labelKey: string }[] = [
 ];
 
 function FieldLabel({ children }: { children: string }) {
-  return <Text className="mb-2 text-xs font-semibold tracking-wider text-[#94A3B8]">{children}</Text>;
+  return <Text className="mb-2 text-xs font-semibold tracking-wider text-app-textSecondary">{children}</Text>;
 }
 
 function InputField(props: {
@@ -51,9 +52,9 @@ function InputField(props: {
       value={String(props.value)}
       onChangeText={props.onChangeText}
       placeholder={props.placeholder}
-      placeholderTextColor="#64748B"
+      placeholderTextColor={APP_COLORS.textMuted}
       keyboardType={props.keyboardType ?? "default"}
-      className="rounded-xl border border-[#1E2A47] bg-[#111C33] px-3 py-3 text-white"
+      className="rounded-xl border border-app-border bg-app-bgSecondary px-3 py-3 text-white"
     />
   );
 }
@@ -195,13 +196,13 @@ export function RecurringAdminFormModal({
           behavior={Platform.OS === "ios" ? "padding" : undefined}
           keyboardVerticalOffset={Platform.OS === "ios" ? 24 : 0}
         >
-          <View className="h-full max-h-[88%] rounded-t-3xl border border-[#1E2A47] bg-[#060F24] p-4">
+          <View className="h-full max-h-[88%] rounded-t-3xl border border-app-border bg-app-bgPrimary p-4">
             <View className="mb-4 flex-row items-center justify-between">
               <Text className="text-lg font-bold text-app-textPrimary">
                 {mode === "create" ? t("recurringAdmin.form.createTitle") : t("recurringAdmin.form.editTitle")}
               </Text>
-              <Pressable onPress={onClose} className="h-8 w-8 items-center justify-center rounded-full bg-[#111C33]">
-                <Text className="text-base font-bold text-[#94A3B8]">×</Text>
+              <Pressable onPress={onClose} className="h-8 w-8 items-center justify-center rounded-full bg-app-bgSecondary">
+                <Text className="text-base font-bold text-app-textSecondary">×</Text>
               </Pressable>
             </View>
 
@@ -241,12 +242,12 @@ export function RecurringAdminFormModal({
               <Pressable
                 onPress={() => onChange({ ...form, transactionType: TransactionType.Income })}
                 className={`flex-1 rounded-xl px-3 py-3 ${
-                  form.transactionType === TransactionType.Income ? "bg-[#18C8FF]" : "bg-[#111C33]"
+                  form.transactionType === TransactionType.Income ? "bg-app-accentBlue" : "bg-app-bgSecondary"
                 }`}
               >
                 <Text
                   className={`text-center text-sm font-semibold ${
-                    form.transactionType === TransactionType.Income ? "text-[#060F24]" : "text-[#94A3B8]"
+                    form.transactionType === TransactionType.Income ? "text-app-bgPrimary" : "text-app-textSecondary"
                   }`}
                 >
                   {t("recurringAdmin.form.transactionType.income")}
@@ -256,12 +257,12 @@ export function RecurringAdminFormModal({
               <Pressable
                 onPress={() => onChange({ ...form, transactionType: TransactionType.Expense })}
                 className={`flex-1 rounded-xl px-3 py-3 ${
-                  form.transactionType === TransactionType.Expense ? "bg-[#1D4ED8]" : "bg-[#111C33]"
+                  form.transactionType === TransactionType.Expense ? "bg-app-accentBlue" : "bg-app-bgSecondary"
                 }`}
               >
                 <Text
                   className={`text-center text-sm font-semibold ${
-                    form.transactionType === TransactionType.Expense ? "text-white" : "text-[#94A3B8]"
+                    form.transactionType === TransactionType.Expense ? "text-white" : "text-app-textSecondary"
                   }`}
                 >
                   {t("recurringAdmin.form.transactionType.expense")}
@@ -279,9 +280,9 @@ export function RecurringAdminFormModal({
                     <Pressable
                       key={option.value}
                       onPress={() => onChange({ ...form, frequency: option.value })}
-                      className={`rounded-full px-3 py-2 ${isActive ? "bg-[#18C8FF]" : "bg-[#111C33]"}`}
+                      className={`rounded-full px-3 py-2 ${isActive ? "bg-app-accentBlue" : "bg-app-bgSecondary"}`}
                     >
-                      <Text className={`text-xs font-semibold ${isActive ? "text-[#060F24]" : "text-[#94A3B8]"}`}>
+                      <Text className={`text-xs font-semibold ${isActive ? "text-app-bgPrimary" : "text-app-textSecondary"}`}>
                         {t(option.labelKey as any)}
                       </Text>
                     </Pressable>
@@ -292,7 +293,7 @@ export function RecurringAdminFormModal({
 
             <View className="mt-4">
               <FieldLabel>{t("recurringAdmin.form.fields.account")}</FieldLabel>
-              <View className="rounded-xl border border-[#1E2A47] bg-[#111C33] p-2">
+              <View className="rounded-xl border border-app-border bg-app-bgSecondary p-2">
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                   {accountOptions.map((account) => {
                     const isSelected = form.accountId === account.value;
@@ -301,9 +302,9 @@ export function RecurringAdminFormModal({
                       <Pressable
                         key={account.value}
                         onPress={() => onChange({ ...form, accountId: account.value })}
-                        className={`mr-2 rounded-lg px-3 py-2 ${isSelected ? "bg-[#18C8FF]" : "bg-[#1A243B]"}`}
+                        className={`mr-2 rounded-lg px-3 py-2 ${isSelected ? "bg-app-accentBlue" : "bg-app-border"}`}
                       >
-                        <Text className={`text-xs font-semibold ${isSelected ? "text-[#060F24]" : "text-[#CBD5E1]"}`}>
+                        <Text className={`text-xs font-semibold ${isSelected ? "text-app-bgPrimary" : "text-[#CBD5E1]"}`}>
                           {account.label}
                         </Text>
                       </Pressable>
@@ -315,7 +316,7 @@ export function RecurringAdminFormModal({
 
             <View className="mt-4">
               <FieldLabel>{t("recurringAdmin.form.fields.category")}</FieldLabel>
-              <View className="rounded-xl border border-[#1E2A47] bg-[#111C33] p-2">
+              <View className="rounded-xl border border-app-border bg-app-bgSecondary p-2">
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                   {categoryOptions.map((category) => {
                     const isSelected = form.categoryId === category.value;
@@ -324,9 +325,9 @@ export function RecurringAdminFormModal({
                       <Pressable
                         key={category.value}
                         onPress={() => onChange({ ...form, categoryId: category.value })}
-                        className={`mr-2 rounded-lg px-3 py-2 ${isSelected ? "bg-[#18C8FF]" : "bg-[#1A243B]"}`}
+                        className={`mr-2 rounded-lg px-3 py-2 ${isSelected ? "bg-app-accentBlue" : "bg-app-border"}`}
                       >
-                        <Text className={`text-xs font-semibold ${isSelected ? "text-[#060F24]" : "text-[#CBD5E1]"}`}>
+                        <Text className={`text-xs font-semibold ${isSelected ? "text-app-bgPrimary" : "text-[#CBD5E1]"}`}>
                           {category.label}
                         </Text>
                       </Pressable>
@@ -338,7 +339,7 @@ export function RecurringAdminFormModal({
 
             <View className="mt-4">
               <FieldLabel>Goal (optional)</FieldLabel>
-              <View className="rounded-xl border border-[#1E2A47] bg-[#111C33] p-2">
+              <View className="rounded-xl border border-app-border bg-app-bgSecondary p-2">
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                   {goalOptions.map((goal) => {
                     const isSelected = (form.goalId ?? "") === goal.value;
@@ -347,9 +348,9 @@ export function RecurringAdminFormModal({
                       <Pressable
                         key={goal.value || "no-goal"}
                         onPress={() => onChange({ ...form, goalId: goal.value || null })}
-                        className={`mr-2 rounded-lg px-3 py-2 ${isSelected ? "bg-[#18C8FF]" : "bg-[#1A243B]"}`}
+                        className={`mr-2 rounded-lg px-3 py-2 ${isSelected ? "bg-app-accentBlue" : "bg-app-border"}`}
                       >
-                        <Text className={`text-xs font-semibold ${isSelected ? "text-[#060F24]" : "text-[#CBD5E1]"}`}>
+                        <Text className={`text-xs font-semibold ${isSelected ? "text-app-bgPrimary" : "text-[#CBD5E1]"}`}>
                           {goal.label}
                         </Text>
                       </Pressable>
@@ -365,9 +366,9 @@ export function RecurringAdminFormModal({
               <FieldLabel>{t("recurringAdmin.form.fields.startDate")}</FieldLabel>
               <Pressable
                 onPress={() => openDatePicker("startDate")}
-                className="rounded-xl border border-[#1E2A47] bg-[#111C33] px-3 py-3"
+                className="rounded-xl border border-app-border bg-app-bgSecondary px-3 py-3"
               >
-                <Text className={`text-base ${form.startDate ? "text-white" : "text-[#64748B]"}`}>
+                <Text className={`text-base ${form.startDate ? "text-white" : "text-app-textMuted"}`}>
                   {form.startDate || t("recurringAdmin.form.placeholders.selectStartDate")}
                 </Text>
               </Pressable>
@@ -377,9 +378,9 @@ export function RecurringAdminFormModal({
               <FieldLabel>{t("recurringAdmin.form.fields.endDate")}</FieldLabel>
               <Pressable
                 onPress={() => openDatePicker("endDate")}
-                className="rounded-xl border border-[#1E2A47] bg-[#111C33] px-3 py-3"
+                className="rounded-xl border border-app-border bg-app-bgSecondary px-3 py-3"
               >
-                <Text className={`text-base ${form.endDate ? "text-white" : "text-[#64748B]"}`}>
+                <Text className={`text-base ${form.endDate ? "text-white" : "text-app-textMuted"}`}>
                   {form.endDate || t("recurringAdmin.form.placeholders.selectEndDate")}
                 </Text>
               </Pressable>
@@ -390,17 +391,17 @@ export function RecurringAdminFormModal({
               <Pressable
                 onPress={onClose}
                 disabled={isSubmitting}
-                className="flex-1 rounded-xl bg-[#111C33] px-4 py-3"
+                className="flex-1 rounded-xl bg-app-bgSecondary px-4 py-3"
               >
-                <Text className="text-center text-sm font-semibold text-[#94A3B8]">{t("common.cancel")}</Text>
+                <Text className="text-center text-sm font-semibold text-app-textSecondary">{t("common.cancel")}</Text>
               </Pressable>
 
               <Pressable
                 onPress={onSubmit}
                 disabled={isSubmitting}
-                className="flex-1 rounded-xl bg-[#18C8FF] px-4 py-3"
+                className="flex-1 rounded-xl bg-app-accentBlue px-4 py-3"
               >
-                <Text className="text-center text-sm font-semibold text-[#060F24]">
+                <Text className="text-center text-sm font-semibold text-app-bgPrimary">
                   {isSubmitting ? t("recurringAdmin.form.actions.saving") : mode === "create" ? t("recurringAdmin.form.actions.create") : t("recurringAdmin.form.actions.save")}
                 </Text>
               </Pressable>
@@ -419,10 +420,10 @@ export function RecurringAdminFormModal({
 
         {activeDateField && Platform.OS === "ios" ? (
           <AppBottomSheetModal visible={!!activeDateField} onClose={() => setActiveDateField(null)} snapPoints={["40%"]} debugName="RecurringAdminFormModal:IOSDatePicker">
-            <View className="rounded-t-3xl border border-[#1E2A47] bg-[#060F24] px-4 pb-6 pt-3">
+            <View className="rounded-t-3xl border border-app-border bg-app-bgPrimary px-4 pb-6 pt-3">
               <View className="mb-2 flex-row items-center justify-between">
                 <Pressable onPress={() => setActiveDateField(null)} className="px-2 py-2">
-                  <Text className="text-sm font-semibold text-[#94A3B8]">{t("common.cancel")}</Text>
+                  <Text className="text-sm font-semibold text-app-textSecondary">{t("common.cancel")}</Text>
                 </Pressable>
 
                 <Text className="text-sm font-semibold text-app-textPrimary">
@@ -436,7 +437,7 @@ export function RecurringAdminFormModal({
                   }}
                   className="px-2 py-2"
                 >
-                  <Text className="text-sm font-semibold text-[#18C8FF]">{t("common.done")}</Text>
+                  <Text className="text-sm font-semibold text-app-accentBlue">{t("common.done")}</Text>
                 </Pressable>
               </View>
 
@@ -447,3 +448,4 @@ export function RecurringAdminFormModal({
     </AppBottomSheetModal>
   );
 }
+

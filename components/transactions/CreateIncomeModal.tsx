@@ -1,3 +1,4 @@
+import { APP_COLORS } from "../../constants/colors";
 import { RefObject, useEffect, useRef, useState } from "react";
 import {
   KeyboardAvoidingView,
@@ -83,10 +84,10 @@ function SelectField({
       <Pressable
         ref={triggerRef}
         onPress={onToggle}
-        className="bg-[#0C1830] border border-[#1E2A47] rounded-xl px-3 py-3 flex-row items-center justify-between"
+        className="bg-app-surface border border-app-border rounded-xl px-3 py-3 flex-row items-center justify-between"
       >
         <Text className="text-app-textPrimary text-sm">{value}</Text>
-        <AppIcon name={isOpen ? "ChevronUp" : "ChevronDown"} size={16} color="#94A3B8" />
+        <AppIcon name={isOpen ? "ChevronUp" : "ChevronDown"} size={16} color={APP_COLORS.textSecondary} />
       </Pressable>
     </View>
   );
@@ -281,11 +282,11 @@ export function CreateIncomeModal({
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={20}
       >
-          <View className="h-full max-h-[92%] rounded-t-3xl border-t border-[#1E2A47] bg-[#111C33]">
-            <View className="px-5 pt-4 pb-3 border-b border-[#1E2A47] flex-row items-center justify-between">
+          <View className="h-full max-h-[92%] rounded-t-3xl border-t border-app-border bg-app-bgSecondary">
+            <View className="px-5 pt-4 pb-3 border-b border-app-border flex-row items-center justify-between">
               <Text className="text-app-textPrimary text-xl font-bold">Add New Income</Text>
               <Pressable onPress={handleClose} className="p-1">
-                <AppIcon name="X" size={18} color="#94A3B8" />
+                <AppIcon name="X" size={18} color={APP_COLORS.textSecondary} />
               </Pressable>
             </View>
 
@@ -306,8 +307,8 @@ export function CreateIncomeModal({
               }}
               keyboardType="decimal-pad"
               placeholder="0.00"
-              placeholderTextColor="#64748B"
-              className="bg-[#0C1830] border border-[#1E2A47] rounded-xl px-3 py-3 text-app-textPrimary"
+              placeholderTextColor={APP_COLORS.textMuted}
+              className="bg-app-surface border border-app-border rounded-xl px-3 py-3 text-app-textPrimary"
             />
             {amountError ? (
               <Text className="text-red-400 text-xs mt-2">{amountError}</Text>
@@ -318,8 +319,8 @@ export function CreateIncomeModal({
               value={description}
               onChangeText={setDescription}
               placeholder="Add details"
-              placeholderTextColor="#64748B"
-              className="bg-[#0C1830] border border-[#1E2A47] rounded-xl px-3 py-3 text-app-textPrimary"
+              placeholderTextColor={APP_COLORS.textMuted}
+              className="bg-app-surface border border-app-border rounded-xl px-3 py-3 text-app-textPrimary"
             />
 
             <SelectField
@@ -347,10 +348,10 @@ export function CreateIncomeModal({
             />
           </ScrollView>
 
-            <View className="px-5 py-4 border-t border-[#1E2A47]">
+            <View className="px-5 py-4 border-t border-app-border">
               <Pressable
                 onPress={handleCreate}
-                className="items-center justify-center py-4 rounded-2xl bg-[#18C8FF]"
+                className="items-center justify-center py-4 rounded-2xl bg-app-accentBlue"
               >
                 <Text className="text-white text-base font-bold">Create Income</Text>
               </Pressable>
@@ -378,9 +379,9 @@ export function CreateIncomeModal({
                   elevation: 24,
                   maxHeight: 240,
                 }}
-                className="bg-[#0C1830] border border-[#1E2A47] rounded-xl overflow-hidden"
+                className="bg-app-surface border border-app-border rounded-xl overflow-hidden"
               >
-              <View className="px-3 py-2 border-b border-[#1E2A47]">
+              <View className="px-3 py-2 border-b border-app-border">
                 <Text className="text-app-textSecondary text-xs uppercase">
                   Select {activeSelectLabel}
                 </Text>
@@ -408,7 +409,7 @@ export function CreateIncomeModal({
                         setIsAccountOpen(false);
                         setIsGoalOpen(false);
                       }}
-                      className="px-3 py-3 flex-row items-center justify-between border-b border-[#1E2A47]"
+                      className="px-3 py-3 flex-row items-center justify-between border-b border-app-border"
                     >
                       <Text
                         className={`text-sm ${
@@ -417,7 +418,7 @@ export function CreateIncomeModal({
                       >
                         {optionLabel}
                       </Text>
-                      {isSelected ? <AppIcon name="Check" size={14} color="#18C8FF" /> : null}
+                      {isSelected ? <AppIcon name="Check" size={14} color={APP_COLORS.actionPrimary} /> : null}
                     </Pressable>
                   );
                 })}
@@ -429,3 +430,4 @@ export function CreateIncomeModal({
     </AppBottomSheetModal>
   );
 }
+

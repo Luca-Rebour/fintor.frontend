@@ -1,3 +1,4 @@
+import { APP_COLORS } from "../../constants/colors";
 import { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Alert, FlatList, Pressable, ScrollView, Text, View } from "react-native";
 import { AppIcon } from "../../components/shared/AppIcon";
@@ -500,7 +501,7 @@ export default function TransactionsScreen() {
   }
 
   return (
-    <View className="flex-1 bg-[#060F24]">
+    <View className="flex-1 bg-app-bgPrimary">
       <FlatList
         data={!isLoading && !error ? transactionRows : []}
         refreshing={isRefreshing}
@@ -515,7 +516,7 @@ export default function TransactionsScreen() {
         contentContainerStyle={{ paddingBottom: 110 }}
         ListHeaderComponent={
           <>
-            <View className="px-4 py-3 border-b border-[#1E2A47]">
+            <View className="px-4 py-3 border-b border-app-border">
               <View className="flex-row items-center justify-between">
                 <Text className="text-lg font-semibold text-app-textPrimary">
                   Transactions
@@ -523,12 +524,12 @@ export default function TransactionsScreen() {
 
                 <Pressable
                   onPress={toggleFiltersMenu}
-                  className="h-10 w-10 items-center justify-center rounded-xl border border-[#1E2A47] bg-[#0C1830]"
+                  className="h-10 w-10 items-center justify-center rounded-xl border border-app-border bg-app-surface"
                 >
                   <AppIcon
                     name="Filter"
                     size={16}
-                    color={isFiltersMenuOpen ? "#18C8FF" : "#94A3B8"}
+                    color={isFiltersMenuOpen ? APP_COLORS.actionPrimary : APP_COLORS.textSecondary}
                   />
                 </Pressable>
               </View>
@@ -539,7 +540,7 @@ export default function TransactionsScreen() {
                     <Text className="text-app-textSecondary text-xs uppercase mb-2">Cuenta</Text>
                     <Pressable
                       onPress={() => setIsAccountFilterOpen((previous) => !previous)}
-                      className="bg-[#0C1830] border border-[#1E2A47] rounded-xl px-3 py-3 flex-row items-center justify-between"
+                      className="bg-app-surface border border-app-border rounded-xl px-3 py-3 flex-row items-center justify-between"
                     >
                       <Text className="text-app-textPrimary text-sm">
                         {getSelectedAccountLabel(accountOptions, selectedAccountValue)}
@@ -547,13 +548,13 @@ export default function TransactionsScreen() {
                       <AppIcon
                         name={isAccountFilterOpen ? "ChevronUp" : "ChevronDown"}
                         size={16}
-                        color="#94A3B8"
+                        color={APP_COLORS.textSecondary}
                       />
                     </Pressable>
 
                     {isAccountFilterOpen ? (
                       <View
-                        className="absolute left-0 right-0 top-full mt-2 bg-[#0C1830] border border-[#1E2A47] rounded-xl overflow-hidden max-h-56 z-50"
+                        className="absolute left-0 right-0 top-full mt-2 bg-app-surface border border-app-border rounded-xl overflow-hidden max-h-56 z-50"
                         style={{ elevation: 24 }}
                       >
                         <ScrollView nestedScrollEnabled>
@@ -566,12 +567,12 @@ export default function TransactionsScreen() {
                                   setSelectedAccountValue(option.value);
                                   setIsAccountFilterOpen(false);
                                 }}
-                                className="px-3 py-3 flex-row items-center justify-between border-b border-[#1E2A47]"
+                                className="px-3 py-3 flex-row items-center justify-between border-b border-app-border"
                               >
                                 <Text className={`text-sm ${isSelected ? "text-app-primary font-semibold" : "text-app-textPrimary"}`}>
                                   {option.label}
                                 </Text>
-                                {isSelected ? <AppIcon name="Check" size={14} color="#18C8FF" /> : null}
+                                {isSelected ? <AppIcon name="Check" size={14} color={APP_COLORS.actionPrimary} /> : null}
                               </Pressable>
                             );
                           })}
@@ -587,8 +588,8 @@ export default function TransactionsScreen() {
                         onPress={() => setAmountDisplayCurrency("BASE")}
                         className={`flex-1 rounded-xl px-3 py-2 border ${
                           amountDisplayCurrency === "BASE"
-                            ? "bg-[#12304A] border-[#18C8FF]"
-                            : "bg-[#0C1830] border-[#1E2A47]"
+                            ? "bg-app-accentBlue/20 border-app-accentBlue"
+                            : "bg-app-surface border-app-border"
                         }`}
                       >
                         <Text
@@ -606,8 +607,8 @@ export default function TransactionsScreen() {
                         onPress={() => setAmountDisplayCurrency("USD")}
                         className={`flex-1 rounded-xl px-3 py-2 border ${
                           amountDisplayCurrency === "USD"
-                            ? "bg-[#12304A] border-[#18C8FF]"
-                            : "bg-[#0C1830] border-[#1E2A47]"
+                            ? "bg-app-accentBlue/20 border-app-accentBlue"
+                            : "bg-app-surface border-app-border"
                         }`}
                       >
                         <Text
@@ -637,7 +638,7 @@ export default function TransactionsScreen() {
         ListEmptyComponent={
           isLoading ? (
             <View className="items-center justify-center mt-10">
-              <ActivityIndicator size="large" color="#18C8FF" />
+              <ActivityIndicator size="large" color={APP_COLORS.actionPrimary} />
             </View>
           ) : error ? (
             <View className="items-center justify-center px-6 mt-8">
@@ -708,3 +709,4 @@ export default function TransactionsScreen() {
     </View>
   );
 }
+

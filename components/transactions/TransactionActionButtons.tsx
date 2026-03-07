@@ -1,9 +1,8 @@
+import { APP_COLORS } from "../../constants/colors";
 import { useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { AppIcon } from "../shared/AppIcon";
-
-import { APP_COLORS } from "../../constants/colors";
 
 type TransactionActionButtonsProps = {
   onAddExpense?: () => void;
@@ -37,12 +36,12 @@ export function TransactionActionButtons({
 
       <View className="absolute bottom-6 right-4 items-end">
         {isMenuOpen ? (
-          <View className="mb-3 w-56 bg-[#0C1830] border border-[#1E2A47] rounded-2xl p-2">
+          <View className="mb-3 w-56 bg-app-surface border border-app-border rounded-2xl p-2">
             <Pressable
               onPress={() => handleActionPress(onAddIncome)}
               className="px-4 py-3.5 min-h-14 flex-row items-center rounded-xl"
             >
-              <AppIcon name="DollarSign" size={18} color="#22C55E" />
+              <AppIcon name="DollarSign" size={18} color={APP_COLORS.success} />
               <Text className="ml-3 text-base font-semibold text-app-textPrimary">{t("transactions.actions.addIncome")}</Text>
             </Pressable>
 
@@ -50,7 +49,7 @@ export function TransactionActionButtons({
               onPress={() => handleActionPress(onAddExpense)}
               className="px-4 py-3.5 min-h-14 flex-row items-center rounded-xl"
             >
-              <AppIcon name="CircleMinus" size={18} color="#EF4444" />
+              <AppIcon name="CircleMinus" size={18} color={APP_COLORS.danger} />
               <Text className="ml-3 text-base font-semibold text-app-textPrimary">{t("transactions.actions.addExpense")}</Text>
             </Pressable>
 
@@ -75,11 +74,12 @@ export function TransactionActionButtons({
             })
           }
           style={{ backgroundColor: APP_COLORS.actionPrimary }}
-          className="h-16 w-16 items-center justify-center rounded-full border border-[#1E2A47]"
+          className="h-16 w-16 items-center justify-center rounded-full border border-app-border"
         >
-          <AppIcon name="Plus" size={26} color="#FFFFFF" />
+          <AppIcon name="Plus" size={26} color={APP_COLORS.textPrimary} />
         </Pressable>
       </View>
     </>
   );
 }
+

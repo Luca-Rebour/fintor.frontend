@@ -1,3 +1,4 @@
+import { APP_COLORS } from "../constants/colors";
 import {
   CreateTransactionRequestDTO,
   CreateTransactionResponseDTO,
@@ -28,7 +29,7 @@ export function mapTransactionDtoToModel(
     transactionType,
     icon: String(dto.icon ?? (transactionType === 0 ? "DollarSign" : "ShoppingCart")),
     accountName: String(dto.accountName ?? "Main account").trim() || "Main account",
-    categoryColor: CATEGORY_COLOR_BY_NAME[categoryName] ?? (transactionType === 1 ? "#18C8FF" : "#FF6B6B"),
+    categoryColor: CATEGORY_COLOR_BY_NAME[categoryName] ?? (transactionType === 1 ? APP_COLORS.actionPrimary : "#FF6B6B"),
     currencyCode: String(dto.currencyCode ?? "USD").trim().toUpperCase() || "USD",
     exchangeRate:
       Number.isFinite(Number(dto.exchangeRate)) && Number(dto.exchangeRate) > 0
@@ -60,3 +61,4 @@ export function mapCreateTransactionInputModelToRequestDto(
     transactionType: model.transactionType,
   };
 }
+

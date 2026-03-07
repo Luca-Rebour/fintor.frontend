@@ -1,3 +1,4 @@
+import { APP_COLORS } from "../../constants/colors";
 import { Redirect, Tabs, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
@@ -39,8 +40,8 @@ export default function ProtectedTabsLayout() {
 
   if (isCheckingAuth) {
     return (
-      <View className="flex-1 items-center justify-center bg-[#060F24]">
-        <ActivityIndicator size="large" color="#18C8FF" />
+      <View className="flex-1 items-center justify-center bg-app-bgPrimary">
+        <ActivityIndicator size="large" color={APP_COLORS.actionPrimary} />
       </View>
     );
   }
@@ -67,10 +68,10 @@ export default function ProtectedTabsLayout() {
       <Tabs
         screenOptions={{
           headerShown: false,
-          tabBarActiveTintColor: "#18C8FF",
-          tabBarInactiveTintColor: "#94A3B8",
+          tabBarActiveTintColor: APP_COLORS.actionPrimary,
+          tabBarInactiveTintColor: APP_COLORS.textSecondary,
           tabBarStyle: {
-            backgroundColor: "#111C33",
+            backgroundColor: APP_COLORS.surfaceCard,
             borderTopWidth: 0,
             paddingTop: 6,
           },
@@ -111,10 +112,10 @@ export default function ProtectedTabsLayout() {
                 accessibilityLabel={t("tabs.openMoreTabOptions")}
                 className="-mt-2 items-center"
               >
-                <View className="h-14 w-14 items-center justify-center rounded-full bg-[#18C8FF]">
-                  <AppIcon name="Ellipsis" color="#060F24" size={24} />
+                <View className="h-14 w-14 items-center justify-center rounded-full bg-app-accentBlue">
+                  <AppIcon name="Ellipsis" color={APP_COLORS.surfacePrimary} size={24} />
                 </View>
-                <Text className="mt-1 text-[11px] font-semibold text-[#94A3B8]">{t("tabs.more")}</Text>
+                <Text className="mt-1 text-[11px] font-semibold text-app-textSecondary">{t("tabs.more")}</Text>
               </Pressable>
             ),
           }}
@@ -182,28 +183,28 @@ export default function ProtectedTabsLayout() {
       </Tabs>
 
       <AppBottomSheetModal visible={isMoreMenuVisible} onClose={closeMoreMenu} snapPoints={["34%"]} debugName="Tabs:MoreMenu">
-          <View className="rounded-2xl border border-[#1A243B] bg-[#111C33] p-4">
+          <View className="rounded-2xl border border-app-border bg-app-bgSecondary p-4">
             <TouchableOpacity
-              className="mb-2 flex-row items-center rounded-xl bg-[#1A243B] px-3 py-3"
+              className="mb-2 flex-row items-center rounded-xl bg-app-border px-3 py-3"
               onPress={() => navigateToTab("/tabs/recurringTransactions")}
             >
-              <AppIcon name="Calendar" color="#18C8FF" size={18} />
+              <AppIcon name="Calendar" color={APP_COLORS.actionPrimary} size={18} />
               <Text className="ml-2 text-base font-medium text-white">{t("tabs.recurringTransactions")}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              className="flex-row items-center rounded-xl bg-[#1A243B] px-3 py-3"
+              className="flex-row items-center rounded-xl bg-app-border px-3 py-3"
               onPress={() => navigateToTab("/tabs/recurringAdmin")}
             >
-              <AppIcon name="Settings" color="#18C8FF" size={18} />
+              <AppIcon name="Settings" color={APP_COLORS.actionPrimary} size={18} />
               <Text className="ml-2 text-base font-medium text-white">{t("tabs.manageRecurring")}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              className="mt-2 flex-row items-center rounded-xl bg-[#1A243B] px-3 py-3"
+              className="mt-2 flex-row items-center rounded-xl bg-app-border px-3 py-3"
               onPress={() => navigateToTab("/tabs/goals")}
             >
-              <AppIcon name="Target" color="#18C8FF" size={18} />
+              <AppIcon name="Target" color={APP_COLORS.actionPrimary} size={18} />
               <Text className="ml-2 text-base font-medium text-white">{t("tabs.goals")}</Text>
             </TouchableOpacity>
           </View>
@@ -211,3 +212,4 @@ export default function ProtectedTabsLayout() {
     </>
   );
 }
+

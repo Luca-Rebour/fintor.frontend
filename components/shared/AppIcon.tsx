@@ -1,3 +1,4 @@
+import { APP_COLORS } from "../../constants/colors";
 import React from "react";
 
 const LucideIcons = require("lucide-react-native/dist/esm/lucide-react-native.js") as Record<
@@ -31,7 +32,7 @@ function normalizeLucideName(name: string) {
   return trimmed.charAt(0).toUpperCase() + trimmed.slice(1);
 }
 
-export function AppIcon({ name, size = 18, color = "#FFFFFF", strokeWidth = 2, style }: AppIconProps) {
+export function AppIcon({ name, size = 18, color = APP_COLORS.textPrimary, strokeWidth = 2, style }: AppIconProps) {
   const lucideKey = normalizeLucideName(String(name || ""));
 
   const IconComponent =
@@ -40,3 +41,4 @@ export function AppIcon({ name, size = 18, color = "#FFFFFF", strokeWidth = 2, s
 
   return <IconComponent size={size} color={color} strokeWidth={strokeWidth} style={style as any} />;
 }
+

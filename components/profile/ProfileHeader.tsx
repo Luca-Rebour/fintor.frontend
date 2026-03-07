@@ -1,3 +1,4 @@
+import { APP_COLORS } from "../../constants/colors";
 import { Pressable, Text, View } from "react-native";
 import { AppIcon } from "../shared/AppIcon";
 
@@ -12,7 +13,7 @@ export function ProfileHeader({ fullName, membershipLabel, onBackPress }: Profil
     <View>
       <View className="mb-6 flex-row items-center justify-between">
         <Pressable onPress={onBackPress} className="h-10 w-10 items-center justify-center rounded-full bg-app-cardSoft">
-          <AppIcon name="ArrowLeft" size={18} color="#FFFFFF" />
+          <AppIcon name="ArrowLeft" size={18} color={APP_COLORS.textPrimary} />
         </Pressable>
         <Text className="text-3xl font-bold text-app-textPrimary">Profile</Text>
         <View className="w-10" />
@@ -32,3 +33,4 @@ export function ProfileHeader({ fullName, membershipLabel, onBackPress }: Profil
     </View>
   );
 }
+

@@ -1,3 +1,4 @@
+import { APP_COLORS } from "../../constants/colors";
 import { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Alert, FlatList, Text, View } from "react-native";
 import { useRouter } from "expo-router";
@@ -128,12 +129,12 @@ export default function AccountsScreen() {
   }, []);
 
   return (
-    <View className="flex-1 bg-[#060F24] px-4 pt-4">
+    <View className="flex-1 bg-app-bgPrimary px-4 pt-4">
       <AccountsHeader onAddPress={() => setIsCreateAccountModalVisible(true)} />
 
       {isLoading ? (
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#18C8FF" />
+          <ActivityIndicator size="large" color={APP_COLORS.actionPrimary} />
         </View>
       ) : (
         <FlatList
@@ -152,7 +153,7 @@ export default function AccountsScreen() {
             </>
           }
           ListEmptyComponent={
-            <View className="mt-10 rounded-2xl border border-[#1E2A47] bg-[#111C33] p-4">
+            <View className="mt-10 rounded-2xl border border-app-border bg-app-bgSecondary p-4">
               <Text className="text-center text-app-textSecondary">{t("accounts.empty")}</Text>
             </View>
           }
@@ -192,3 +193,4 @@ export default function AccountsScreen() {
     </View>
   );
 }
+

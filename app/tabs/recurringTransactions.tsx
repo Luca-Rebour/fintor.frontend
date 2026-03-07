@@ -1,3 +1,4 @@
+import { APP_COLORS } from "../../constants/colors";
 import { useMemo, useEffect, useState } from "react";
 import {
 	ActivityIndicator,
@@ -348,21 +349,21 @@ export default function RecurringTransactionsScreen() {
 
 	if (isLoading) {
 		return (
-			<View className="flex-1 items-center justify-center bg-[#060F24]">
-				<ActivityIndicator size="large" color="#18C8FF" />
+			<View className="flex-1 items-center justify-center bg-app-bgPrimary">
+				<ActivityIndicator size="large" color={APP_COLORS.actionPrimary} />
 			</View>
 		);
 	}
 
 	if (error) {
 		return (
-			<View className="flex-1 items-center justify-center bg-[#060F24] px-6">
+			<View className="flex-1 items-center justify-center bg-app-bgPrimary px-6">
 				<Text className="text-center text-base text-app-textPrimary">
 					{error}
 				</Text>
 				<Pressable
 					onPress={() => loadRecurringTransactions()}
-					className="mt-4 rounded-xl border border-[#1E2A47] bg-[#111C33] px-4 py-2"
+					className="mt-4 rounded-xl border border-app-border bg-app-bgSecondary px-4 py-2"
 				>
 					<Text className="font-semibold text-app-primary">{t("common.retry")}</Text>
 				</Pressable>
@@ -371,7 +372,7 @@ export default function RecurringTransactionsScreen() {
 	}
 
 	return (
-		<View className="flex-1 bg-[#060F24]">
+		<View className="flex-1 bg-app-bgPrimary">
 			<RecurringHeader
 				title={t("recurring.title")}
 				onBackPress={() => router.push("/tabs/home")}
@@ -385,23 +386,23 @@ export default function RecurringTransactionsScreen() {
 					<RefreshControl
 						refreshing={isRefreshing}
 						onRefresh={handleRefresh}
-						tintColor="#18C8FF"
-						colors={["#18C8FF"]}
+						tintColor={APP_COLORS.actionPrimary}
+						colors={[APP_COLORS.actionPrimary]}
 					/>
 				}
 			>
 				<RecurringTypeToggle value={selectedType} onChange={setSelectedType} />
 
 				{pendingApprovalsForType.length ? (
-					<View className="mb-6 rounded-2xl border border-[#1E2A47] bg-[#111C33]">
+					<View className="mb-6 rounded-2xl border border-app-border bg-app-bgSecondary">
 						<Pressable
 							onPress={() => setIsPendingExpanded((previous) => !previous)}
 							className="flex-row items-center justify-between px-4 py-3"
 						>
-							<Text className="text-xs font-semibold tracking-widest text-[#94A3B8]">
+							<Text className="text-xs font-semibold tracking-widest text-app-textSecondary">
 								{t("recurring.labels.pending")} ({pendingApprovalsForType.length})
 							</Text>
-							<Text className="text-sm font-semibold text-[#18C8FF]">
+							<Text className="text-sm font-semibold text-app-accentBlue">
 								{isPendingExpanded ? t("recurring.actions.hide") : t("recurring.actions.show")}
 							</Text>
 						</Pressable>
@@ -421,15 +422,15 @@ export default function RecurringTransactionsScreen() {
 				) : null}
 
 				{rescheduledApprovalsForType.length ? (
-					<View className="mb-6 rounded-2xl border border-[#1E2A47] bg-[#111C33]">
+					<View className="mb-6 rounded-2xl border border-app-border bg-app-bgSecondary">
 						<Pressable
 							onPress={() => setIsRescheduledExpanded((previous) => !previous)}
 							className="flex-row items-center justify-between px-4 py-3"
 						>
-							<Text className="text-xs font-semibold tracking-widest text-[#94A3B8]">
+							<Text className="text-xs font-semibold tracking-widest text-app-textSecondary">
 								{t("recurring.labels.rescheduled")} ({rescheduledApprovalsForType.length})
 							</Text>
-							<Text className="text-sm font-semibold text-[#18C8FF]">
+							<Text className="text-sm font-semibold text-app-accentBlue">
 								{isRescheduledExpanded ? t("recurring.actions.hide") : t("recurring.actions.show")}
 							</Text>
 						</Pressable>
@@ -449,11 +450,11 @@ export default function RecurringTransactionsScreen() {
 				) : null}
 
 				<View className="mb-3 mt-1 flex-row items-center justify-between">
-					<Text className="text-xs font-semibold tracking-widest text-[#94A3B8]">
+					<Text className="text-xs font-semibold tracking-widest text-app-textSecondary">
 						{t("recurring.labels.upcomingRecurringTransactions")}
 					</Text>
 					<Pressable onPress={() => router.push("/tabs/recurringAdmin")}>
-						<Text className="text-sm font-semibold text-[#18C8FF]">{t("common.viewAll")}</Text>
+						<Text className="text-sm font-semibold text-app-accentBlue">{t("common.viewAll")}</Text>
 					</Pressable>
 				</View>
 
@@ -466,8 +467,8 @@ export default function RecurringTransactionsScreen() {
 						/>
 					))
 				) : (
-					<View className="mb-4 rounded-2xl border border-[#1E2A47] bg-[#111C33] px-4 py-5">
-						<Text className="text-center text-sm text-[#94A3B8]">
+					<View className="mb-4 rounded-2xl border border-app-border bg-app-bgSecondary px-4 py-5">
+						<Text className="text-center text-sm text-app-textSecondary">
 							{t("recurring.empty.filtered")}
 						</Text>
 					</View>
@@ -477,9 +478,9 @@ export default function RecurringTransactionsScreen() {
 			</ScrollView>
 
 			<AppBottomSheetModal visible={!!rescheduleApproval} onClose={() => setRescheduleApproval(null)} snapPoints={["52%"]} debugName="RecurringTransactions:Reschedule">
-				<View className="rounded-t-3xl border border-[#1E2A47] bg-[#060F24] px-4 pb-6 pt-4">
+				<View className="rounded-t-3xl border border-app-border bg-app-bgPrimary px-4 pb-6 pt-4">
 					<Text className="mb-1 text-base font-bold text-app-textPrimary">{t("recurring.reschedule.title")}</Text>
-					<Text className="mb-3 text-sm text-[#94A3B8]">
+					<Text className="mb-3 text-sm text-app-textSecondary">
 						{t("recurring.reschedule.message", {
 							description: rescheduleApproval?.description ?? t("recurring.reschedule.fallbackDescription"),
 						})}
@@ -497,15 +498,15 @@ export default function RecurringTransactionsScreen() {
 						<Pressable
 							onPress={() => setRescheduleApproval(null)}
 							disabled={isSubmittingAction}
-							className="flex-1 rounded-2xl border border-[#334155] bg-[#1A243B] px-4 py-3"
+							className="flex-1 rounded-2xl border border-app-border bg-app-border px-4 py-3"
 						>
-							<Text className="text-center text-sm font-semibold text-[#94A3B8]">{t("common.cancel")}</Text>
+							<Text className="text-center text-sm font-semibold text-app-textSecondary">{t("common.cancel")}</Text>
 						</Pressable>
 
 						<Pressable
 							onPress={submitRescheduleApproval}
 							disabled={isSubmittingAction}
-							className="flex-1 rounded-2xl bg-[#1D4ED8] px-4 py-3"
+							className="flex-1 rounded-2xl bg-app-accentBlue px-4 py-3"
 						>
 							<Text className="text-center text-sm font-semibold text-white">
 								{isSubmittingAction ? t("recurringAdmin.form.actions.saving") : t("recurring.actions.saveDate")}
@@ -517,4 +518,5 @@ export default function RecurringTransactionsScreen() {
 		</View>
 	);
 }
+
 

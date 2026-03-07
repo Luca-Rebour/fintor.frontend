@@ -1,3 +1,4 @@
+import { APP_COLORS } from "../../constants/colors";
 import { Pressable, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { RecurringTransactionApiDTO } from "../../types/recurring";
@@ -49,10 +50,10 @@ export function RecurringAdminItem({ transaction, onEdit, onDelete }: RecurringA
 
   function getIconPalette(iconName: string | null): { wrapper: string; icon: string } {
     const palettes = [
-      { wrapper: "border-[#7F1D1D] bg-[#3A1A2A]", icon: "#EF4444" },
-      { wrapper: "border-[#14532D] bg-[#0F2A27]", icon: "#22C55E" },
-      { wrapper: "border-[#1E3A8A] bg-[#142A57]", icon: "#3B82F6" },
-      { wrapper: "border-[#581C87] bg-[#2B1744]", icon: "#A855F7" },
+      { wrapper: "border-app-danger/40 bg-app-danger/20", icon: APP_COLORS.danger },
+      { wrapper: "border-app-success/40 bg-app-success/20", icon: APP_COLORS.success },
+      { wrapper: "border-app-accentBlue/40 bg-app-accentBlue/20", icon: APP_COLORS.actionPrimary },
+      { wrapper: "border-app-accentPurple/40 bg-app-accentPurple/20", icon: APP_COLORS.actionSecondary },
     ];
 
     const key = String(iconName || "walletcards");
@@ -69,7 +70,7 @@ export function RecurringAdminItem({ transaction, onEdit, onDelete }: RecurringA
     <Pressable
       onLongPress={() => onDelete(transaction)}
       delayLongPress={280}
-      className="mb-3 flex-row items-center rounded-2xl border border-[#1E2A47] bg-[#111C33] px-3 py-3"
+      className="mb-3 flex-row items-center rounded-2xl border border-app-border bg-app-surface px-3 py-3"
     >
       <View className={`mr-3 h-11 w-11 items-center justify-center rounded-xl border ${palette.wrapper}`}>
         <AppIcon name={transaction.icon || "WalletCards"} size={18} color={palette.icon} />
@@ -77,18 +78,19 @@ export function RecurringAdminItem({ transaction, onEdit, onDelete }: RecurringA
 
       <View className="flex-1">
         <Text className="text-base font-semibold text-app-textPrimary">{transaction.name}</Text>
-        <Text className="mt-0.5 text-xs text-[#94A3B8]">{subtitle}</Text>
-        <Text className="mt-0.5 text-[10px] font-semibold tracking-wide text-[#64748B]">{frequencyLabel}</Text>
+        <Text className="mt-0.5 text-xs text-app-textSecondary">{subtitle}</Text>
+        <Text className="mt-0.5 text-[10px] font-semibold tracking-wide text-app-textMuted">{frequencyLabel}</Text>
       </View>
 
       <View className="ml-2 items-end">
-        <Text className={`text-xl font-bold ${isIncome ? "text-[#18C8FF]" : "text-[#F43F5E]"}`}>
+        <Text className={`text-xl font-bold ${isIncome ? "text-app-accentBlue" : "text-app-danger"}`}>
           {formatAmount(transaction.amount, transaction.currencyCode || "USD", transaction.transactionType)}
         </Text>
-        <Pressable onPress={() => onEdit(transaction)} className="mt-1 h-6 w-6 items-center justify-center rounded-full bg-[#1A243B]">
-          <AppIcon name="Pencil" size={12} color="#64748B" />
+        <Pressable onPress={() => onEdit(transaction)} className="mt-1 h-6 w-6 items-center justify-center rounded-full bg-app-border">
+          <AppIcon name="Pencil" size={12} color={APP_COLORS.textMuted} />
         </Pressable>
       </View>
     </Pressable>
   );
 }
+

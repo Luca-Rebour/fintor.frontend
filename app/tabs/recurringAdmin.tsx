@@ -1,3 +1,4 @@
+import { APP_COLORS } from "../../constants/colors";
 import { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Alert, Pressable, RefreshControl, ScrollView, Text, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -260,19 +261,19 @@ export default function RecurringAdminScreen() {
 
   if (isLoading) {
     return (
-      <View className="flex-1 items-center justify-center bg-[#060F24]">
-        <ActivityIndicator size="large" color="#18C8FF" />
+      <View className="flex-1 items-center justify-center bg-app-bgPrimary">
+        <ActivityIndicator size="large" color={APP_COLORS.actionPrimary} />
       </View>
     );
   }
 
   if (error) {
     return (
-      <View className="flex-1 items-center justify-center bg-[#060F24] px-6">
+      <View className="flex-1 items-center justify-center bg-app-bgPrimary px-6">
         <Text className="text-center text-base text-app-textPrimary">{error}</Text>
         <Pressable
           onPress={() => loadRecurringList()}
-          className="mt-4 rounded-xl border border-[#1E2A47] bg-[#111C33] px-4 py-2"
+          className="mt-4 rounded-xl border border-app-border bg-app-bgSecondary px-4 py-2"
         >
           <Text className="font-semibold text-app-primary">{t("common.retry")}</Text>
         </Pressable>
@@ -281,7 +282,7 @@ export default function RecurringAdminScreen() {
   }
 
   return (
-    <View className="flex-1 bg-[#060F24]">
+    <View className="flex-1 bg-app-bgPrimary">
       <RecurringAdminHeader
         title={t("recurringAdmin.title")}
         onBackPress={() => router.push("/tabs/recurringTransactions")}
@@ -295,28 +296,28 @@ export default function RecurringAdminScreen() {
           <RefreshControl
             refreshing={isRefreshing}
             onRefresh={handleRefresh}
-            tintColor="#18C8FF"
-            colors={["#18C8FF"]}
+            tintColor={APP_COLORS.actionPrimary}
+            colors={[APP_COLORS.actionPrimary]}
           />
         }
       >
-        <View className="mb-4 mt-1 flex-row border-b border-[#1E2A47]">
+        <View className="mb-4 mt-1 flex-row border-b border-app-border">
           <Pressable onPress={() => setSelectedType(TransactionType.Expense)} className="mr-6 pb-2">
-            <Text className={`text-sm font-semibold ${selectedType === TransactionType.Expense ? "text-white" : "text-[#64748B]"}`}>
+            <Text className={`text-sm font-semibold ${selectedType === TransactionType.Expense ? "text-white" : "text-app-textMuted"}`}>
               {t("recurring.type.expense")}
             </Text>
-            <View className={`mt-2 h-0.5 rounded-full ${selectedType === TransactionType.Expense ? "bg-[#2563EB]" : "bg-transparent"}`} />
+            <View className={`mt-2 h-0.5 rounded-full ${selectedType === TransactionType.Expense ? "bg-app-accentBlue" : "bg-transparent"}`} />
           </Pressable>
 
           <Pressable onPress={() => setSelectedType(TransactionType.Income)} className="pb-2">
-            <Text className={`text-sm font-semibold ${selectedType === TransactionType.Income ? "text-white" : "text-[#64748B]"}`}>
+            <Text className={`text-sm font-semibold ${selectedType === TransactionType.Income ? "text-white" : "text-app-textMuted"}`}>
               {t("recurring.type.income")}
             </Text>
-            <View className={`mt-2 h-0.5 rounded-full ${selectedType === TransactionType.Income ? "bg-[#2563EB]" : "bg-transparent"}`} />
+            <View className={`mt-2 h-0.5 rounded-full ${selectedType === TransactionType.Income ? "bg-app-accentBlue" : "bg-transparent"}`} />
           </Pressable>
         </View>
 
-        <Text className="mb-3 text-xs font-semibold tracking-widest text-[#64748B]">UPCOMING THIS MONTH</Text>
+        <Text className="mb-3 text-xs font-semibold tracking-widest text-app-textMuted">UPCOMING THIS MONTH</Text>
 
         {filteredTransactions.length ? (
           filteredTransactions.map((transaction) => (
@@ -328,14 +329,14 @@ export default function RecurringAdminScreen() {
             />
           ))
         ) : (
-          <View className="rounded-2xl border border-[#1E2A47] bg-[#111C33] px-4 py-5">
-            <Text className="text-center text-sm text-[#94A3B8]">{t("recurring.empty.filtered")}</Text>
+          <View className="rounded-2xl border border-app-border bg-app-bgSecondary px-4 py-5">
+            <Text className="text-center text-sm text-app-textSecondary">{t("recurring.empty.filtered")}</Text>
           </View>
         )}
 
         <Pressable
           onPress={openCreateModal}
-          className="mb-20 mt-3 flex-row items-center justify-center rounded-2xl bg-[#2563EB] px-4 py-4"
+          className="mb-20 mt-3 flex-row items-center justify-center rounded-2xl bg-app-accentBlue px-4 py-4"
         >
           <View className="mr-2 h-5 w-5 items-center justify-center rounded-full border border-[#BFDBFE]">
             <AppIcon name="Plus" color="#DBEAFE" size={12} />
@@ -359,3 +360,4 @@ export default function RecurringAdminScreen() {
     </View>
   );
 }
+

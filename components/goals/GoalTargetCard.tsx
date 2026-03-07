@@ -45,7 +45,7 @@ export function GoalTargetCard({ goal, onPress }: GoalTargetCardProps) {
   })();
 
   return (
-    <Pressable className="rounded-3xl bg-[#111C33] p-4" onPress={() => onPress?.(goal)}>
+    <Pressable className="rounded-3xl border border-app-border bg-app-surface p-4" onPress={() => onPress?.(goal)}>
       <View className="flex-row items-center justify-between">
         <View className="flex-row items-center gap-3">
           <View
@@ -80,7 +80,7 @@ export function GoalTargetCard({ goal, onPress }: GoalTargetCardProps) {
         </Text>
       </View>
 
-      <View className="mt-2 h-2 rounded-full bg-[#253558] overflow-hidden">
+      <View className="mt-2 h-2 rounded-full bg-app-border overflow-hidden">
         <LinearGradient
           colors={[goal.accentColor, `${goal.accentColor}CC`]}
           start={{ x: 0, y: 0 }}

@@ -1,3 +1,4 @@
+import { APP_COLORS } from "../../constants/colors";
 import { Pressable, Text, View } from "react-native";
 import { AppIcon } from "../shared/AppIcon";
 
@@ -12,19 +13,20 @@ export function RecurringHeader({ title, onBackPress, onSearchPress }: Recurring
     <View className="flex-row items-center justify-between px-4 pb-3 pt-2">
       <Pressable
         onPress={onBackPress}
-        className="h-10 w-10 items-center justify-center rounded-full bg-[#111C33]"
+        className="h-10 w-10 items-center justify-center rounded-full bg-app-bgSecondary"
       >
-        <AppIcon name="ArrowLeft" size={18} color="#FFFFFF" />
+        <AppIcon name="ArrowLeft" size={18} color={APP_COLORS.textPrimary} />
       </Pressable>
 
       <Text className="text-xl font-bold text-app-textPrimary">{title}</Text>
 
       <Pressable
         onPress={onSearchPress}
-        className="h-10 w-10 items-center justify-center rounded-full bg-[#111C33]"
+        className="h-10 w-10 items-center justify-center rounded-full bg-app-bgSecondary"
       >
-        <AppIcon name="Search" size={18} color="#FFFFFF" />
+        <AppIcon name="Search" size={18} color={APP_COLORS.textPrimary} />
       </Pressable>
     </View>
   );
 }
+

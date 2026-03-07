@@ -127,9 +127,9 @@ export function AppDatePicker({
 			<Pressable
 				onPress={openPicker}
 				disabled={disabled}
-				className="rounded-xl border border-[#1E2A47] bg-[#0C1830] px-3 py-3"
+				className="rounded-xl border border-app-border bg-app-surface px-3 py-3"
 			>
-				<Text className={`text-base ${value ? "text-app-textPrimary" : "text-[#64748B]"}`}>
+				<Text className={`text-base ${value ? "text-app-textPrimary" : "text-app-textMuted"}`}>
 					{value || placeholder}
 				</Text>
 			</Pressable>
@@ -147,10 +147,10 @@ export function AppDatePicker({
 
 			{isOpen && Platform.OS === "ios" ? (
 				<AppBottomSheetModal visible={isOpen} onClose={closePicker} snapPoints={["40%"]} debugName="AppDatePicker:IOS">
-					<View className="rounded-t-3xl border border-[#1E2A47] bg-[#060F24] px-4 pb-6 pt-3">
+					<View className="rounded-t-3xl border border-app-border bg-app-bgPrimary px-4 pb-6 pt-3">
 						<View className="mb-2 flex-row items-center justify-between">
 							<Pressable onPress={closePicker} className="px-2 py-2">
-								<Text className="text-sm font-semibold text-[#94A3B8]">{cancelLabel}</Text>
+								<Text className="text-sm font-semibold text-app-textSecondary">{cancelLabel}</Text>
 							</Pressable>
 
 							<Text className="text-sm font-semibold text-app-textPrimary">
@@ -164,7 +164,7 @@ export function AppDatePicker({
 								}}
 								className="px-2 py-2"
 							>
-								<Text className="text-sm font-semibold text-[#18C8FF]">{doneLabel}</Text>
+								<Text className="text-sm font-semibold text-app-accentBlue">{doneLabel}</Text>
 							</Pressable>
 						</View>
 

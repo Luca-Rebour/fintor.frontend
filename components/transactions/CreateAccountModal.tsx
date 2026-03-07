@@ -1,3 +1,4 @@
+import { APP_COLORS } from "../../constants/colors";
 import { useEffect, useMemo, useState } from "react";
 import {
 	ActivityIndicator,
@@ -138,7 +139,7 @@ export function CreateAccountModal({
 				behavior={Platform.OS === "ios" ? "padding" : "height"}
 				keyboardVerticalOffset={20}
 			>
-					<View className="h-full max-h-[92%] rounded-t-3xl border-t border-[#1E2A47] bg-[#111C33] px-5 pt-3 pb-6">
+					<View className="h-full max-h-[92%] rounded-t-3xl border-t border-app-border bg-app-bgSecondary px-5 pt-3 pb-6">
 						<Text className="text-3xl font-bold text-app-textPrimary">Add New Account</Text>
 						<Text className="mt-1 text-sm text-app-textSecondary">
 							Connect a new funding source to your wallet
@@ -155,8 +156,8 @@ export function CreateAccountModal({
 								<>
 							<View className="mt-2">
 								<Text className="mb-2 text-xs uppercase text-app-primary">Account Name</Text>
-								<View className="flex-row items-center rounded-2xl border border-[#1E2A47] bg-[#0C1830] px-3 py-3">
-									<AppIcon name="House" size={17} color="#94A3B8" />
+								<View className="flex-row items-center rounded-2xl border border-app-border bg-app-surface px-3 py-3">
+									<AppIcon name="House" size={17} color={APP_COLORS.textSecondary} />
 									<TextInput
 										value={accountName}
 										onChangeText={(value) => {
@@ -164,7 +165,7 @@ export function CreateAccountModal({
 											if (nameError) setNameError("");
 										}}
 										placeholder="e.g. Chase Savings"
-										placeholderTextColor="#64748B"
+										placeholderTextColor={APP_COLORS.textMuted}
 										className="ml-3 flex-1 text-base text-app-textPrimary"
 									/>
 								</View>
@@ -173,8 +174,8 @@ export function CreateAccountModal({
 
 							<View className="mt-4">
 								<Text className="mb-2 text-xs uppercase text-app-primary">Initial Balance</Text>
-								<View className="flex-row items-center rounded-2xl border border-[#1E2A47] bg-[#0C1830] px-3 py-3">
-									<AppIcon name="DollarSign" size={17} color="#18C8FF" />
+								<View className="flex-row items-center rounded-2xl border border-app-border bg-app-surface px-3 py-3">
+									<AppIcon name="DollarSign" size={17} color={APP_COLORS.actionPrimary} />
 									<TextInput
 										value={initialBalance}
 										onChangeText={(value) => {
@@ -183,7 +184,7 @@ export function CreateAccountModal({
 										}}
 										keyboardType="decimal-pad"
 										placeholder="0.00"
-										placeholderTextColor="#64748B"
+										placeholderTextColor={APP_COLORS.textMuted}
 										className="ml-3 flex-1 text-base text-app-textPrimary"
 									/>
 								</View>
@@ -195,25 +196,25 @@ export function CreateAccountModal({
 								<View className="relative z-50" style={{ elevation: 30 }}>
 									<Pressable
 										onPress={() => setIsCurrencyOpen((previous) => !previous)}
-										className="bg-[#0C1830] border border-[#1E2A47] rounded-2xl px-3 py-3 flex-row items-center justify-between"
+										className="bg-app-surface border border-app-border rounded-2xl px-3 py-3 flex-row items-center justify-between"
 									>
 										<Text className="text-sm text-app-textPrimary">{getCurrencyLabel(currencyOptions, currencyCode)}</Text>
-										<AppIcon name={isCurrencyOpen ? "ChevronUp" : "ChevronDown"} size={16} color="#94A3B8" />
+										<AppIcon name={isCurrencyOpen ? "ChevronUp" : "ChevronDown"} size={16} color={APP_COLORS.textSecondary} />
 									</Pressable>
 
 									{isCurrencyOpen ? (
 										<View
-											className="mt-2 bg-[#0C1830] border border-[#1E2A47] rounded-2xl overflow-hidden"
+											className="mt-2 bg-app-surface border border-app-border rounded-2xl overflow-hidden"
 											style={{ maxHeight: 300 }}
 										>
-											<View className="px-3 py-3 border-b border-[#1E2A47]">
-												<View className="flex-row items-center rounded-xl border border-[#1E2A47] bg-[#111C33] px-3 py-2">
-													<AppIcon name="Search" size={15} color="#94A3B8" />
+											<View className="px-3 py-3 border-b border-app-border">
+												<View className="flex-row items-center rounded-xl border border-app-border bg-app-bgSecondary px-3 py-2">
+													<AppIcon name="Search" size={15} color={APP_COLORS.textSecondary} />
 													<TextInput
 														value={currencySearchText}
 														onChangeText={setCurrencySearchText}
 														placeholder="Buscar por código o nombre"
-														placeholderTextColor="#64748B"
+														placeholderTextColor={APP_COLORS.textMuted}
 														className="ml-2 flex-1 text-sm text-app-textPrimary"
 														autoCapitalize="none"
 													/>
@@ -222,7 +223,7 @@ export function CreateAccountModal({
 
 											{isLoadingCurrencies ? (
 												<View className="py-6 items-center justify-center">
-													<ActivityIndicator color="#18C8FF" />
+													<ActivityIndicator color={APP_COLORS.actionPrimary} />
 												</View>
 											) : (
 												<FlatList
@@ -246,7 +247,7 @@ export function CreateAccountModal({
 																	setIsCurrencyOpen(false);
 																	setCurrencySearchText("");
 																}}
-																className="px-3 py-3 flex-row items-center justify-between border-b border-[#1E2A47]"
+																className="px-3 py-3 flex-row items-center justify-between border-b border-app-border"
 															>
 																<View>
 																	<Text className={`text-sm ${isSelected ? "text-app-primary font-semibold" : "text-app-textPrimary"}`}>
@@ -254,7 +255,7 @@ export function CreateAccountModal({
 																	</Text>
 																	<Text className="mt-0.5 text-xs text-app-textSecondary">{item.name}</Text>
 																</View>
-																{isSelected ? <AppIcon name="Check" size={14} color="#18C8FF" /> : null}
+																{isSelected ? <AppIcon name="Check" size={14} color={APP_COLORS.actionPrimary} /> : null}
 															</Pressable>
 														);
 													}}
@@ -267,7 +268,7 @@ export function CreateAccountModal({
 
 							<IconColorPicker
 								selectedIcon={selectedIcon}
-								selectedColor="#18C8FF"
+								selectedColor={APP_COLORS.actionPrimary}
 								onChangeIcon={setSelectedIcon}
 								onChangeColor={() => {}}
 								selectedIconLabel="Selected account icon"
@@ -279,7 +280,7 @@ export function CreateAccountModal({
 							<Pressable
 								onPress={handleCreate}
 								disabled={isSubmitting}
-								className="mt-7 mb-2 flex-row items-center justify-center rounded-2xl bg-[#18C8FF] py-4"
+								className="mt-7 mb-2 flex-row items-center justify-center rounded-2xl bg-app-accentBlue py-4"
 							>
 								{isSubmitting ? (
 									<ActivityIndicator color="#061324" />
@@ -298,3 +299,4 @@ export function CreateAccountModal({
 		</AppBottomSheetModal>
 	);
 }
+
