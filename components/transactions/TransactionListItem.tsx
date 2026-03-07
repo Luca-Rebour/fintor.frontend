@@ -220,9 +220,10 @@ export function TransactionListItem({
             marginRight: 10,
           }}
         >
+          
           <AppIcon
             name={transaction.icon as any}
-            color={color}
+            color={transaction.categoryColor || APP_COLORS.actionPrimary}
             size={20}
           />
         </View>

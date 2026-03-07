@@ -21,6 +21,7 @@ export type CreateTransactionResponseDTO = {
   exchangeRate: number;
   currencyCode: string | null;
   icon: string;
+  categoryColor?: string | null;
 };
 
 export type GetTransactionDTO = {
@@ -35,6 +36,7 @@ export type GetTransactionDTO = {
   exchangeRate: number;
   currencyCode: string | null;
   icon: string;
+  categoryColor?: string | null;
 };
 
 export type GetTransactionsResponseDTO = GetTransactionDTO[];

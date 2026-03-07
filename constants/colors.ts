@@ -38,16 +38,3 @@ export const APP_COLORS = {
   success: APP_THEME_COLORS.success,
   danger: APP_THEME_COLORS.danger,
 };
-
-export const CATEGORY_COLOR_BY_NAME: Record<string, string> = {
-  Salary: APP_THEME_COLORS.accentCyan,
-  Freelance: APP_THEME_COLORS.accentBlue,
-  Investments: APP_THEME_COLORS.accentPurple,
-  Bonus: APP_THEME_COLORS.success,
-  Refund: APP_THEME_COLORS.accentOrange,
-  "Food & Dining": APP_THEME_COLORS.danger,
-  Transport: APP_THEME_COLORS.accentOrange,
-  Shopping: APP_THEME_COLORS.accentPurple,
-  Bills: APP_THEME_COLORS.accentBlue,
-  Entertainment: APP_THEME_COLORS.accentPink,
-};

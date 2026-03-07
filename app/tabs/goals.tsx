@@ -1,5 +1,5 @@
 import { APP_COLORS } from "../../constants/colors";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, Pressable, ScrollView, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "expo-router";
@@ -7,7 +7,6 @@ import { useRouter } from "expo-router";
 import { CreateGoalModal } from "../../components/goals/CreateGoalModal";
 import { GoalTargetCard } from "../../components/goals/GoalTargetCard";
 import { GoalsHeader } from "../../components/goals/GoalsHeader";
-import { SavingsOverviewCard } from "../../components/goals/SavingsOverviewCard";
 import { createGoal, getGoalsData } from "../../services/goals.service";
 import {
 	CreateGoalInputModel as CreateGoalDTO,
@@ -62,27 +61,6 @@ export default function GoalsScreen() {
 		}
 	}
 
-	const overview = useMemo(() => {
-		const totalSavings = goalsData.reduce(
-			(sum, goal) => sum + Math.max(0, Number(goal.currentAmount) || 0),
-			0,
-		);
-
-		const totalGoal = goalsData.reduce(
-			(sum, goal) => sum + Math.max(0, Number(goal.targetAmount) || 0),
-			0,
-		);
-
-		const monthlyChangePercent = totalGoal > 0 ? Math.round((totalSavings / totalGoal) * 100) : 0;
-
-		return {
-			totalSavings,
-			monthlyChangePercent,
-			currentValue: totalSavings,
-			goalValue: totalGoal,
-		};
-	}, [goalsData]);
-
 	function handleGoalPress(goal: GoalApi) {
 		router.push({
 			pathname: "/tabs/goalTransactions",
@@ -120,13 +98,6 @@ export default function GoalsScreen() {
 						paddingBottom: 24,
 					}}
 				>
-					<SavingsOverviewCard
-						totalSavings={overview.totalSavings}
-						monthlyChangePercent={overview.monthlyChangePercent}
-						currentValue={overview.currentValue}
-						goalValue={overview.goalValue}
-					/>
-
 					<View className="mt-6 mb-3 flex-row items-center justify-between">
 						<Text className="text-2xl font-bold text-app-textPrimary">{t("goals.targetsTitle")}</Text>
 						<Pressable
