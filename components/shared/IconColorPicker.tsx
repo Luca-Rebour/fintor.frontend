@@ -219,11 +219,11 @@ export function IconColorPicker({
           <Text className="text-app-textSecondary text-xs uppercase mt-4 mb-2">{colorSectionLabel}</Text>
           <View className="rounded-xl border border-app-border bg-app-surface p-3 mb-2">
             <View className="flex-row flex-wrap gap-3">
-              {ICON_COLOR_OPTIONS.map((color) => {
+              {ICON_COLOR_OPTIONS.map((color, index) => {
                 const isSelected = color === selectedColor;
                 return (
                   <Pressable
-                    key={color}
+                    key={`${color}-${index}`}
                     onPress={() => onChangeColor(color)}
                     className={`h-10 w-10 rounded-full border-2 items-center justify-center ${
                       isSelected ? "border-white" : "border-app-border"

@@ -183,7 +183,7 @@ export default function ProtectedTabsLayout() {
       </Tabs>
 
       <AppBottomSheetModal visible={isMoreMenuVisible} onClose={closeMoreMenu} snapPoints={["34%"]} debugName="Tabs:MoreMenu">
-          <View className="rounded-2xl border border-app-border bg-app-bgSecondary p-4">
+          <View className="rounded-2xl bg-app-bgSecondary p-4">
             <TouchableOpacity
               className="mb-2 flex-row items-center rounded-xl bg-app-border px-3 py-3"
               onPress={() => navigateToTab("/tabs/recurringTransactions")}

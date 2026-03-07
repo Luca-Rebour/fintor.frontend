@@ -11,6 +11,7 @@ import {
 } from "../types/models/category.model";
 
 export function mapCategoryDtoToModel(dto: GetCategoryDTO | CreateCategoryResponseDTO): CategoryModel {
+  console.log(dto);
   return {
     id: String(dto.id ?? ""),
     label: String(dto.name ?? "Sin categoría").trim() || "Sin categoría",

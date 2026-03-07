@@ -1,5 +1,4 @@
 import { APP_COLORS } from "../constants/colors";
-import { CATEGORY_COLOR_BY_NAME } from "../constants/colors";
 import { mapFinancialSummaryDtoToModel } from "../mappers/report.mapper";
 import { FinancialSummaryDTO, GetFinancialSummaryResponseDTO } from "../types/api/report";
 import { apiGet } from "./api.client";
@@ -108,7 +107,7 @@ export function mapOverviewSpendingToChartData(
       return {
         category,
         amount,
-        color: hasValidHexColor ? apiColor : CATEGORY_COLOR_BY_NAME[category] || APP_COLORS.actionPrimary,
+        color: hasValidHexColor ? apiColor : APP_COLORS.actionPrimary,
       };
     })
     .filter((item): item is OverviewCategoryExpense => item !== null)

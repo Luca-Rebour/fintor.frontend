@@ -8,7 +8,6 @@ import {
   CreateTransactionInputModel,
   TransactionModel,
 } from "../types/models/transaction.model";
-import { CATEGORY_COLOR_BY_NAME } from "../constants/colors";
 
 function normalizeTransactionType(value: number): 0 | 1 {
   return value === 0 ? 0 : 1;
@@ -17,8 +16,10 @@ function normalizeTransactionType(value: number): 0 | 1 {
 export function mapTransactionDtoToModel(
   dto: GetTransactionDTO | CreateTransactionResponseDTO,
 ): TransactionModel {
+  
   const transactionType = normalizeTransactionType(dto.transactionType);
   const categoryName = String(dto.categoryName ?? "Other").trim() || "Other";
+  const apiCategoryColor = typeof dto.categoryColor === "string" ? dto.categoryColor.trim() : "";
 
   return {
     id: String(dto.id ?? `txn_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`),
@@ -29,7 +30,7 @@ export function mapTransactionDtoToModel(
     transactionType,
     icon: String(dto.icon ?? (transactionType === 0 ? "DollarSign" : "ShoppingCart")),
     accountName: String(dto.accountName ?? "Main account").trim() || "Main account",
-    categoryColor: CATEGORY_COLOR_BY_NAME[categoryName] ?? (transactionType === 1 ? APP_COLORS.actionPrimary : "#FF6B6B"),
+    categoryColor: apiCategoryColor || APP_COLORS.actionPrimary,
     currencyCode: String(dto.currencyCode ?? "USD").trim().toUpperCase() || "USD",
     exchangeRate:
       Number.isFinite(Number(dto.exchangeRate)) && Number(dto.exchangeRate) > 0
