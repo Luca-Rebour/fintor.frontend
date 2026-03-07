@@ -1,3 +1,4 @@
+import { APP_COLORS } from "../../constants/colors";
 import { Pressable, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { AppIcon } from "../shared/AppIcon";
@@ -11,12 +12,13 @@ export function AddRecurringTransactionCard({ onPress }: AddRecurringTransaction
   return (
     <Pressable
       onPress={onPress}
-      className="mb-20 mt-1 items-center rounded-3xl border border-dashed border-[#334155] bg-[#111C33] px-4 py-8"
+      className="mb-20 mt-1 items-center rounded-3xl border border-dashed border-app-border bg-app-surface px-4 py-8"
     >
-      <View className="h-10 w-10 items-center justify-center rounded-full bg-[#1A243B]">
-        <AppIcon name="Plus" color="#94A3B8" size={18} />
+      <View className="h-10 w-10 items-center justify-center rounded-full bg-app-border">
+        <AppIcon name="Plus" color={APP_COLORS.textSecondary} size={18} />
       </View>
-      <Text className="mt-3 text-base font-semibold text-[#94A3B8]">{t("recurring.addCard.title")}</Text>
+      <Text className="mt-3 text-base font-semibold text-app-textSecondary">{t("recurring.addCard.title")}</Text>
     </Pressable>
   );
 }
+

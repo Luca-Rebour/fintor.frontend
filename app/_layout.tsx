@@ -1,3 +1,4 @@
+import { APP_COLORS } from "../constants/colors";
 import "react-native-gesture-handler";
 import { Stack, usePathname } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -27,7 +28,7 @@ function LayoutWithInsets() {
       return "#062027"; // Color de profile
     }
     
-    return "#060F24"; // Color de home
+    return APP_COLORS.surfacePrimary; // Color de home
   };
   
   return (

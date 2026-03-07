@@ -20,7 +20,7 @@ const OPTIONS: ToggleOption[] = [
 export function RecurringTypeToggle({ value, onChange }: RecurringTypeToggleProps) {
   const { t } = useTranslation();
   return (
-    <View className="mb-4 mt-1 flex-row rounded-full bg-[#111C33] p-1">
+    <View className="mb-4 mt-1 flex-row rounded-full bg-app-bgSecondary p-1">
       {OPTIONS.map((option) => {
         const isActive = option.value === value;
 
@@ -28,11 +28,11 @@ export function RecurringTypeToggle({ value, onChange }: RecurringTypeToggleProp
           <Pressable
             key={option.value}
             onPress={() => onChange(option.value)}
-            className={`flex-1 rounded-full px-4 py-2.5 ${isActive ? "bg-[#1D4ED8]" : "bg-transparent"}`}
+            className={`flex-1 rounded-full px-4 py-2.5 ${isActive ? "bg-app-accentBlue" : "bg-transparent"}`}
           >
             <Text
               className={`text-center text-sm font-semibold ${
-                isActive ? "text-white" : "text-[#94A3B8]"
+                isActive ? "text-white" : "text-app-textSecondary"
               }`}
             >
               {t(option.labelKey)}

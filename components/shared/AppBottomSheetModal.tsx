@@ -1,3 +1,4 @@
+import { APP_COLORS } from "../../constants/colors";
 import { PropsWithChildren, useCallback, useEffect, useMemo, useRef } from "react";
 import { StyleSheet } from "react-native";
 import {
@@ -141,8 +142,9 @@ export function AppBottomSheetModal({
 
 const styles = StyleSheet.create({
   sheetBackground: {
-    backgroundColor: "#111C33",
+    backgroundColor: APP_COLORS.surfaceCard,
     borderTopWidth: 1,
-    borderTopColor: "#1E2A47",
+    borderTopColor: APP_COLORS.border,
   },
 });
+

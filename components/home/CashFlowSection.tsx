@@ -1,3 +1,4 @@
+import { APP_COLORS } from "../../constants/colors";
 import { Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { AppIcon } from "../shared/AppIcon";
@@ -28,7 +29,7 @@ export function CashFlowSection({ metrics }: CashFlowSectionProps) {
               <AppIcon
                 name={metric.trend === "up" ? "ArrowDown" : "ArrowUp"}
                 size={12}
-                color={metric.trend === "up" ? "#10B981" : "#EF4444"}
+                color={metric.trend === "up" ? "#10B981" : APP_COLORS.danger}
               />
             </View>
             <Text className="text-xs text-app-textSecondary">{metric.label}</Text>
@@ -47,3 +48,4 @@ export function CashFlowSection({ metrics }: CashFlowSectionProps) {
     </View>
   );
 }
+

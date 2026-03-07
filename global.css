@@ -3,17 +3,66 @@
 @tailwind utilities;
 
 :root {
+  --color-bg-primary: 240 8% 5%;
+  --color-bg-secondary: 233 10% 10%;
+  --color-surface: 230 10% 12%;
+  --color-border: 230 14% 20%;
+  --color-text-primary: 0 0% 100%;
+  --color-text-secondary: 240 4% 72%;
+  --color-text-muted: 240 3% 44%;
+  --color-accent-purple: 252 100% 69%;
+  --color-accent-blue: 211 100% 65%;
+  --color-accent-cyan: 175 66% 50%;
+  --color-accent-orange: 31 100% 65%;
+  --color-accent-pink: 341 100% 68%;
+  --color-success: 142 71% 45%;
+  --color-danger: 0 84% 60%;
+
   --app-login-bg-start: 196 89% 13%;
   --app-login-bg-end: 222 57% 10%;
   --app-signup-bg-start: 272 66% 9%;
   --app-signup-bg-end: 281 70% 8%;
-  --app-card: 266 45% 15%;
-  --app-card-soft: 264 40% 20%;
-  --app-border: 260 35% 28%;
-  --app-text-primary: 0 0% 100%;
-  --app-text-secondary: 234 35% 73%;
-  --app-primary: 196 100% 54%;
-  --app-primary-strong: 273 89% 55%;
-  --app-accent: 191 100% 47%;
-  --app-success: 159 100% 49%;
+  --app-card: var(--color-bg-secondary);
+  --app-card-soft: var(--color-surface);
+  --app-border: var(--color-border);
+  --app-text-primary: var(--color-text-primary);
+  --app-text-secondary: var(--color-text-secondary);
+  --app-primary: var(--color-accent-blue);
+  --app-primary-strong: var(--color-accent-purple);
+  --app-accent: var(--color-accent-cyan);
+  --app-success: var(--color-success);
+}
+
+[data-theme="dark"] {
+  --color-bg-primary: 240 8% 5%;
+  --color-bg-secondary: 233 10% 10%;
+  --color-surface: 230 10% 12%;
+  --color-border: 230 14% 20%;
+  --color-text-primary: 0 0% 100%;
+  --color-text-secondary: 240 4% 72%;
+  --color-text-muted: 240 3% 44%;
+  --color-accent-purple: 252 100% 69%;
+  --color-accent-blue: 211 100% 65%;
+  --color-accent-cyan: 175 66% 50%;
+  --color-accent-orange: 31 100% 65%;
+  --color-accent-pink: 341 100% 68%;
+  --color-success: 142 71% 45%;
+  --color-danger: 0 84% 60%;
+}
+
+[data-theme="light"] {
+  --color-bg-primary: 0 0% 98%;
+  --color-bg-secondary: 0 0% 100%;
+  --color-surface: 220 14% 96%;
+  --color-border: 220 13% 85%;
+  --color-text-primary: 240 10% 8%;
+  --color-text-secondary: 240 5% 35%;
+  --color-text-muted: 240 4% 52%;
+  --color-accent-purple: 252 90% 55%;
+  --color-accent-blue: 211 95% 52%;
+  --color-accent-cyan: 175 70% 40%;
+  --color-accent-orange: 31 95% 55%;
+  --color-accent-pink: 341 82% 58%;
+  --color-success: 142 65% 35%;
+  --color-danger: 0 75% 50%;
 }

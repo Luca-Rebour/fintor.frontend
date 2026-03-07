@@ -1,3 +1,4 @@
+import { APP_COLORS } from "../../constants/colors";
 import { Pressable, Text, View } from "react-native";
 import { AppIcon } from "../shared/AppIcon";
 
@@ -15,7 +16,7 @@ export function RecurringAdminHeader({ title, onBackPress, onActionPress }: Recu
           onPress={onBackPress}
           className="h-10 w-10 items-center justify-center rounded-full"
         >
-          <AppIcon name="ArrowLeft" size={18} color="#FFFFFF" />
+          <AppIcon name="ArrowLeft" size={18} color={APP_COLORS.textPrimary} />
         </Pressable>
 
         <Text className="text-xl font-bold text-app-textPrimary">{title}</Text>
@@ -24,9 +25,10 @@ export function RecurringAdminHeader({ title, onBackPress, onActionPress }: Recu
           onPress={onActionPress}
           className="h-10 w-10 items-center justify-center rounded-full"
         >
-          <AppIcon name="EllipsisVertical" size={18} color="#FFFFFF" />
+          <AppIcon name="EllipsisVertical" size={18} color={APP_COLORS.textPrimary} />
         </Pressable>
       </View>
     </View>
   );
 }
+

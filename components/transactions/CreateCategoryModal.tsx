@@ -1,3 +1,4 @@
+import { APP_COLORS } from "../../constants/colors";
 import { useState } from "react";
 import {
   ActivityIndicator,
@@ -78,11 +79,11 @@ export function CreateCategoryModal({
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={20}
       >
-          <View className="h-full max-h-[92%] rounded-t-3xl border-t border-[#1E2A47] bg-[#111C33]">
-            <View className="px-5 pt-4 pb-3 border-b border-[#1E2A47] flex-row items-center justify-between">
+          <View className="h-full max-h-[92%] rounded-t-3xl border-t border-app-border bg-app-bgSecondary">
+            <View className="px-5 pt-4 pb-3 border-b border-app-border flex-row items-center justify-between">
               <Text className="text-app-textPrimary text-xl font-bold">Add Category</Text>
               <Pressable onPress={handleClose} className="p-1">
-                <AppIcon name="X" size={18} color="#94A3B8" />
+                <AppIcon name="X" size={18} color={APP_COLORS.textSecondary} />
               </Pressable>
             </View>
 
@@ -97,8 +98,8 @@ export function CreateCategoryModal({
                   }
                 }}
                 placeholder="Ej. Food, Utilities, Travel"
-                placeholderTextColor="#64748B"
-                className="bg-[#0C1830] border border-[#1E2A47] rounded-xl px-3 py-3 text-app-textPrimary"
+                placeholderTextColor={APP_COLORS.textMuted}
+                className="bg-app-surface border border-app-border rounded-xl px-3 py-3 text-app-textPrimary"
               />
               {nameError ? <Text className="text-red-400 text-xs mt-2">{nameError}</Text> : null}
 
@@ -110,11 +111,11 @@ export function CreateCategoryModal({
               />
             </View>
 
-            <View className="px-5 py-4 border-t border-[#1E2A47]">
+            <View className="px-5 py-4 border-t border-app-border">
               <Pressable
                 onPress={handleCreate}
                 disabled={isSubmitting}
-                className="items-center justify-center py-4 rounded-2xl bg-[#18C8FF]"
+                className="items-center justify-center py-4 rounded-2xl bg-app-accentBlue"
               >
                 {isSubmitting ? (
                   <ActivityIndicator color="#061324" />
@@ -128,3 +129,4 @@ export function CreateCategoryModal({
     </AppBottomSheetModal>
   );
 }
+

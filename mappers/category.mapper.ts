@@ -1,3 +1,4 @@
+import { APP_COLORS } from "../constants/colors";
 import {
   CreateCategoryRequestDTO,
   CreateCategoryResponseDTO,
@@ -14,7 +15,7 @@ export function mapCategoryDtoToModel(dto: GetCategoryDTO | CreateCategoryRespon
     id: String(dto.id ?? ""),
     label: String(dto.name ?? "Sin categoría").trim() || "Sin categoría",
     icon: String(dto.icon ?? "Tag").trim() || "Tag",
-    color: String(dto.color ?? "#18C8FF").trim() || "#18C8FF",
+    color: String(dto.color ?? APP_COLORS.actionPrimary).trim() || APP_COLORS.actionPrimary,
   };
 }
 
@@ -32,3 +33,4 @@ export function mapCreateCategoryInputModelToRequestDto(model: CreateCategoryInp
     color: model.color.trim(),
   };
 }
+

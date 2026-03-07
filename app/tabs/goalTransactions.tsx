@@ -1,3 +1,4 @@
+import { APP_COLORS } from "../../constants/colors";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, FlatList, Pressable, Text, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -60,21 +61,21 @@ export default function GoalTransactionsScreen() {
 
   if (isLoading) {
     return (
-      <View className="flex-1 items-center justify-center bg-[#060F24]">
-        <ActivityIndicator size="large" color="#18C8FF" />
+      <View className="flex-1 items-center justify-center bg-app-bgPrimary">
+        <ActivityIndicator size="large" color={APP_COLORS.actionPrimary} />
       </View>
     );
   }
 
   if (error) {
     return (
-      <View className="flex-1 bg-[#060F24] px-4 pt-2">
+      <View className="flex-1 bg-app-bgPrimary px-4 pt-2">
         <View className="mb-3 flex-row items-center justify-between">
           <Pressable
             onPress={() => router.back()}
-            className="h-10 w-10 items-center justify-center rounded-full bg-[#111C33]"
+            className="h-10 w-10 items-center justify-center rounded-full bg-app-bgSecondary"
           >
-            <AppIcon name="ArrowLeft" size={18} color="#FFFFFF" />
+            <AppIcon name="ArrowLeft" size={18} color={APP_COLORS.textPrimary} />
           </Pressable>
 
           <Text className="text-lg font-bold text-app-textPrimary">{t("goals.details.title")}</Text>
@@ -82,7 +83,7 @@ export default function GoalTransactionsScreen() {
           <View className="h-10 w-10" />
         </View>
 
-        <View className="mt-10 rounded-2xl border border-[#1E2A47] bg-[#111C33] p-4">
+        <View className="mt-10 rounded-2xl border border-app-border bg-app-bgSecondary p-4">
           <Text className="text-center text-app-textSecondary">{error}</Text>
         </View>
       </View>
@@ -90,13 +91,13 @@ export default function GoalTransactionsScreen() {
   }
 
   return (
-    <View className="flex-1 bg-[#060F24] px-4 pt-2">
+    <View className="flex-1 bg-app-bgPrimary px-4 pt-2">
       <View className="mb-3 flex-row items-center justify-between">
         <Pressable
           onPress={() => router.back()}
-          className="h-10 w-10 items-center justify-center rounded-full bg-[#111C33]"
+          className="h-10 w-10 items-center justify-center rounded-full bg-app-bgSecondary"
         >
-          <AppIcon name="ArrowLeft" size={18} color="#FFFFFF" />
+          <AppIcon name="ArrowLeft" size={18} color={APP_COLORS.textPrimary} />
         </Pressable>
 
         <Text className="text-lg font-bold text-app-textPrimary">{t("goals.details.title")}</Text>
@@ -125,10 +126,11 @@ export default function GoalTransactionsScreen() {
           scrollEnabled={!isItemSwipeActive}
         />
       ) : (
-        <View className="mt-10 rounded-2xl border border-[#1E2A47] bg-[#111C33] p-4">
+        <View className="mt-10 rounded-2xl border border-app-border bg-app-bgSecondary p-4">
           <Text className="text-center text-app-textSecondary">{t("goals.details.empty")}</Text>
         </View>
       )}
     </View>
   );
 }
+

@@ -1,3 +1,4 @@
+import { APP_COLORS } from "../../constants/colors";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   FlatList,
@@ -215,11 +216,11 @@ export function CreateGoalModal({
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={20}
       >
-          <View className="h-full max-h-[92%] rounded-t-3xl border-t border-[#1E2A47] bg-[#111C33]">
-            <View className="px-5 pt-4 pb-3 border-b border-[#1E2A47] flex-row items-center justify-between">
+          <View className="h-full max-h-[92%] rounded-t-3xl border-t border-app-border bg-app-bgSecondary">
+            <View className="px-5 pt-4 pb-3 border-b border-app-border flex-row items-center justify-between">
               <Text className="text-app-textPrimary text-xl font-bold">Crear target</Text>
               <Pressable onPress={handleClose} className="p-1">
-                <AppIcon name="X" size={18} color="#94A3B8" />
+                <AppIcon name="X" size={18} color={APP_COLORS.textSecondary} />
               </Pressable>
             </View>
 
@@ -245,8 +246,8 @@ export function CreateGoalModal({
                       }
                     }}
                     placeholder="Ej: Viaje a Europa"
-                    placeholderTextColor="#64748B"
-                    className="bg-[#0C1830] border border-[#1E2A47] rounded-xl px-3 py-3 text-app-textPrimary"
+                    placeholderTextColor={APP_COLORS.textMuted}
+                    className="bg-app-surface border border-app-border rounded-xl px-3 py-3 text-app-textPrimary"
                   />
                   {titleError ? <Text className="text-red-400 text-xs mt-2">{titleError}</Text> : null}
 
@@ -255,8 +256,8 @@ export function CreateGoalModal({
                     value={description}
                     onChangeText={setDescription}
                     placeholder="Ej: Summer 2026"
-                    placeholderTextColor="#64748B"
-                    className="bg-[#0C1830] border border-[#1E2A47] rounded-xl px-3 py-3 text-app-textPrimary"
+                    placeholderTextColor={APP_COLORS.textMuted}
+                    className="bg-app-surface border border-app-border rounded-xl px-3 py-3 text-app-textPrimary"
                   />
 
                   <Text className="text-app-textSecondary text-xs uppercase mt-3 mb-2">Monto objetivo</Text>
@@ -270,8 +271,8 @@ export function CreateGoalModal({
                     }}
                     keyboardType="decimal-pad"
                     placeholder="0.00"
-                    placeholderTextColor="#64748B"
-                    className="bg-[#0C1830] border border-[#1E2A47] rounded-xl px-3 py-3 text-app-textPrimary"
+                    placeholderTextColor={APP_COLORS.textMuted}
+                    className="bg-app-surface border border-app-border rounded-xl px-3 py-3 text-app-textPrimary"
                   />
                   {targetAmountError ? <Text className="text-red-400 text-xs mt-2">{targetAmountError}</Text> : null}
 
@@ -286,8 +287,8 @@ export function CreateGoalModal({
                     }}
                     keyboardType="decimal-pad"
                     placeholder="0.00"
-                    placeholderTextColor="#64748B"
-                    className="bg-[#0C1830] border border-[#1E2A47] rounded-xl px-3 py-3 text-app-textPrimary"
+                    placeholderTextColor={APP_COLORS.textMuted}
+                    className="bg-app-surface border border-app-border rounded-xl px-3 py-3 text-app-textPrimary"
                   />
                   {currentAmountError ? <Text className="text-red-400 text-xs mt-2">{currentAmountError}</Text> : null}
 
@@ -314,10 +315,10 @@ export function CreateGoalModal({
                   <Pressable
                     ref={accountTriggerRef}
                     onPress={openAccountSelect}
-                    className="bg-[#0C1830] border border-[#1E2A47] rounded-xl px-3 py-3 flex-row items-center justify-between"
+                    className="bg-app-surface border border-app-border rounded-xl px-3 py-3 flex-row items-center justify-between"
                   >
                     <Text className="text-app-textPrimary text-sm">{getSelectedAccountLabel(accountOptions, accountId)}</Text>
-                    <AppIcon name={isAccountOpen ? "ChevronUp" : "ChevronDown"} size={16} color="#94A3B8" />
+                    <AppIcon name={isAccountOpen ? "ChevronUp" : "ChevronDown"} size={16} color={APP_COLORS.textSecondary} />
                   </Pressable>
                   {accountError ? <Text className="text-red-400 text-xs mt-2">{accountError}</Text> : null}
 
@@ -356,13 +357,13 @@ export function CreateGoalModal({
               }
             />
 
-            <View className="px-5 py-4 border-t border-[#1E2A47]">
+            <View className="px-5 py-4 border-t border-app-border">
               <Pressable
                 onPress={handleCreate}
                 disabled={isSubmitting}
-                className="items-center justify-center py-4 rounded-2xl bg-[#18C8FF]"
+                className="items-center justify-center py-4 rounded-2xl bg-app-accentBlue"
               >
-                <Text className="text-[#060F24] text-base font-bold">
+                <Text className="text-app-bgPrimary text-base font-bold">
                   {isSubmitting ? "Guardando..." : "Crear target"}
                 </Text>
               </Pressable>
@@ -388,9 +389,9 @@ export function CreateGoalModal({
                   elevation: 24,
                   maxHeight: 240,
                 }}
-                className="bg-[#0C1830] border border-[#1E2A47] rounded-xl overflow-hidden"
+                className="bg-app-surface border border-app-border rounded-xl overflow-hidden"
               >
-                <View className="px-3 py-2 border-b border-[#1E2A47]">
+                <View className="px-3 py-2 border-b border-app-border">
                   <Text className="text-app-textSecondary text-xs uppercase">Seleccioná cuenta</Text>
                 </View>
 
@@ -407,7 +408,7 @@ export function CreateGoalModal({
                             setAccountError("");
                           }
                         }}
-                        className="px-3 py-3 flex-row items-center justify-between border-b border-[#1E2A47]"
+                        className="px-3 py-3 flex-row items-center justify-between border-b border-app-border"
                       >
                         <Text
                           className={`text-sm ${
@@ -416,7 +417,7 @@ export function CreateGoalModal({
                         >
                           {formatAccountOptionLabel(option)}
                         </Text>
-                        {isSelected ? <AppIcon name="Check" size={14} color="#18C8FF" /> : null}
+                        {isSelected ? <AppIcon name="Check" size={14} color={APP_COLORS.actionPrimary} /> : null}
                       </Pressable>
                     );
                   })}
@@ -428,3 +429,4 @@ export function CreateGoalModal({
     </AppBottomSheetModal>
   );
 }
+

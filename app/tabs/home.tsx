@@ -1,3 +1,4 @@
+import { APP_COLORS } from "../../constants/colors";
 import { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Alert, RefreshControl, ScrollView, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
@@ -241,22 +242,22 @@ export default function HomeScreen() {
 
 	if (isLoading) {
 		return (
-			<View className="flex-1 items-center justify-center bg-[#060F24]">
-				<ActivityIndicator size="large" color="#18C8FF" />
+			<View className="flex-1 items-center justify-center bg-app-bgPrimary">
+				<ActivityIndicator size="large" color={APP_COLORS.actionPrimary} />
 			</View>
 		);
 	}
 
 	if (error || !dashboardData) {
 		return (
-			<View className="flex-1 items-center justify-center bg-[#060F24] px-6">
+			<View className="flex-1 items-center justify-center bg-app-bgPrimary px-6">
 				<Text className="text-center text-base text-app-textPrimary">{error || t("home.errors.noDashboardData")}</Text>
 			</View>
 		);
 	}
 
 	return (
-		<View className="flex-1 bg-[#060F24] px-4">
+		<View className="flex-1 bg-app-bgPrimary px-4">
 			<ScrollView
 				showsVerticalScrollIndicator={false}
 				contentContainerClassName="pb-20 pt-2"
@@ -264,8 +265,8 @@ export default function HomeScreen() {
 					<RefreshControl
 						refreshing={isRefreshing}
 						onRefresh={handleRefresh}
-						tintColor="#18C8FF"
-						colors={["#18C8FF"]}
+						tintColor={APP_COLORS.actionPrimary}
+						colors={[APP_COLORS.actionPrimary]}
 					/>
 				}
 			>
@@ -292,4 +293,5 @@ export default function HomeScreen() {
 		</View>
 	);
 }
+
 

@@ -1,3 +1,4 @@
+import { APP_COLORS } from "../../constants/colors";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, Pressable, ScrollView, Text, View } from "react-native";
 import { useRouter } from "expo-router";
@@ -59,22 +60,22 @@ export default function ProfileScreen() {
 
 	if (isLoading) {
 		return (
-			<View className="flex-1 items-center justify-center bg-[#062027]">
-				<ActivityIndicator size="large" color="#18C8FF" />
+			<View className="flex-1 items-center justify-center bg-app-bgPrimary">
+				<ActivityIndicator size="large" color={APP_COLORS.actionPrimary} />
 			</View>
 		);
 	}
 
 	if (error || !profileData) {
 		return (
-			<View className="flex-1 items-center justify-center bg-[#062027] px-6">
+			<View className="flex-1 items-center justify-center bg-app-bgPrimary px-6">
 				<Text className="text-center text-base text-app-textPrimary">{error || t("profile.errors.noData")}</Text>
 			</View>
 		);
 	}
 
 	return (
-		<View className="flex-1 bg-[#062027] px-4">
+		<View className="flex-1 bg-app-bgPrimary px-4">
 			<ScrollView showsVerticalScrollIndicator={false} contentContainerClassName="pb-20 pt-2">
 				<ProfileHeader
 					fullName={fullNameFromAuth || profileData.fullName}
@@ -109,7 +110,7 @@ export default function ProfileScreen() {
 				</View>
 
 				<LinearGradient
-					colors={["#F43F5E", "#9333EA"]}
+					colors={[APP_COLORS.danger, APP_COLORS.actionSecondary]}
 					start={{ x: 0, y: 0.5 }}
 					end={{ x: 1, y: 0.5 }}
 					style={{ borderRadius: 9999 }}
@@ -124,4 +125,5 @@ export default function ProfileScreen() {
 		</View>
 	);
 }
+
 

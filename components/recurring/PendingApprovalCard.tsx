@@ -1,3 +1,4 @@
+import { APP_COLORS } from "../../constants/colors";
 import { Pressable, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { AppIcon } from "../shared/AppIcon";
@@ -33,37 +34,37 @@ export function PendingApprovalCard({ approval, onConfirm, onReschedule, onCance
     String(approval.status).toLowerCase() === "rescheduled";
 
   return (
-    <View className="mb-6 rounded-3xl border border-[#1E2A47] bg-[#111C33] p-4">
+    <View className="mb-6 rounded-3xl border border-app-border bg-app-surface p-4">
       <View className="mb-3 flex-row items-center justify-between">
         <View className="flex-row items-center gap-2">
-          <Text className="text-xs font-semibold tracking-widest text-[#94A3B8]">{t("recurring.labels.pendingApproval")}</Text>
+          <Text className="text-xs font-semibold tracking-widest text-app-textSecondary">{t("recurring.labels.pendingApproval")}</Text>
           
         </View>
 
         <Pressable
           onPress={() => onCancel?.(approval)}
-          className="h-8 w-8 items-center justify-center rounded-full bg-[#1A243B]"
+          className="h-8 w-8 items-center justify-center rounded-full bg-app-border"
         >
           <AppIcon name="Trash2" color="#F87171" size={16} />
         </Pressable>
       </View>
 
-      <View className="mb-4 flex-row items-center rounded-2xl bg-[#1A243B] px-3 py-3">
-        <View className="mr-3 h-10 w-10 items-center justify-center rounded-xl bg-[#111C33]">
-          <AppIcon name={approval.icon || "WalletCards"} color="#18C8FF" size={18} />
+      <View className="mb-4 flex-row items-center rounded-2xl bg-app-bgSecondary px-3 py-3">
+        <View className="mr-3 h-10 w-10 items-center justify-center rounded-xl bg-app-surface">
+          <AppIcon name={approval.icon || "WalletCards"} color={APP_COLORS.actionPrimary} size={18} />
         </View>
 
         <View className="flex-1">
-          <Text className="text-xs text-[#94A3B8]">{approval.description}</Text>
+          <Text className="text-xs text-app-textSecondary">{approval.description}</Text>
           <Text className="mt-0.5 text-3xl font-bold text-white">{formatCurrency(approval.amount, approval.currencyCode)}</Text>
-          <Text className="mt-1 text-xs font-semibold tracking-wide text-[#94A3B8]">
+          <Text className="mt-1 text-xs font-semibold tracking-wide text-app-textSecondary">
             {approval.currencyCode}
           </Text>
         </View>
 
         <View className="items-end">
-          <Text className="text-[10px] font-semibold tracking-wide text-[#94A3B8]">{t("recurring.labels.expected")}</Text>
-          <Text className="mt-0.5 text-base font-bold text-[#18C8FF]">{formatDate(approval.dueDate)}</Text>
+          <Text className="text-[10px] font-semibold tracking-wide text-app-textSecondary">{t("recurring.labels.expected")}</Text>
+          <Text className="mt-0.5 text-base font-bold text-app-accentBlue">{formatDate(approval.dueDate)}</Text>
         </View>
       </View>
 
@@ -71,7 +72,7 @@ export function PendingApprovalCard({ approval, onConfirm, onReschedule, onCance
         {!isRescheduled ? (
           <Pressable
             onPress={() => onConfirm?.(approval)}
-            className="flex-1 rounded-2xl bg-[#1D4ED8] px-4 py-3"
+            className="flex-1 rounded-2xl bg-app-accentBlue px-4 py-3"
           >
             <Text className="text-center text-sm font-semibold text-white">{t("recurring.actions.confirm")}</Text>
           </Pressable>
@@ -79,11 +80,12 @@ export function PendingApprovalCard({ approval, onConfirm, onReschedule, onCance
 
         <Pressable
           onPress={() => onReschedule?.(approval)}
-          className={`${isRescheduled ? "w-full" : "flex-1"} rounded-2xl border border-[#334155] bg-[#1A243B] px-4 py-3`}
+          className={`${isRescheduled ? "w-full" : "flex-1"} rounded-2xl border border-app-border bg-app-border px-4 py-3`}
         >
-          <Text className="text-center text-sm font-semibold text-[#94A3B8]">{t("recurring.actions.reschedule")}</Text>
+          <Text className="text-center text-sm font-semibold text-app-textSecondary">{t("recurring.actions.reschedule")}</Text>
         </Pressable>
       </View>
     </View>
   );
 }
+

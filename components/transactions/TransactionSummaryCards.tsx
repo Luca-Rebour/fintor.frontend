@@ -1,3 +1,4 @@
+import { APP_COLORS } from "../../constants/colors";
 import { Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { AppIcon } from "../shared/AppIcon";
@@ -21,12 +22,12 @@ export function TransactionSummaryCards({
   return (
     <View className="px-4 mt-4 gap-3">
       <View className="flex-row gap-3">
-        <View className="flex-1 bg-[#111C33] rounded-xl p-4">
+        <View className="flex-1 bg-app-surface rounded-xl p-4">
           <View className="flex-row items-center justify-between mb-2">
             <Text className="text-app-textSecondary text-xs uppercase">
               {t("transactions.summary.monthlySpending")}
             </Text>
-            <AppIcon name="ArrowDown" size={16} color="#EF4444" />
+            <AppIcon name="ArrowDown" size={16} color={APP_COLORS.danger} />
           </View>
 
           <Text className="text-app-textPrimary text-xl font-semibold">
@@ -34,12 +35,12 @@ export function TransactionSummaryCards({
           </Text>
         </View>
 
-        <View className="flex-1 bg-[#111C33] rounded-xl p-4">
+        <View className="flex-1 bg-app-surface rounded-xl p-4">
           <View className="flex-row items-center justify-between mb-2">
             <Text className="text-app-textSecondary text-xs uppercase">
               {t("transactions.summary.monthlyIncome")}
             </Text>
-            <AppIcon name="ArrowUp" size={16} color="#22C55E" />
+            <AppIcon name="ArrowUp" size={16} color={APP_COLORS.success} />
           </View>
 
           <Text className="text-app-textPrimary text-xl font-semibold">
@@ -48,7 +49,7 @@ export function TransactionSummaryCards({
         </View>
       </View>
 
-      <View className="bg-[#111C33] rounded-xl p-4">
+      <View className="bg-app-surface rounded-xl p-4">
         <View className="flex-row items-center justify-between mb-2">
           <Text className="text-app-textSecondary text-xs uppercase">
             {t("transactions.summary.balance")}
@@ -56,7 +57,7 @@ export function TransactionSummaryCards({
           <AppIcon
             name={balance >= 0 ? "TrendingUp" : "TrendingDown"}
             size={16}
-            color={balance >= 0 ? "#22C55E" : "#EF4444"}
+            color={balance >= 0 ? APP_COLORS.success : APP_COLORS.danger}
           />
         </View>
 
@@ -67,3 +68,4 @@ export function TransactionSummaryCards({
     </View>
   );
 }
+

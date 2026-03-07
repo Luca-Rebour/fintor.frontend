@@ -8,8 +8,8 @@ type AccountsSectionHeaderProps = {
 export function AccountsSectionHeader({ activeAccountsLabel, accountsCountLabel }: AccountsSectionHeaderProps) {
   return (
     <View className="mb-3 flex-row items-center justify-between">
-      <Text className="text-xs font-semibold tracking-widest text-[#94A3B8]">{activeAccountsLabel}</Text>
-      <Text className="text-xs font-bold text-[#18C8FF]">{accountsCountLabel}</Text>
+      <Text className="text-xs font-semibold tracking-widest text-app-textSecondary">{activeAccountsLabel}</Text>
+      <Text className="text-xs font-bold text-app-accentBlue">{accountsCountLabel}</Text>
     </View>
   );
 }

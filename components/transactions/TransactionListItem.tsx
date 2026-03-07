@@ -1,3 +1,4 @@
+import { APP_COLORS } from "../../constants/colors";
 import { useMemo, useRef } from "react";
 import { Animated, PanResponder, Pressable, Text, View } from "react-native";
 import { AppIcon } from "../shared/AppIcon";
@@ -53,8 +54,8 @@ function TransactionExpandedDetails({
   const txnDate = new Date(transaction.date);
 
   return (
-    <View className="px-4 pb-4 pt-2 border-t border-[#1E2A47]">
-      <View className="rounded-xl border border-[#223250] bg-[#0C1830] p-3">
+    <View className="px-4 pb-4 pt-2 border-t border-app-border">
+      <View className="rounded-xl border border-[#223250] bg-app-surface p-3">
         <View className="flex-row items-start justify-between">
           <View className="flex-1 pr-3">
             <Text className="text-[11px] uppercase tracking-wide text-app-textSecondary">
@@ -73,7 +74,7 @@ function TransactionExpandedDetails({
           </Pressable>
         </View>
 
-        <View className="mt-3 pt-3 border-t border-[#1E2A47] flex-row">
+        <View className="mt-3 pt-3 border-t border-app-border flex-row">
           <View className="flex-1 pr-2">
             <Text className="text-[11px] uppercase tracking-wide text-app-textSecondary">
               Fecha
@@ -173,7 +174,7 @@ export function TransactionListItem({
     [onSwipeGestureChange, onSwipeLeft, transaction.id, translateX],
   );
 
-  const color = transaction.categoryColor || "#18C8FF";
+  const color = transaction.categoryColor || APP_COLORS.actionPrimary;
   const categoryLabel = transaction.categoryName?.trim() || "Other";
   const accountLabel = transaction.accountName?.trim() || "Main account";
   const currencyCode = displayCurrencyCode?.trim().toUpperCase() || transaction.currencyCode?.trim().toUpperCase() || "USD";
@@ -189,14 +190,14 @@ export function TransactionListItem({
           right: 0,
           bottom: 0,
           width: 110,
-          backgroundColor: "#EF4444",
+          backgroundColor: APP_COLORS.danger,
           alignItems: "center",
           justifyContent: "center",
           opacity: deleteRevealOpacity,
         }}
       >
         <Animated.View style={{ transform: [{ scale: deleteRevealScale }] }}>
-          <AppIcon name="Trash2" size={22} color="#FFFFFF" />
+          <AppIcon name="Trash2" size={22} color={APP_COLORS.textPrimary} />
         </Animated.View>
       </Animated.View>
 
@@ -268,3 +269,4 @@ export function TransactionListItem({
     </View>
   );
 }
+

@@ -1,3 +1,4 @@
+import { APP_COLORS } from "../../constants/colors";
 import { LinearGradient } from "expo-linear-gradient";
 import { Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
@@ -25,7 +26,7 @@ export function SavingsOverviewCard({
   return (
     <View className="rounded-3xl overflow-hidden">
       <LinearGradient
-        colors={["#111C33", "#1A1440"]}
+        colors={[APP_COLORS.surfaceElevated, APP_COLORS.actionSecondary]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={{ padding: 16 }}
@@ -41,9 +42,9 @@ export function SavingsOverviewCard({
           </Text>
         </View>
 
-        <View className="mt-4 h-2 rounded-full bg-[#253558] overflow-hidden">
+        <View className="mt-4 h-2 rounded-full bg-app-border overflow-hidden">
           <LinearGradient
-            colors={["#B063FF", "#7E5BFF"]}
+            colors={[APP_COLORS.actionSecondary, APP_COLORS.actionPrimary]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
             style={{ width: `${progress}%`, height: "100%", borderRadius: 999 }}
@@ -58,3 +59,4 @@ export function SavingsOverviewCard({
     </View>
   );
 }
+
