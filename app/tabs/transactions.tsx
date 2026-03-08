@@ -31,6 +31,7 @@ import { CreateAccountModal } from "../../components/transactions/CreateAccountM
 import { CreateCategoryModal } from "../../components/transactions/CreateCategoryModal";
 import { TransactionListItem } from "../../components/transactions/TransactionListItem";
 import { TransactionSummaryCards } from "../../components/transactions/TransactionSummaryCards";
+import { AppBottomSheetModal } from "../../components/shared/AppBottomSheetModal";
 
 type TransactionGroup = {
   dateKey: string;
@@ -104,7 +105,7 @@ export default function TransactionsScreen() {
   const [accountOptions, setAccountOptions] = useState<AccountOption[]>([]);
   const [selectedAccountValue, setSelectedAccountValue] = useState<string>(ALL_ACCOUNTS_VALUE);
   const [isFiltersMenuOpen, setIsFiltersMenuOpen] = useState(false);
-  const [isAccountFilterOpen, setIsAccountFilterOpen] = useState(false);
+  const [isAccountFilterSheetOpen, setIsAccountFilterSheetOpen] = useState(false);
   const [amountDisplayCurrency, setAmountDisplayCurrency] =
     useState<AmountDisplayCurrency>("BASE");
   const [isCreateExpenseModalVisible, setIsCreateExpenseModalVisible] =
@@ -124,7 +125,7 @@ export default function TransactionsScreen() {
       const nextValue = !previous;
 
       if (!nextValue) {
-        setIsAccountFilterOpen(false);
+        setIsAccountFilterSheetOpen(false);
       }
 
       return nextValue;
@@ -539,46 +540,18 @@ export default function TransactionsScreen() {
                   <View className="mt-3 relative">
                     <Text className="text-app-textSecondary text-xs uppercase mb-2">Cuenta</Text>
                     <Pressable
-                      onPress={() => setIsAccountFilterOpen((previous) => !previous)}
+                      onPress={() => setIsAccountFilterSheetOpen(true)}
                       className="bg-app-surface border border-app-border rounded-xl px-3 py-3 flex-row items-center justify-between"
                     >
                       <Text className="text-app-textPrimary text-sm">
                         {getSelectedAccountLabel(accountOptions, selectedAccountValue)}
                       </Text>
                       <AppIcon
-                        name={isAccountFilterOpen ? "ChevronUp" : "ChevronDown"}
+                        name="ChevronDown"
                         size={16}
                         color={APP_COLORS.textSecondary}
                       />
                     </Pressable>
-
-                    {isAccountFilterOpen ? (
-                      <View
-                        className="absolute left-0 right-0 top-full mt-2 bg-app-surface border border-app-border rounded-xl overflow-hidden max-h-56 z-50"
-                        style={{ elevation: 24 }}
-                      >
-                        <ScrollView nestedScrollEnabled>
-                          {[{ value: ALL_ACCOUNTS_VALUE, label: "Todas las cuentas" }, ...accountOptions].map((option) => {
-                            const isSelected = option.value === selectedAccountValue;
-                            return (
-                              <Pressable
-                                key={option.value}
-                                onPress={() => {
-                                  setSelectedAccountValue(option.value);
-                                  setIsAccountFilterOpen(false);
-                                }}
-                                className="px-3 py-3 flex-row items-center justify-between border-b border-app-border"
-                              >
-                                <Text className={`text-sm ${isSelected ? "text-app-primary font-semibold" : "text-app-textPrimary"}`}>
-                                  {option.label}
-                                </Text>
-                                {isSelected ? <AppIcon name="Check" size={14} color={APP_COLORS.actionPrimary} /> : null}
-                              </Pressable>
-                            );
-                          })}
-                        </ScrollView>
-                      </View>
-                    ) : null}
                   </View>
 
                   <View className="mt-3">
@@ -706,6 +679,37 @@ export default function TransactionsScreen() {
         onClose={() => setIsCreateCategoryModalVisible(false)}
         onCreateCategory={handleCreateCategory}
       />
+
+      <AppBottomSheetModal
+        visible={isAccountFilterSheetOpen}
+        onClose={() => setIsAccountFilterSheetOpen(false)}
+        snapPoints={["50%"]}
+        debugName="Transactions:AccountFilter"
+      >
+        <View className="px-5 pt-4 pb-2 border-b border-app-border">
+          <Text className="text-app-textPrimary text-lg font-semibold">Selecciona cuenta</Text>
+        </View>
+        <ScrollView nestedScrollEnabled keyboardShouldPersistTaps="handled">
+          {[{ value: ALL_ACCOUNTS_VALUE, label: "Todas las cuentas" }, ...accountOptions].map((option) => {
+            const isSelected = option.value === selectedAccountValue;
+            return (
+              <Pressable
+                key={option.value}
+                onPress={() => {
+                  setSelectedAccountValue(option.value);
+                  setIsAccountFilterSheetOpen(false);
+                }}
+                className="px-5 py-4 flex-row items-center justify-between border-b border-app-border"
+              >
+                <Text className={`text-sm ${isSelected ? "text-app-primary font-semibold" : "text-app-textPrimary"}`}>
+                  {option.label}
+                </Text>
+                {isSelected ? <AppIcon name="Check" size={16} color={APP_COLORS.actionPrimary} /> : null}
+              </Pressable>
+            );
+          })}
+        </ScrollView>
+      </AppBottomSheetModal>
     </View>
   );
 }
