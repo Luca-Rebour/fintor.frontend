@@ -32,6 +32,7 @@ const CHART_SIZE = 190;
 const CHART_STROKE_WIDTH = 26;
 const CHART_RADIUS = (CHART_SIZE - CHART_STROKE_WIDTH) / 2;
 const CHART_CENTER = CHART_SIZE / 2;
+const DEFAULT_VISIBLE_CATEGORIES = 3;
 
 function formatMoney(value: number) {
   return `$${value.toFixed(2)}`;
@@ -51,6 +52,7 @@ export function NetWorthSection({ refreshKey = 0 }: NetWorthSectionProps) {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [selectedFilterDays, setSelectedFilterDays] = useState<ReportFilterDays>(30);
+  const [isDetailsExpanded, setIsDetailsExpanded] = useState(false);
   const [authUser, setAuthUser] = useState<User | null>(getAuthUserSnapshot());
 
   function getUserBaseCurrencyCode(user: User | null) {
@@ -150,6 +152,15 @@ export function NetWorthSection({ refreshKey = 0 }: NetWorthSectionProps) {
     });
   }, [expensesByCategory, totalExpenses, circumference]);
 
+  const visibleExpensesByCategory = useMemo(
+    () => (isDetailsExpanded ? expensesByCategory : expensesByCategory.slice(0, DEFAULT_VISIBLE_CATEGORIES)),
+    [expensesByCategory, isDetailsExpanded],
+  );
+
+  useEffect(() => {
+    setIsDetailsExpanded(false);
+  }, [selectedFilterDays]);
+
   return (
     <View className="mb-4 rounded-3xl bg-app-card/50 p-4">
       <Text className="text-sm text-app-textSecondary">{t("home.expenseChart.title")}</Text>
@@ -230,7 +241,7 @@ export function NetWorthSection({ refreshKey = 0 }: NetWorthSectionProps) {
           </View>
 
           <View className="mt-5 gap-2">
-            {expensesByCategory.map((item) => {
+            {visibleExpensesByCategory.map((item) => {
               const percent = totalExpenses > 0 ? (item.amount / totalExpenses) * 100 : 0;
               return (
                 <View key={item.category} className="flex-row items-center justify-between rounded-xl bg-app-cardSoft px-3 py-2">
@@ -254,6 +265,17 @@ export function NetWorthSection({ refreshKey = 0 }: NetWorthSectionProps) {
                 </View>
               );
             })}
+
+            {expensesByCategory.length > DEFAULT_VISIBLE_CATEGORIES ? (
+              <Pressable
+                onPress={() => setIsDetailsExpanded((previous) => !previous)}
+                className="mt-1 items-center justify-center rounded-xl border border-app-border bg-app-cardSoft px-3 py-2"
+              >
+                <Text className="text-sm font-semibold text-app-primary">
+                  {isDetailsExpanded ? "Ver menos" : "Expandir y ver todas"}
+                </Text>
+              </Pressable>
+            ) : null}
           </View>
         </>
       )}
