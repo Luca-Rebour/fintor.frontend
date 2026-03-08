@@ -108,6 +108,9 @@ export function CreateCategoryModal({
                 selectedColor={selectedColor}
                 onChangeIcon={setSelectedIcon}
                 onChangeColor={setSelectedColor}
+                useBottomSheetSelector
+                bottomSheetTitle="Selecciona un icono"
+                bottomSheetSnapPoints={["78%"]}
               />
             </View>
 

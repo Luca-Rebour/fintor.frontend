@@ -211,6 +211,9 @@ export function CreateAccountModal({
 								searchPlaceholder="Search account icon"
 								iconSectionLabel="Account icons"
 								showColorSection={false}
+								useBottomSheetSelector
+								bottomSheetTitle="Select account icon"
+								bottomSheetSnapPoints={["78%"]}
 							/>
 
 							<Pressable
