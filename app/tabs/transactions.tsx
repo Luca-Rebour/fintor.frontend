@@ -600,12 +600,13 @@ export default function TransactionsScreen() {
               ) : null}
             </View>
 
+              <View className="mb-4">
             <TransactionSummaryCards
               monthlySpending={monthlySummary.totalSpending}
               monthlyIncome={monthlySummary.totalIncome}
               balance={overallBalance}
               currencyCode={summaryCurrencyCode}
-            />
+            /></View>
           </>
         }
         ListEmptyComponent={

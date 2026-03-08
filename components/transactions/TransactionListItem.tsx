@@ -181,7 +181,7 @@ export function TransactionListItem({
   const amountToDisplay = Number.isFinite(displayAmount) ? Math.abs(displayAmount as number) : Math.abs(transaction.amount);
 
   return (
-    <View className="mb-3 overflow-hidden">
+    <View className="mb-3 overflow-hidden rounded-2xl border border-app-border bg-app-surface">
       <Animated.View
         pointerEvents="none"
         style={{
