@@ -12,6 +12,7 @@ type AppBottomSheetModalProps = PropsWithChildren<{
   onClose: () => void;
   snapPoints?: Array<string | number>;
   debugName?: string;
+  stackBehavior?: "push" | "switch" | "replace";
 }>;
 
 const BOTTOM_SHEET_DEBUG = true;
@@ -34,6 +35,7 @@ export function AppBottomSheetModal({
   onClose,
   snapPoints,
   debugName = "unnamed",
+  stackBehavior,
   children,
 }: AppBottomSheetModalProps) {
   const modalRef = useRef<BottomSheetModal>(null);
@@ -126,6 +128,7 @@ export function AppBottomSheetModal({
       ref={modalRef}
       index={0}
       snapPoints={resolvedSnapPoints}
+      stackBehavior={stackBehavior}
       enableDynamicSizing={false}
       enablePanDownToClose
       backdropComponent={renderBackdrop}
