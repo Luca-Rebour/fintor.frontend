@@ -43,7 +43,7 @@ export function CreateAccountModal({
 	const [currencyCode, setCurrencyCode] = useState("USD");
 	const [selectedIcon, setSelectedIcon] = useState("WalletCards");
 	const [currencyOptions, setCurrencyOptions] = useState<CurrencyOption[]>(getCurrencyOptionsSnapshot());
-	const [isCurrencyOpen, setIsCurrencyOpen] = useState(false);
+	const [isCurrencySelectorOpen, setIsCurrencySelectorOpen] = useState(false);
 	const [currencySearchText, setCurrencySearchText] = useState("");
 	const [isLoadingCurrencies, setIsLoadingCurrencies] = useState(currencyOptions.length === 0);
 	const [isSubmitting, setIsSubmitting] = useState(false);
@@ -87,7 +87,7 @@ export function CreateAccountModal({
 		setCurrencyCode("USD");
 		setSelectedIcon("WalletCards");
 		setCurrencySearchText("");
-		setIsCurrencyOpen(false);
+		setIsCurrencySelectorOpen(false);
 		setNameError("");
 		setBalanceError("");
 	}
@@ -193,77 +193,13 @@ export function CreateAccountModal({
 
 							<View className="mt-4 z-50" style={{ elevation: 30 }}>
 								<Text className="mb-2 text-xs uppercase text-app-primary">Currency</Text>
-								<View className="relative z-50" style={{ elevation: 30 }}>
-									<Pressable
-										onPress={() => setIsCurrencyOpen((previous) => !previous)}
-										className="bg-app-surface border border-app-border rounded-2xl px-3 py-3 flex-row items-center justify-between"
-									>
-										<Text className="text-sm text-app-textPrimary">{getCurrencyLabel(currencyOptions, currencyCode)}</Text>
-										<AppIcon name={isCurrencyOpen ? "ChevronUp" : "ChevronDown"} size={16} color={APP_COLORS.textSecondary} />
-									</Pressable>
-
-									{isCurrencyOpen ? (
-										<View
-											className="mt-2 bg-app-surface border border-app-border rounded-2xl overflow-hidden"
-											style={{ maxHeight: 300 }}
-										>
-											<View className="px-3 py-3 border-b border-app-border">
-												<View className="flex-row items-center rounded-xl border border-app-border bg-app-bgSecondary px-3 py-2">
-													<AppIcon name="Search" size={15} color={APP_COLORS.textSecondary} />
-													<TextInput
-														value={currencySearchText}
-														onChangeText={setCurrencySearchText}
-														placeholder="Buscar por código o nombre"
-														placeholderTextColor={APP_COLORS.textMuted}
-														className="ml-2 flex-1 text-sm text-app-textPrimary"
-														autoCapitalize="none"
-													/>
-												</View>
-											</View>
-
-											{isLoadingCurrencies ? (
-												<View className="py-6 items-center justify-center">
-													<ActivityIndicator color={APP_COLORS.actionPrimary} />
-												</View>
-											) : (
-												<FlatList
-													data={filteredCurrencyOptions}
-													keyExtractor={(item) => item.code}
-													keyboardShouldPersistTaps="handled"
-													initialNumToRender={16}
-													maxToRenderPerBatch={20}
-													windowSize={6}
-													ListEmptyComponent={
-														<View className="px-3 py-5">
-															<Text className="text-center text-sm text-app-textSecondary">No se encontraron monedas</Text>
-														</View>
-													}
-													renderItem={({ item }) => {
-														const isSelected = item.code === currencyCode;
-														return (
-															<Pressable
-																onPress={() => {
-																	setCurrencyCode(item.code);
-																	setIsCurrencyOpen(false);
-																	setCurrencySearchText("");
-																}}
-																className="px-3 py-3 flex-row items-center justify-between border-b border-app-border"
-															>
-																<View>
-																	<Text className={`text-sm ${isSelected ? "text-app-primary font-semibold" : "text-app-textPrimary"}`}>
-																		{item.code}
-																	</Text>
-																	<Text className="mt-0.5 text-xs text-app-textSecondary">{item.name}</Text>
-																</View>
-																{isSelected ? <AppIcon name="Check" size={14} color={APP_COLORS.actionPrimary} /> : null}
-															</Pressable>
-														);
-													}}
-												/>
-											)}
-										</View>
-									) : null}
-								</View>
+								<Pressable
+									onPress={() => setIsCurrencySelectorOpen(true)}
+									className="bg-app-surface border border-app-border rounded-2xl px-3 py-3 flex-row items-center justify-between"
+								>
+									<Text className="text-sm text-app-textPrimary">{getCurrencyLabel(currencyOptions, currencyCode)}</Text>
+									<AppIcon name="ChevronDown" size={16} color={APP_COLORS.textSecondary} />
+								</Pressable>
 							</View>
 
 							<IconColorPicker
@@ -296,6 +232,70 @@ export function CreateAccountModal({
 						/>
 					</View>
 			</KeyboardAvoidingView>
+
+			<AppBottomSheetModal
+				visible={isCurrencySelectorOpen}
+				onClose={() => setIsCurrencySelectorOpen(false)}
+				snapPoints={["70%"]}
+				debugName="CreateAccountCurrencySelect"
+				stackBehavior="push"
+			>
+				<View className="px-5 pt-4 pb-3 border-b border-app-border">
+					<Text className="text-app-textPrimary text-lg font-semibold">Select Currency</Text>
+					<View className="mt-3 flex-row items-center rounded-xl border border-app-border bg-app-bgSecondary px-3 py-2">
+						<AppIcon name="Search" size={15} color={APP_COLORS.textSecondary} />
+						<TextInput
+							value={currencySearchText}
+							onChangeText={setCurrencySearchText}
+							placeholder="Buscar por codigo o nombre"
+							placeholderTextColor={APP_COLORS.textMuted}
+							className="ml-2 flex-1 text-sm text-app-textPrimary"
+							autoCapitalize="none"
+						/>
+					</View>
+				</View>
+
+				{isLoadingCurrencies ? (
+					<View className="py-6 items-center justify-center">
+						<ActivityIndicator color={APP_COLORS.actionPrimary} />
+					</View>
+				) : (
+					<FlatList
+						data={filteredCurrencyOptions}
+						keyExtractor={(item) => item.code}
+						keyboardShouldPersistTaps="handled"
+						initialNumToRender={16}
+						maxToRenderPerBatch={20}
+						windowSize={6}
+						ListEmptyComponent={
+							<View className="px-3 py-5">
+								<Text className="text-center text-sm text-app-textSecondary">No se encontraron monedas</Text>
+							</View>
+						}
+						renderItem={({ item }) => {
+							const isSelected = item.code === currencyCode;
+							return (
+								<Pressable
+									onPress={() => {
+										setCurrencyCode(item.code);
+										setIsCurrencySelectorOpen(false);
+										setCurrencySearchText("");
+									}}
+									className="px-5 py-3 flex-row items-center justify-between border-b border-app-border"
+								>
+									<View>
+										<Text className={`text-sm ${isSelected ? "text-app-primary font-semibold" : "text-app-textPrimary"}`}>
+											{item.code}
+										</Text>
+										<Text className="mt-0.5 text-xs text-app-textSecondary">{item.name}</Text>
+									</View>
+									{isSelected ? <AppIcon name="Check" size={14} color={APP_COLORS.actionPrimary} /> : null}
+								</Pressable>
+							);
+						}}
+					/>
+				)}
+			</AppBottomSheetModal>
 		</AppBottomSheetModal>
 	);
 }

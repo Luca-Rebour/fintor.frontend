@@ -1,5 +1,5 @@
 import { APP_COLORS } from "../../constants/colors";
-import { RefObject, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -34,16 +34,6 @@ type CreateExpenseModalProps = {
 
 const DEFAULT_EXPENSE_ICON = "ShoppingCart";
 
-const DROPDOWN_MAX_HEIGHT = 240;
-const DROPDOWN_OFFSET = 6;
-const DROPDOWN_ROW_HEIGHT = 48;
-const DROPDOWN_HEADER_HEIGHT = 36;
-
-function getEstimatedDropdownHeight(optionsCount: number) {
-  const estimatedRowsHeight = optionsCount * DROPDOWN_ROW_HEIGHT;
-  return Math.min(DROPDOWN_MAX_HEIGHT, DROPDOWN_HEADER_HEIGHT + estimatedRowsHeight);
-}
-
 function getOptionLabel(
   options: Array<{ label: string; value: string }>,
   value: string,
@@ -68,26 +58,21 @@ function isAccountOption(option: CategoryOption | AccountOption | GoalOption): o
 function SelectField({
   label,
   value,
-  isOpen,
-  onToggle,
-  triggerRef,
+  onPress,
 }: {
   label: string;
   value: string;
-  isOpen: boolean;
-  onToggle: () => void;
-  triggerRef: RefObject<View | null>;
+  onPress: () => void;
 }) {
   return (
     <View className="mt-3">
       <Text className="text-app-textSecondary text-xs uppercase mb-2">{label}</Text>
       <Pressable
-        ref={triggerRef}
-        onPress={onToggle}
+        onPress={onPress}
         className="bg-app-surface border border-app-border rounded-xl px-3 py-3 flex-row items-center justify-between"
       >
         <Text className="text-app-textPrimary text-sm">{value}</Text>
-        <AppIcon name={isOpen ? "ChevronUp" : "ChevronDown"} size={16} color={APP_COLORS.textSecondary} />
+        <AppIcon name="ChevronDown" size={16} color={APP_COLORS.textSecondary} />
       </Pressable>
     </View>
   );
@@ -107,25 +92,7 @@ export function CreateExpenseModal({
   const [account, setAccount] = useState("");
   const [goal, setGoal] = useState(NO_GOAL_VALUE);
   const [amountError, setAmountError] = useState("");
-  const [isCategoryOpen, setIsCategoryOpen] = useState(false);
-  const [isAccountOpen, setIsAccountOpen] = useState(false);
-  const [isGoalOpen, setIsGoalOpen] = useState(false);
-  const categoryTriggerRef = useRef<View>(null);
-  const accountTriggerRef = useRef<View>(null);
-  const goalTriggerRef = useRef<View>(null);
-  const [dropdownPosition, setDropdownPosition] = useState({
-    top: 0,
-    left: 0,
-    width: 0,
-  });
-
-  const activeSelectType = isCategoryOpen
-    ? "category"
-    : isAccountOpen
-      ? "account"
-      : isGoalOpen
-        ? "goal"
-      : null;
+  const [activeSelectType, setActiveSelectType] = useState<"category" | "account" | "goal" | null>(null);
 
   const activeSelectOptions =
     activeSelectType === "category"
@@ -203,39 +170,6 @@ export function CreateExpenseModal({
     };
   }, [visible]);
 
-  function openCategorySelect() {
-    setIsAccountOpen(false);
-    setIsGoalOpen(false);
-    categoryTriggerRef.current?.measureInWindow((x, y, width, height) => {
-      const estimatedHeight = getEstimatedDropdownHeight(categoryOptions.length);
-      const top = Math.max(12, y - estimatedHeight - DROPDOWN_OFFSET);
-      setDropdownPosition({ top, left: x, width });
-      setIsCategoryOpen((prev) => !prev);
-    });
-  }
-
-  function openAccountSelect() {
-    setIsCategoryOpen(false);
-    setIsGoalOpen(false);
-    accountTriggerRef.current?.measureInWindow((x, y, width, height) => {
-      const estimatedHeight = getEstimatedDropdownHeight(accountOptions.length);
-      const top = Math.max(12, y - estimatedHeight - DROPDOWN_OFFSET);
-      setDropdownPosition({ top, left: x, width });
-      setIsAccountOpen((prev) => !prev);
-    });
-  }
-
-  function openGoalSelect() {
-    setIsCategoryOpen(false);
-    setIsAccountOpen(false);
-    goalTriggerRef.current?.measureInWindow((x, y, width, height) => {
-      const estimatedHeight = getEstimatedDropdownHeight(goalOptions.length);
-      const top = Math.max(12, y - estimatedHeight - DROPDOWN_OFFSET);
-      setDropdownPosition({ top, left: x, width });
-      setIsGoalOpen((prev) => !prev);
-    });
-  }
-
   function resetForm() {
     setAmount("");
     setDescription("");
@@ -243,9 +177,7 @@ export function CreateExpenseModal({
     setAccount(accountOptions[0]?.value ?? "");
     setGoal(NO_GOAL_VALUE);
     setAmountError("");
-    setIsCategoryOpen(false);
-    setIsAccountOpen(false);
-    setIsGoalOpen(false);
+    setActiveSelectType(null);
   }
 
   function handleClose() {
@@ -324,25 +256,19 @@ export function CreateExpenseModal({
             <SelectField
               label="Category"
               value={getOptionLabel(categoryOptions, category)}
-              isOpen={isCategoryOpen}
-              onToggle={openCategorySelect}
-              triggerRef={categoryTriggerRef}
+              onPress={() => setActiveSelectType("category")}
             />
 
             <SelectField
               label="Account"
               value={getSelectedAccountLabel(accountOptions, account)}
-              isOpen={isAccountOpen}
-              onToggle={openAccountSelect}
-              triggerRef={accountTriggerRef}
+              onPress={() => setActiveSelectType("account")}
             />
 
             <SelectField
               label="Goal (optional)"
               value={getOptionLabel(goalOptions, goal)}
-              isOpen={isGoalOpen}
-              onToggle={openGoalSelect}
-              triggerRef={goalTriggerRef}
+              onPress={() => setActiveSelectType("goal")}
             />
           </ScrollView>
 
@@ -355,76 +281,50 @@ export function CreateExpenseModal({
               </Pressable>
             </View>
           </View>
-
-          {activeSelectType ? (
-            <>
-              <Pressable
-                onPress={() => {
-                  setIsCategoryOpen(false);
-                  setIsAccountOpen(false);
-                  setIsGoalOpen(false);
-                }}
-                style={{ position: "absolute", top: 0, right: 0, bottom: 0, left: 0 }}
-              />
-
-              <View
-                style={{
-                  position: "absolute",
-                  top: dropdownPosition.top,
-                  left: dropdownPosition.left,
-                  width: dropdownPosition.width,
-                  zIndex: 999,
-                  elevation: 24,
-                  maxHeight: 240,
-                }}
-                className="bg-app-surface border border-app-border rounded-xl overflow-hidden"
-              >
-              <View className="px-3 py-2 border-b border-app-border">
-                <Text className="text-app-textSecondary text-xs uppercase">
-                  Select {activeSelectLabel}
-                </Text>
-              </View>
-
-              <ScrollView nestedScrollEnabled>
-                {activeSelectOptions.map((option) => {
-                  const isSelected = option.value === activeSelectValue;
-                  const optionLabel =
-                    activeSelectType === "account" && isAccountOption(option)
-                      ? formatAccountOptionLabel(option)
-                      : option.label;
-                  return (
-                    <Pressable
-                      key={option.value}
-                      onPress={() => {
-                        if (activeSelectType === "category") {
-                          setCategory(option.value);
-                        } else if (activeSelectType === "account") {
-                          setAccount(option.value);
-                        } else {
-                          setGoal(option.value);
-                        }
-                        setIsCategoryOpen(false);
-                        setIsAccountOpen(false);
-                        setIsGoalOpen(false);
-                      }}
-                      className="px-3 py-3 flex-row items-center justify-between border-b border-app-border"
-                    >
-                      <Text
-                        className={`text-sm ${
-                          isSelected ? "text-app-primary font-semibold" : "text-app-textPrimary"
-                        }`}
-                      >
-                        {optionLabel}
-                      </Text>
-                      {isSelected ? <AppIcon name="Check" size={14} color={APP_COLORS.actionPrimary} /> : null}
-                    </Pressable>
-                  );
-                })}
-              </ScrollView>
-              </View>
-            </>
-          ) : null}
       </KeyboardAvoidingView>
+
+      <AppBottomSheetModal
+        visible={activeSelectType !== null}
+        onClose={() => setActiveSelectType(null)}
+        snapPoints={["55%"]}
+        debugName="CreateExpenseModalSelect"
+        stackBehavior="push"
+      >
+        <View className="px-5 pt-4 pb-2 border-b border-app-border">
+          <Text className="text-app-textPrimary text-lg font-semibold">Select {activeSelectLabel}</Text>
+        </View>
+        <ScrollView className="max-h-full" nestedScrollEnabled keyboardShouldPersistTaps="handled">
+          {activeSelectOptions.map((option) => {
+            const isSelected = option.value === activeSelectValue;
+            const optionLabel =
+              activeSelectType === "account" && isAccountOption(option)
+                ? formatAccountOptionLabel(option)
+                : option.label;
+
+            return (
+              <Pressable
+                key={option.value}
+                onPress={() => {
+                  if (activeSelectType === "category") {
+                    setCategory(option.value);
+                  } else if (activeSelectType === "account") {
+                    setAccount(option.value);
+                  } else {
+                    setGoal(option.value);
+                  }
+                  setActiveSelectType(null);
+                }}
+                className="px-5 py-4 flex-row items-center justify-between border-b border-app-border"
+              >
+                <Text className={`text-sm ${isSelected ? "text-app-primary font-semibold" : "text-app-textPrimary"}`}>
+                  {optionLabel}
+                </Text>
+                {isSelected ? <AppIcon name="Check" size={16} color={APP_COLORS.actionPrimary} /> : null}
+              </Pressable>
+            );
+          })}
+        </ScrollView>
+      </AppBottomSheetModal>
     </AppBottomSheetModal>
   );
 }
