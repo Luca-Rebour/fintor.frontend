@@ -285,8 +285,8 @@ export default function HomeScreen() {
 					<GoalSection goal={topGoalForHome} />
 				) : (
 					<View className="mb-8 rounded-2xl bg-app-cardSoft p-4">
-						<Text className="text-base font-semibold text-app-textPrimary">Sin metas activas</Text>
-						<Text className="mt-1 text-sm text-app-textSecondary">Todavía no creaste ninguna goal.</Text>
+						<Text className="text-base font-semibold text-app-textPrimary">{t("home.goals.emptyTitle")}</Text>
+						<Text className="mt-1 text-sm text-app-textSecondary">{t("home.goals.emptySubtitle")}</Text>
 					</View>
 				)}
 			</ScrollView>

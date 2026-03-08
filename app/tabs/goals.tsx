@@ -54,8 +54,8 @@ export default function GoalsScreen() {
 			setGoalsData((previous) => [createdGoal, ...previous]);
 			setIsCreateModalVisible(false);
 		} catch (createError) {
-			const message = createError instanceof Error ? createError.message : "No se pudo crear el target";
-			Alert.alert("Error", message);
+			const message = createError instanceof Error ? createError.message : t("goals.errors.failedToCreateTarget");
+			Alert.alert(t("goals.errors.genericTitle"), message);
 		} finally {
 			setIsCreatingTarget(false);
 		}
@@ -104,7 +104,7 @@ export default function GoalsScreen() {
 							onPress={() => setIsCreateModalVisible(true)}
 							className="rounded-lg border border-app-border bg-app-bgSecondary px-3 py-2"
 						>
-							<Text className="text-sm font-semibold text-app-primary">Crear target</Text>
+							<Text className="text-sm font-semibold text-app-primary">{t("goals.actions.createTarget")}</Text>
 						</Pressable>
 					</View>
 

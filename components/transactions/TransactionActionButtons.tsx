@@ -53,7 +53,7 @@ export function TransactionActionButtons({
         debugName="Transactions:ActionsMenu"
       >
         <View className="px-4 py-3 border-b border-app-border">
-          <Text className="text-base font-semibold text-app-textPrimary">Transactions</Text>
+          <Text className="text-base font-semibold text-app-textPrimary">{t("transactions.actions.menuTitle")}</Text>
         </View>
         <View className="px-3 py-2">
           <Pressable

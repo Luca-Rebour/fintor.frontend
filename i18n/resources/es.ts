@@ -4,6 +4,15 @@ const es = {
     done: "Listo",
     cancel: "Cancelar",
     viewAll: "Ver todo",
+    iconPicker: {
+      selectedIcon: "Icono seleccionado",
+      searchPlaceholder: "Buscar icono por nombre",
+      icons: "Iconos",
+      color: "Color",
+      noIconsFound: "No se encontraron iconos",
+      openSelector: "Abrir selector de iconos",
+      selectIconTitle: "Seleccionar icono",
+    },
   },
   tabs: {
     home: "Inicio",
@@ -76,6 +85,7 @@ const es = {
     },
   },
   profile: {
+    title: "Perfil",
     errors: {
       failedToLoad: "No se pudo cargar el perfil",
       noData: "No hay datos de perfil disponibles",
@@ -108,11 +118,15 @@ const es = {
     goals: {
       title: "Metas",
       seeAll: "Ver todo",
+      emptyTitle: "Sin metas activas",
+      emptySubtitle: "Todavía no creaste ninguna meta.",
     },
     expenseChart: {
       title: "Gastos por categoría",
       noExpensesInPeriod: "No hay gastos en este período.",
       total: "Total",
+      showLess: "Ver menos",
+      showAll: "Expandir y ver todas",
       filters: {
         week1: "1 semana",
         month1: "1 mes",
@@ -125,6 +139,41 @@ const es = {
     title: "Metas financieras",
     errors: {
       failedToLoad: "No se pudieron cargar las metas",
+      failedToCreateTarget: "No se pudo crear el objetivo",
+      genericTitle: "Error",
+    },
+    actions: {
+      createTarget: "Crear objetivo",
+    },
+    form: {
+      title: "Crear objetivo",
+      fields: {
+        title: "Título",
+        descriptionOptional: "Descripción (opcional)",
+        targetAmount: "Monto objetivo",
+        currentAmount: "Monto actual",
+        targetDate: "Fecha objetivo",
+        account: "Cuenta",
+      },
+      placeholders: {
+        title: "Ej: Viaje a Europa",
+        description: "Ej: Summer 2026",
+        amount: "0.00",
+        targetDate: "Seleccionar fecha objetivo",
+      },
+      validation: {
+        titleRequired: "Ingresá un título",
+        targetAmountInvalid: "Ingresá un monto objetivo válido",
+        currentAmountInvalid: "Ingresá un monto actual válido",
+        targetDateRequired: "Seleccioná una fecha objetivo",
+        accountRequired: "Seleccioná una cuenta",
+        exchangeRateUnavailable: "No se pudo calcular el tipo de cambio de la cuenta",
+      },
+      actions: {
+        create: "Crear objetivo",
+        saving: "Guardando...",
+      },
+      selectAccount: "Seleccioná una cuenta",
     },
     targetsTitle: "Tus objetivos",
     details: {
@@ -150,6 +199,17 @@ const es = {
     recentActivity: "Actividad reciente",
     transactions: "Transacciones",
     noTransactions: "No hay transacciones para esta cuenta.",
+    activeAccounts: "CUENTAS ACTIVAS",
+    accountsCount: "{{count}} CUENTAS",
+    addAccountButton: "Agregar cuenta",
+    totalBalanceLabel: "BALANCE TOTAL",
+    availableLabel: "DISPONIBLE",
+    errors: {
+      invalidInitialBalance: "El saldo inicial no es válido.",
+      exchangeRateUnavailable: "No se pudo obtener el tipo de cambio para crear la cuenta.",
+      createAccountFailed: "No se pudo crear la cuenta",
+      genericTitle: "Error",
+    },
   },
   recurring: {
     title: "Recurrentes",
@@ -208,6 +268,9 @@ const es = {
   },
   recurringAdmin: {
     title: "Gestionar recurrentes",
+    labels: {
+      upcomingThisMonth: "PRÓXIMAS ESTE MES",
+    },
     errors: {
       failedToLoad: "No se pudieron cargar las transacciones recurrentes",
       couldNotSave: "No se pudo guardar la transacción recurrente",
@@ -272,13 +335,105 @@ const es = {
         endDate: "Fecha fin",
       },
     },
+    actions: {
+      addNewRecurring: "Agregar nueva recurrente",
+    },
   },
   transactions: {
+    title: "Transacciones",
+    groups: {
+      today: "Hoy",
+      yesterday: "Ayer",
+    },
     actions: {
       addIncome: "Agregar ingreso",
       addExpense: "Agregar gasto",
       addAccount: "Agregar cuenta",
       addCategory: "Agregar categoría",
+      menuTitle: "Transacciones",
+    },
+    filters: {
+      account: "Cuenta",
+      amountCurrency: "Moneda de montos",
+      primaryCurrency: "Principal ({{code}})",
+      allAccounts: "Todas las cuentas",
+      selectAccount: "Selecciona cuenta",
+    },
+    createIncome: {
+      title: "Agregar nuevo ingreso",
+      createButton: "Crear ingreso",
+    },
+    createExpense: {
+      title: "Agregar nuevo gasto",
+      createButton: "Crear gasto",
+    },
+    createCategory: {
+      title: "Agregar categoría",
+      createButton: "Crear categoría",
+      selectIconTitle: "Selecciona un icono",
+    },
+    createAccount: {
+      title: "Agregar nueva cuenta",
+      subtitle: "Conecta una nueva fuente de fondos a tu billetera",
+      createButton: "Crear cuenta",
+      selectCurrencyTitle: "Selecciona moneda",
+      selectedAccountIcon: "Icono de cuenta seleccionado",
+      accountIcons: "Iconos de cuenta",
+      searchAccountIcon: "Buscar icono de cuenta",
+    },
+    fields: {
+      amount: "Monto",
+      descriptionOptional: "Descripción (opcional)",
+      category: "Categoría",
+      account: "Cuenta",
+      goalOptional: "Objetivo (opcional)",
+      name: "Nombre",
+      accountName: "Nombre de la cuenta",
+      initialBalance: "Saldo inicial",
+      currency: "Moneda",
+      description: "Descripción",
+      date: "Fecha",
+      time: "Hora",
+    },
+    placeholders: {
+      amount: "0.00",
+      addDetails: "Agregar detalles",
+      categoryName: "Ej. Comida, Servicios, Viajes",
+      accountNameExample: "p. ej. Caja de ahorro",
+      currencySearch: "Buscar por código o nombre",
+    },
+    labels: {
+      noGoal: "Sin objetivo",
+      noDescription: "Sin descripción",
+      otherCategory: "Otra",
+      mainAccount: "Cuenta principal",
+    },
+    select: {
+      selectLabel: "Seleccionar {{label}}",
+    },
+    success: {
+      categoryCreatedTitle: "Categoría creada",
+      categoryCreatedMessage: "La categoría \"{{name}}\" fue creada correctamente.",
+    },
+    errors: {
+      genericTitle: "Error",
+      failedToLoad: "No se pudieron cargar las transacciones",
+      exchangeRateForTransaction: "No se pudo obtener el tipo de cambio para esta transacción.",
+      exchangeRateForAccount: "No se pudo obtener el tipo de cambio para crear la cuenta.",
+      invalidInitialBalance: "El saldo inicial no es válido.",
+      createAccountFailed: "No se pudo crear la cuenta",
+      createCategoryFailed: "No se pudo crear la categoría",
+      deleteTransactionFailed: "No se pudo eliminar la transacción",
+      invalidAmount: "Ingresa un monto válido mayor a 0",
+      categoryNameRequired: "Ingresa un nombre para la categoría",
+      accountNameRequired: "Ingresa un nombre de cuenta",
+      initialBalanceRequired: "Ingresa un saldo inicial válido",
+      noCurrenciesFound: "No se encontraron monedas",
+    },
+    delete: {
+      title: "Eliminar transacción",
+      message: "¿Seguro que quieres eliminar esta transacción? Esta acción no se puede deshacer.",
+      confirm: "Eliminar",
     },
     summary: {
       monthlySpending: "Gasto mensual",

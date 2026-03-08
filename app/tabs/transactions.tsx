@@ -1,6 +1,7 @@
 import { APP_COLORS } from "../../constants/colors";
 import { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Alert, FlatList, Pressable, ScrollView, Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
 import { AppIcon } from "../../components/shared/AppIcon";
 import {
   addNewTransaction,
@@ -55,11 +56,7 @@ const ALL_ACCOUNTS_VALUE = "__all_accounts__";
   type AmountDisplayCurrency = "BASE" | "USD";
 
 function getSelectedAccountLabel(options: AccountOption[], selectedAccountValue: string) {
-  if (selectedAccountValue === ALL_ACCOUNTS_VALUE) {
-    return "Todas las cuentas";
-  }
-
-  return options.find((option) => option.value === selectedAccountValue)?.label ?? "Todas las cuentas";
+  return options.find((option) => option.value === selectedAccountValue)?.label ?? "";
 }
 
 function getLocalDateKey(input: string) {
@@ -70,18 +67,18 @@ function getLocalDateKey(input: string) {
   return `${y}-${m}-${day}`;
 }
 
-function getGroupTitle(dateKey: string) {
+function getGroupTitle(dateKey: string, todayLabel: string, yesterdayLabel: string) {
   const todayKey = getLocalDateKey(new Date().toISOString());
   const yesterdayDate = new Date();
   yesterdayDate.setDate(yesterdayDate.getDate() - 1);
   const yesterdayKey = getLocalDateKey(yesterdayDate.toISOString());
 
   if (dateKey === todayKey) {
-    return "Today";
+    return todayLabel;
   }
 
   if (dateKey === yesterdayKey) {
-    return "Yesterday";
+    return yesterdayLabel;
   }
 
   return new Date(`${dateKey}T00:00:00`).toLocaleDateString("es-ES", {
@@ -93,6 +90,7 @@ function getGroupTitle(dateKey: string) {
 }
 
 export default function TransactionsScreen() {
+  const { t } = useTranslation();
   const [transactionsData, setTransactionsData] = useState<TransactionDTO[]>(
     [],
   );
@@ -212,7 +210,7 @@ export default function TransactionsScreen() {
     const exchangeRate = await resolveExchangeRateForAccount(payload.accountId);
 
     if (exchangeRate === null && accountCurrencyCode !== baseCurrencyCode) {
-      Alert.alert("Error", "No se pudo obtener el tipo de cambio para esta transacción.");
+      Alert.alert(t("transactions.errors.genericTitle"), t("transactions.errors.exchangeRateForTransaction"));
       return null;
     }
 
@@ -248,7 +246,7 @@ export default function TransactionsScreen() {
       const message =
         loadError instanceof Error
           ? loadError.message
-          : "Failed to load transactions";
+          : t("transactions.errors.failedToLoad");
       setError(message);
     } finally {
       if (showInitialLoader) {
@@ -344,10 +342,10 @@ export default function TransactionsScreen() {
       .sort((a, b) => (a[0] < b[0] ? 1 : -1)) // fecha descendente
       .map(([dateKey, items]) => ({
         dateKey,
-        title: getGroupTitle(dateKey),
+        title: getGroupTitle(dateKey, t("transactions.groups.today"), t("transactions.groups.yesterday")),
         items: items.sort((a, b) => +new Date(b.date) - +new Date(a.date)),
       }));
-  }, [filteredTransactions]);
+  }, [filteredTransactions, t]);
 
   const transactionRows = useMemo<TransactionListRow[]>(() => {
     return groupedTransactions.flatMap((group) => {
@@ -410,7 +408,7 @@ export default function TransactionsScreen() {
       const normalizedInitialBalance = Number(payload.initialBalance);
 
       if (!Number.isFinite(normalizedInitialBalance)) {
-        Alert.alert("Error", "El saldo inicial no es válido.");
+        Alert.alert(t("transactions.errors.genericTitle"), t("transactions.errors.invalidInitialBalance"));
         return;
       }
 
@@ -422,7 +420,7 @@ export default function TransactionsScreen() {
         const resolvedRate = await getExchangeRateForCurrencies(accountCurrencyCode, userBaseCurrencyCode);
 
         if (resolvedRate === null) {
-          Alert.alert("Error", "No se pudo obtener el tipo de cambio para crear la cuenta.");
+          Alert.alert(t("transactions.errors.genericTitle"), t("transactions.errors.exchangeRateForAccount"));
           return;
         }
 
@@ -438,36 +436,39 @@ export default function TransactionsScreen() {
       await loadAccounts();
       setSelectedAccountValue(ALL_ACCOUNTS_VALUE);
     } catch (createError) {
-      const message = createError instanceof Error ? createError.message : "No se pudo crear la cuenta";
-      Alert.alert("Error", message);
+      const message = createError instanceof Error ? createError.message : t("transactions.errors.createAccountFailed");
+      Alert.alert(t("transactions.errors.genericTitle"), message);
     }
   }
 
   async function handleCreateCategory(payload: CreateCategoryDTO) {
     try {
       await createCategory(payload);
-      Alert.alert("Categoría creada", `La categoría \"${payload.name}\" fue creada correctamente.`);
+      Alert.alert(
+        t("transactions.success.categoryCreatedTitle"),
+        t("transactions.success.categoryCreatedMessage", { name: payload.name }),
+      );
     } catch (createError) {
-      const message = createError instanceof Error ? createError.message : "No se pudo crear la categoría";
-      Alert.alert("Error", message);
+      const message = createError instanceof Error ? createError.message : t("transactions.errors.createCategoryFailed");
+      Alert.alert(t("transactions.errors.genericTitle"), message);
     }
   }
 
   function handleRequestDeleteTransaction(transactionId: string) {
     Alert.alert(
-      "Eliminar transacción",
-      "¿Seguro que quieres eliminar esta transacción? Esta acción no se puede deshacer.",
+      t("transactions.delete.title"),
+      t("transactions.delete.message"),
       [
-        { text: "Cancelar", style: "cancel" },
+        { text: t("common.cancel"), style: "cancel" },
         {
-          text: "Eliminar",
+          text: t("transactions.delete.confirm"),
           style: "destructive",
           onPress: async () => {
             try {
               await deleteTransactionById(transactionId);
             } catch (deleteError) {
-              const message = deleteError instanceof Error ? deleteError.message : "No se pudo eliminar la transacción";
-              Alert.alert("Error", message);
+              const message = deleteError instanceof Error ? deleteError.message : t("transactions.errors.deleteTransactionFailed");
+              Alert.alert(t("transactions.errors.genericTitle"), message);
             }
           },
         },
@@ -520,7 +521,7 @@ export default function TransactionsScreen() {
             <View className="px-4 py-3 border-b border-app-border">
               <View className="flex-row items-center justify-between">
                 <Text className="text-lg font-semibold text-app-textPrimary">
-                  Transactions
+                  {t("transactions.title")}
                 </Text>
 
                 <Pressable
@@ -538,13 +539,15 @@ export default function TransactionsScreen() {
               {isFiltersMenuOpen ? (
                 <>
                   <View className="mt-3 relative">
-                    <Text className="text-app-textSecondary text-xs uppercase mb-2">Cuenta</Text>
+                    <Text className="text-app-textSecondary text-xs uppercase mb-2">{t("transactions.filters.account")}</Text>
                     <Pressable
                       onPress={() => setIsAccountFilterSheetOpen(true)}
                       className="bg-app-surface border border-app-border rounded-xl px-3 py-3 flex-row items-center justify-between"
                     >
                       <Text className="text-app-textPrimary text-sm">
-                        {getSelectedAccountLabel(accountOptions, selectedAccountValue)}
+                        {selectedAccountValue === ALL_ACCOUNTS_VALUE
+                          ? t("transactions.filters.allAccounts")
+                          : getSelectedAccountLabel(accountOptions, selectedAccountValue) || t("transactions.filters.allAccounts")}
                       </Text>
                       <AppIcon
                         name="ChevronDown"
@@ -555,7 +558,7 @@ export default function TransactionsScreen() {
                   </View>
 
                   <View className="mt-3">
-                    <Text className="text-app-textSecondary text-xs uppercase mb-2">Moneda de montos</Text>
+                    <Text className="text-app-textSecondary text-xs uppercase mb-2">{t("transactions.filters.amountCurrency")}</Text>
                     <View className="flex-row gap-2">
                       <Pressable
                         onPress={() => setAmountDisplayCurrency("BASE")}
@@ -572,7 +575,7 @@ export default function TransactionsScreen() {
                               : "text-app-textPrimary"
                           }`}
                         >
-                          Principal ({baseCurrencyCode})
+                          {t("transactions.filters.primaryCurrency", { code: baseCurrencyCode })}
                         </Text>
                       </Pressable>
 
@@ -688,10 +691,10 @@ export default function TransactionsScreen() {
         debugName="Transactions:AccountFilter"
       >
         <View className="px-5 pt-4 pb-2 border-b border-app-border">
-          <Text className="text-app-textPrimary text-lg font-semibold">Selecciona cuenta</Text>
+          <Text className="text-app-textPrimary text-lg font-semibold">{t("transactions.filters.selectAccount")}</Text>
         </View>
         <ScrollView nestedScrollEnabled keyboardShouldPersistTaps="handled">
-          {[{ value: ALL_ACCOUNTS_VALUE, label: "Todas las cuentas" }, ...accountOptions].map((option) => {
+          {[{ value: ALL_ACCOUNTS_VALUE, label: t("transactions.filters.allAccounts") }, ...accountOptions].map((option) => {
             const isSelected = option.value === selectedAccountValue;
             return (
               <Pressable

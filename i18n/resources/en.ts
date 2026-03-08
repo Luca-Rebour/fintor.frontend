@@ -4,6 +4,15 @@ const en = {
     done: "Done",
     cancel: "Cancel",
     viewAll: "View All",
+    iconPicker: {
+      selectedIcon: "Selected icon",
+      searchPlaceholder: "Search icon by name",
+      icons: "Icons",
+      color: "Color",
+      noIconsFound: "No icons found",
+      openSelector: "Open icon selector",
+      selectIconTitle: "Select icon",
+    },
   },
   tabs: {
     home: "Home",
@@ -76,6 +85,7 @@ const en = {
     },
   },
   profile: {
+    title: "Profile",
     errors: {
       failedToLoad: "Failed to load profile",
       noData: "No profile data available",
@@ -108,11 +118,15 @@ const en = {
     goals: {
       title: "Goals",
       seeAll: "See all",
+      emptyTitle: "No active goals",
+      emptySubtitle: "You have not created any goals yet.",
     },
     expenseChart: {
       title: "Expenses by category",
       noExpensesInPeriod: "No expenses in this period.",
       total: "Total",
+      showLess: "Show less",
+      showAll: "Expand and view all",
       filters: {
         week1: "1 week",
         month1: "1 month",
@@ -125,6 +139,41 @@ const en = {
     title: "Financial Goals",
     errors: {
       failedToLoad: "Failed to load goals",
+      failedToCreateTarget: "Could not create target",
+      genericTitle: "Error",
+    },
+    actions: {
+      createTarget: "Create target",
+    },
+    form: {
+      title: "Create target",
+      fields: {
+        title: "Title",
+        descriptionOptional: "Description (optional)",
+        targetAmount: "Target amount",
+        currentAmount: "Current amount",
+        targetDate: "Target date",
+        account: "Account",
+      },
+      placeholders: {
+        title: "Ex: Europe trip",
+        description: "Ex: Summer 2026",
+        amount: "0.00",
+        targetDate: "Select target date",
+      },
+      validation: {
+        titleRequired: "Enter a title",
+        targetAmountInvalid: "Enter a valid target amount",
+        currentAmountInvalid: "Enter a valid current amount",
+        targetDateRequired: "Select a target date",
+        accountRequired: "Select an account",
+        exchangeRateUnavailable: "Could not calculate account exchange rate",
+      },
+      actions: {
+        create: "Create target",
+        saving: "Saving...",
+      },
+      selectAccount: "Select an account",
     },
     targetsTitle: "Your Targets",
     details: {
@@ -150,6 +199,17 @@ const en = {
     recentActivity: "Recent Activity",
     transactions: "Transactions",
     noTransactions: "No transactions for this account.",
+    activeAccounts: "ACTIVE ACCOUNTS",
+    accountsCount: "{{count}} ACCOUNTS",
+    addAccountButton: "Add Account",
+    totalBalanceLabel: "TOTAL BALANCE",
+    availableLabel: "AVAILABLE",
+    errors: {
+      invalidInitialBalance: "Initial balance is invalid.",
+      exchangeRateUnavailable: "Could not get exchange rate to create the account.",
+      createAccountFailed: "Could not create account",
+      genericTitle: "Error",
+    },
   },
   recurring: {
     title: "Recurring",
@@ -208,6 +268,9 @@ const en = {
   },
   recurringAdmin: {
     title: "Manage Recurring",
+    labels: {
+      upcomingThisMonth: "UPCOMING THIS MONTH",
+    },
     errors: {
       failedToLoad: "Failed to load recurring transactions",
       couldNotSave: "Could not save recurring transaction",
@@ -272,13 +335,105 @@ const en = {
         endDate: "End date",
       },
     },
+    actions: {
+      addNewRecurring: "Add New Recurring",
+    },
   },
   transactions: {
+    title: "Transactions",
+    groups: {
+      today: "Today",
+      yesterday: "Yesterday",
+    },
     actions: {
       addIncome: "Add Income",
       addExpense: "Add Expense",
       addAccount: "Add Account",
       addCategory: "Add Category",
+      menuTitle: "Transactions",
+    },
+    filters: {
+      account: "Account",
+      amountCurrency: "Amount currency",
+      primaryCurrency: "Primary ({{code}})",
+      allAccounts: "All accounts",
+      selectAccount: "Select account",
+    },
+    createIncome: {
+      title: "Add New Income",
+      createButton: "Create Income",
+    },
+    createExpense: {
+      title: "Add New Expense",
+      createButton: "Create Expense",
+    },
+    createCategory: {
+      title: "Add Category",
+      createButton: "Create Category",
+      selectIconTitle: "Select an icon",
+    },
+    createAccount: {
+      title: "Add New Account",
+      subtitle: "Connect a new funding source to your wallet",
+      createButton: "Create Account",
+      selectCurrencyTitle: "Select Currency",
+      selectedAccountIcon: "Selected account icon",
+      accountIcons: "Account icons",
+      searchAccountIcon: "Search account icon",
+    },
+    fields: {
+      amount: "Amount",
+      descriptionOptional: "Description (optional)",
+      category: "Category",
+      account: "Account",
+      goalOptional: "Goal (optional)",
+      name: "Name",
+      accountName: "Account name",
+      initialBalance: "Initial balance",
+      currency: "Currency",
+      description: "Description",
+      date: "Date",
+      time: "Time",
+    },
+    placeholders: {
+      amount: "0.00",
+      addDetails: "Add details",
+      categoryName: "e.g. Food, Utilities, Travel",
+      accountNameExample: "e.g. Chase Savings",
+      currencySearch: "Search by code or name",
+    },
+    labels: {
+      noGoal: "No goal",
+      noDescription: "No description",
+      otherCategory: "Other",
+      mainAccount: "Main account",
+    },
+    select: {
+      selectLabel: "Select {{label}}",
+    },
+    success: {
+      categoryCreatedTitle: "Category created",
+      categoryCreatedMessage: "Category \"{{name}}\" was created successfully.",
+    },
+    errors: {
+      genericTitle: "Error",
+      failedToLoad: "Failed to load transactions",
+      exchangeRateForTransaction: "Could not get exchange rate for this transaction.",
+      exchangeRateForAccount: "Could not get exchange rate to create the account.",
+      invalidInitialBalance: "Initial balance is invalid.",
+      createAccountFailed: "Could not create account",
+      createCategoryFailed: "Could not create category",
+      deleteTransactionFailed: "Could not delete transaction",
+      invalidAmount: "Enter a valid amount greater than 0",
+      categoryNameRequired: "Enter a category name",
+      accountNameRequired: "Enter an account name",
+      initialBalanceRequired: "Enter a valid initial balance",
+      noCurrenciesFound: "No currencies found",
+    },
+    delete: {
+      title: "Delete transaction",
+      message: "Are you sure you want to delete this transaction? This action cannot be undone.",
+      confirm: "Delete",
     },
     summary: {
       monthlySpending: "Monthly Spending",

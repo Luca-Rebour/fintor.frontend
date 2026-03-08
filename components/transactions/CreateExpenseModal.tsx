@@ -1,5 +1,6 @@
 import { APP_COLORS } from "../../constants/colors";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -24,7 +25,7 @@ type GoalOption = {
 };
 
 const NO_GOAL_VALUE = "";
-const NO_GOAL_LABEL = "No goal";
+const NO_GOAL_LABEL = "";
 
 type CreateExpenseModalProps = {
   visible: boolean;
@@ -83,6 +84,7 @@ export function CreateExpenseModal({
   onClose,
   onCreateExpense,
 }: CreateExpenseModalProps) {
+  const { t } = useTranslation();
   const [accountOptions, setAccountOptions] = useState<AccountOption[]>([]);
   const [categoryOptions, setCategoryOptions] = useState<CategoryOption[]>([]);
   const [goalOptions, setGoalOptions] = useState<GoalOption[]>([{ value: NO_GOAL_VALUE, label: NO_GOAL_LABEL }]);
@@ -110,10 +112,10 @@ export function CreateExpenseModal({
 
   const activeSelectLabel =
     activeSelectType === "category"
-      ? "Category"
+      ? t("transactions.fields.category")
       : activeSelectType === "account"
-        ? "Account"
-        : "Goal";
+        ? t("transactions.fields.account")
+        : t("transactions.fields.goalOptional");
 
   useEffect(() => {
     if (!visible) {
@@ -148,7 +150,7 @@ export function CreateExpenseModal({
       );
 
       const goalSelectOptions: GoalOption[] = [
-        { value: NO_GOAL_VALUE, label: NO_GOAL_LABEL },
+        { value: NO_GOAL_VALUE, label: t("transactions.labels.noGoal") },
         ...goalsData.map((goalItem) => ({
           value: goalItem.id,
           label: goalItem.title,
@@ -188,7 +190,7 @@ export function CreateExpenseModal({
   function handleCreate() {
     const parsedAmount = Number(amount.replace(",", "."));
     if (!Number.isFinite(parsedAmount) || parsedAmount <= 0) {
-      setAmountError("Enter a valid amount greater than 0");
+      setAmountError(t("transactions.errors.invalidAmount"));
       return;
     }
 
@@ -216,7 +218,7 @@ export function CreateExpenseModal({
       >
           <View className="h-full max-h-[92%] rounded-t-3xl border-t border-app-border bg-app-bgSecondary">
             <View className="px-5 pt-4 pb-3 border-b border-app-border flex-row items-center justify-between">
-              <Text className="text-app-textPrimary text-xl font-bold">Add New Expense</Text>
+              <Text className="text-app-textPrimary text-xl font-bold">{t("transactions.createExpense.title")}</Text>
               <Pressable onPress={handleClose} className="p-1">
                 <AppIcon name="X" size={18} color={APP_COLORS.textSecondary} />
               </Pressable>
@@ -228,7 +230,7 @@ export function CreateExpenseModal({
               keyboardShouldPersistTaps="handled"
               keyboardDismissMode="on-drag"
             >
-            <Text className="text-app-textSecondary text-xs uppercase mb-2">Amount</Text>
+            <Text className="text-app-textSecondary text-xs uppercase mb-2">{t("transactions.fields.amount")}</Text>
             <TextInput
               value={amount}
               onChangeText={(text) => {
@@ -238,35 +240,35 @@ export function CreateExpenseModal({
                 }
               }}
               keyboardType="decimal-pad"
-              placeholder="0.00"
+              placeholder={t("transactions.placeholders.amount")}
               placeholderTextColor={APP_COLORS.textMuted}
               className="bg-app-surface border border-app-border rounded-xl px-3 py-3 text-app-textPrimary"
             />
             {amountError ? <Text className="text-red-400 text-xs mt-2">{amountError}</Text> : null}
 
-            <Text className="text-app-textSecondary text-xs uppercase mt-3 mb-2">Description (optional)</Text>
+            <Text className="text-app-textSecondary text-xs uppercase mt-3 mb-2">{t("transactions.fields.descriptionOptional")}</Text>
             <TextInput
               value={description}
               onChangeText={setDescription}
-              placeholder="Add details"
+              placeholder={t("transactions.placeholders.addDetails")}
               placeholderTextColor={APP_COLORS.textMuted}
               className="bg-app-surface border border-app-border rounded-xl px-3 py-3 text-app-textPrimary"
             />
 
             <SelectField
-              label="Category"
+              label={t("transactions.fields.category")}
               value={getOptionLabel(categoryOptions, category)}
               onPress={() => setActiveSelectType("category")}
             />
 
             <SelectField
-              label="Account"
+              label={t("transactions.fields.account")}
               value={getSelectedAccountLabel(accountOptions, account)}
               onPress={() => setActiveSelectType("account")}
             />
 
             <SelectField
-              label="Goal (optional)"
+              label={t("transactions.fields.goalOptional")}
               value={getOptionLabel(goalOptions, goal)}
               onPress={() => setActiveSelectType("goal")}
             />
@@ -277,7 +279,7 @@ export function CreateExpenseModal({
                 onPress={handleCreate}
                 className="items-center justify-center py-4 rounded-2xl bg-app-danger"
               >
-                <Text className="text-white text-base font-bold">Create Expense</Text>
+                <Text className="text-white text-base font-bold">{t("transactions.createExpense.createButton")}</Text>
               </Pressable>
             </View>
           </View>
@@ -291,7 +293,7 @@ export function CreateExpenseModal({
         stackBehavior="push"
       >
         <View className="px-5 pt-4 pb-2 border-b border-app-border">
-          <Text className="text-app-textPrimary text-lg font-semibold">Select {activeSelectLabel}</Text>
+          <Text className="text-app-textPrimary text-lg font-semibold">{t("transactions.select.selectLabel", { label: activeSelectLabel })}</Text>
         </View>
         <ScrollView className="max-h-full" nestedScrollEnabled keyboardShouldPersistTaps="handled">
           {activeSelectOptions.map((option) => {

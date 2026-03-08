@@ -1,5 +1,6 @@
 import { APP_COLORS } from "../../constants/colors";
 import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
 	ActivityIndicator,
 	FlatList,
@@ -38,6 +39,7 @@ export function CreateAccountModal({
 	onClose,
 	onCreateAccount,
 }: CreateAccountModalProps) {
+	const { t } = useTranslation();
 	const [accountName, setAccountName] = useState("");
 	const [initialBalance, setInitialBalance] = useState("");
 	const [currencyCode, setCurrencyCode] = useState("USD");
@@ -105,12 +107,12 @@ export function CreateAccountModal({
 		const normalizedName = accountName.trim();
 
 		if (!normalizedName) {
-			setNameError("Ingresa un nombre de cuenta");
+			setNameError(t("transactions.errors.accountNameRequired"));
 			return;
 		}
 
 		if (!Number.isFinite(parsedBalance) || parsedBalance < 0) {
-			setBalanceError("Ingresa un saldo inicial válido");
+			setBalanceError(t("transactions.errors.initialBalanceRequired"));
 			return;
 		}
 
@@ -140,9 +142,9 @@ export function CreateAccountModal({
 				keyboardVerticalOffset={20}
 			>
 					<View className="h-full max-h-[92%] rounded-t-3xl border-t border-app-border bg-app-bgSecondary px-5 pt-3 pb-6">
-						<Text className="text-3xl font-bold text-app-textPrimary">Add New Account</Text>
+						<Text className="text-3xl font-bold text-app-textPrimary">{t("transactions.createAccount.title")}</Text>
 						<Text className="mt-1 text-sm text-app-textSecondary">
-							Connect a new funding source to your wallet
+							{t("transactions.createAccount.subtitle")}
 						</Text>
 
 						<FlatList
@@ -155,7 +157,7 @@ export function CreateAccountModal({
 							ListHeaderComponent={
 								<>
 							<View className="mt-2">
-								<Text className="mb-2 text-xs uppercase text-app-primary">Account Name</Text>
+								<Text className="mb-2 text-xs uppercase text-app-primary">{t("transactions.fields.accountName")}</Text>
 								<View className="flex-row items-center rounded-2xl border border-app-border bg-app-surface px-3 py-3">
 									<AppIcon name="House" size={17} color={APP_COLORS.textSecondary} />
 									<TextInput
@@ -164,7 +166,7 @@ export function CreateAccountModal({
 											setAccountName(value);
 											if (nameError) setNameError("");
 										}}
-										placeholder="e.g. Chase Savings"
+										placeholder={t("transactions.placeholders.accountNameExample")}
 										placeholderTextColor={APP_COLORS.textMuted}
 										className="ml-3 flex-1 text-base text-app-textPrimary"
 									/>
@@ -173,7 +175,7 @@ export function CreateAccountModal({
 							</View>
 
 							<View className="mt-4">
-								<Text className="mb-2 text-xs uppercase text-app-primary">Initial Balance</Text>
+								<Text className="mb-2 text-xs uppercase text-app-primary">{t("transactions.fields.initialBalance")}</Text>
 								<View className="flex-row items-center rounded-2xl border border-app-border bg-app-surface px-3 py-3">
 									<AppIcon name="DollarSign" size={17} color={APP_COLORS.actionPrimary} />
 									<TextInput
@@ -183,7 +185,7 @@ export function CreateAccountModal({
 											if (balanceError) setBalanceError("");
 										}}
 										keyboardType="decimal-pad"
-										placeholder="0.00"
+										placeholder={t("transactions.placeholders.amount")}
 										placeholderTextColor={APP_COLORS.textMuted}
 										className="ml-3 flex-1 text-base text-app-textPrimary"
 									/>
@@ -192,7 +194,7 @@ export function CreateAccountModal({
 							</View>
 
 							<View className="mt-4 z-50" style={{ elevation: 30 }}>
-								<Text className="mb-2 text-xs uppercase text-app-primary">Currency</Text>
+								<Text className="mb-2 text-xs uppercase text-app-primary">{t("transactions.fields.currency")}</Text>
 								<Pressable
 									onPress={() => setIsCurrencySelectorOpen(true)}
 									className="bg-app-surface border border-app-border rounded-2xl px-3 py-3 flex-row items-center justify-between"
@@ -207,12 +209,12 @@ export function CreateAccountModal({
 								selectedColor={APP_COLORS.actionPrimary}
 								onChangeIcon={setSelectedIcon}
 								onChangeColor={() => {}}
-								selectedIconLabel="Selected account icon"
-								searchPlaceholder="Search account icon"
-								iconSectionLabel="Account icons"
+								selectedIconLabel={t("transactions.createAccount.selectedAccountIcon")}
+								searchPlaceholder={t("transactions.createAccount.searchAccountIcon")}
+								iconSectionLabel={t("transactions.createAccount.accountIcons")}
 								showColorSection={false}
 								useBottomSheetSelector
-								bottomSheetTitle="Select account icon"
+								bottomSheetTitle={t("transactions.createAccount.selectedAccountIcon")}
 								bottomSheetSnapPoints={["78%"]}
 							/>
 
@@ -225,7 +227,7 @@ export function CreateAccountModal({
 									<ActivityIndicator color="#061324" />
 								) : (
 									<>
-										<Text className="text-base font-bold text-[#061324]">Create Account</Text>
+										<Text className="text-base font-bold text-[#061324]">{t("transactions.createAccount.createButton")}</Text>
 										<AppIcon name="ArrowRight" size={18} color="#061324" style={{ marginLeft: 8 }} />
 									</>
 								)}
@@ -244,13 +246,13 @@ export function CreateAccountModal({
 				stackBehavior="push"
 			>
 				<View className="px-5 pt-4 pb-3 border-b border-app-border">
-					<Text className="text-app-textPrimary text-lg font-semibold">Select Currency</Text>
+					<Text className="text-app-textPrimary text-lg font-semibold">{t("transactions.createAccount.selectCurrencyTitle")}</Text>
 					<View className="mt-3 flex-row items-center rounded-xl border border-app-border bg-app-bgSecondary px-3 py-2">
 						<AppIcon name="Search" size={15} color={APP_COLORS.textSecondary} />
 						<TextInput
 							value={currencySearchText}
 							onChangeText={setCurrencySearchText}
-							placeholder="Buscar por codigo o nombre"
+							placeholder={t("transactions.placeholders.currencySearch")}
 							placeholderTextColor={APP_COLORS.textMuted}
 							className="ml-2 flex-1 text-sm text-app-textPrimary"
 							autoCapitalize="none"
@@ -272,7 +274,7 @@ export function CreateAccountModal({
 						windowSize={6}
 						ListEmptyComponent={
 							<View className="px-3 py-5">
-								<Text className="text-center text-sm text-app-textSecondary">No se encontraron monedas</Text>
+								<Text className="text-center text-sm text-app-textSecondary">{t("transactions.errors.noCurrenciesFound")}</Text>
 							</View>
 						}
 						renderItem={({ item }) => {

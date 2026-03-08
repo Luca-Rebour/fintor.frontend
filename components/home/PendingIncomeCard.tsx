@@ -1,4 +1,5 @@
 import { APP_COLORS } from "../../constants/colors";
+import { useTranslation } from "react-i18next";
 import { Pressable, Text, View } from "react-native";
 import { RecurringPendingApprovalApiDTO } from "../../types/recurring";
 import { AppIcon } from "../shared/AppIcon";
@@ -25,6 +26,8 @@ function formatDate(input: string): string {
 }
 
 export function PendingIncomeCard({ pendingTransactions, onConfirm, isSubmitting = false }: PendingIncomeCardProps) {
+  const { t } = useTranslation();
+
   if (!pendingTransactions.length) {
     return null;
   }
@@ -36,7 +39,7 @@ export function PendingIncomeCard({ pendingTransactions, onConfirm, isSubmitting
   return (
     <View className="mb-6">
       <View className="mb-3 flex-row items-center justify-between">
-        <Text className="text-xs font-semibold tracking-widest text-app-textSecondary">PENDING TRANSACTIONS</Text>
+        <Text className="text-xs font-semibold tracking-widest text-app-textSecondary">{t("recurring.labels.pendingApproval")}</Text>
         <View className="rounded-full bg-app-accentBlue/20 px-2.5 py-1">
           <Text className="text-[10px] font-bold text-app-accentBlue">{pendingTransactions.length}</Text>
         </View>
@@ -60,7 +63,9 @@ export function PendingIncomeCard({ pendingTransactions, onConfirm, isSubmitting
 
               <View className="flex-1">
                 <Text className="text-sm font-semibold text-white">
-                  Pending {topPendingTransaction.transactionType === 0 ? "Income" : "Expense"}
+                  {`${t("recurring.labels.pendingApproval")} ${
+                    topPendingTransaction.transactionType === 0 ? t("recurring.type.income") : t("recurring.type.expense")
+                  }`}
                 </Text>
                 <Text className="text-xs text-app-textSecondary" numberOfLines={1}>
                   {topPendingTransaction.description}
@@ -78,7 +83,7 @@ export function PendingIncomeCard({ pendingTransactions, onConfirm, isSubmitting
                 className="rounded-full bg-app-accentBlue px-5 py-2"
               >
                 <Text className="text-sm font-semibold text-white">
-                  {isSubmitting ? "..." : "Confirm"}
+                  {isSubmitting ? "..." : t("recurring.actions.confirm")}
                 </Text>
               </Pressable>
 

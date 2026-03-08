@@ -317,7 +317,7 @@ export default function RecurringAdminScreen() {
           </Pressable>
         </View>
 
-        <Text className="mb-3 text-xs font-semibold tracking-widest text-app-textMuted">UPCOMING THIS MONTH</Text>
+        <Text className="mb-3 text-xs font-semibold tracking-widest text-app-textMuted">{t("recurringAdmin.labels.upcomingThisMonth")}</Text>
 
         {filteredTransactions.length ? (
           filteredTransactions.map((transaction) => (
@@ -341,7 +341,7 @@ export default function RecurringAdminScreen() {
           <View className="mr-2 h-5 w-5 items-center justify-center rounded-full border border-[#BFDBFE]">
             <AppIcon name="Plus" color="#DBEAFE" size={12} />
           </View>
-          <Text className="text-base font-semibold text-white">Add New Recurring</Text>
+          <Text className="text-base font-semibold text-white">{t("recurringAdmin.actions.addNewRecurring")}</Text>
         </Pressable>
       </ScrollView>
 

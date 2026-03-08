@@ -1,5 +1,6 @@
 import { APP_COLORS } from "../../constants/colors";
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { AppBottomSheetModal } from "./AppBottomSheetModal";
 import { AppIcon } from "./AppIcon";
@@ -94,21 +95,28 @@ export function IconColorPicker({
   selectedColor,
   onChangeIcon,
   onChangeColor,
-  selectedIconLabel = "Selected icon",
-  searchPlaceholder = "Buscar icono por nombre",
-  iconSectionLabel = "Icons",
-  colorSectionLabel = "Color",
+  selectedIconLabel,
+  searchPlaceholder,
+  iconSectionLabel,
+  colorSectionLabel,
   showColorSection = true,
   iconListMaxHeight = 260,
   onIconListTouchStart,
   onIconListTouchEnd,
   useBottomSheetSelector = false,
   bottomSheetSnapPoints = ["72%"],
-  bottomSheetTitle = "Select icon",
+  bottomSheetTitle,
 }: IconColorPickerProps) {
+  const { t } = useTranslation();
   const [iconSearch, setIconSearch] = useState("");
   const [visibleIconCount, setVisibleIconCount] = useState(INITIAL_ICONS_BATCH);
   const [isIconSelectorOpen, setIsIconSelectorOpen] = useState(false);
+
+  const resolvedSelectedIconLabel = selectedIconLabel ?? t("common.iconPicker.selectedIcon");
+  const resolvedSearchPlaceholder = searchPlaceholder ?? t("common.iconPicker.searchPlaceholder");
+  const resolvedIconSectionLabel = iconSectionLabel ?? t("common.iconPicker.icons");
+  const resolvedColorSectionLabel = colorSectionLabel ?? t("common.iconPicker.color");
+  const resolvedBottomSheetTitle = bottomSheetTitle ?? t("common.iconPicker.selectIconTitle");
 
   // Lazy load de iconos
   const iconOptions = useMemo(() => getIconOptions(), []);
@@ -149,14 +157,14 @@ export function IconColorPicker({
           <TextInput
             value={iconSearch}
             onChangeText={setIconSearch}
-            placeholder={searchPlaceholder}
+            placeholder={resolvedSearchPlaceholder}
             placeholderTextColor={APP_COLORS.textMuted}
             autoCapitalize="none"
             className="ml-2 flex-1 text-sm text-app-textPrimary"
           />
         </View>
 
-        <Text className="text-app-textSecondary text-xs uppercase mt-4 mb-2">{iconSectionLabel}</Text>
+        <Text className="text-app-textSecondary text-xs uppercase mt-4 mb-2">{resolvedIconSectionLabel}</Text>
 
         <View style={iconListContainerStyle}>
           <ScrollView
@@ -204,7 +212,7 @@ export function IconColorPicker({
             <View className="flex-row flex-wrap gap-2">
               {visibleIcons.length === 0 ? (
                 <View className="w-full py-6">
-                  <Text className="text-center text-sm text-app-textSecondary">No se encontraron iconos</Text>
+                  <Text className="text-center text-sm text-app-textSecondary">{t("common.iconPicker.noIconsFound")}</Text>
                 </View>
               ) : (
                 visibleIcons.map((iconName) => (
@@ -231,7 +239,7 @@ export function IconColorPicker({
   return (
     <>
       <View className="mt-4 flex-row items-center justify-between">
-        <Text className="text-app-textSecondary text-xs uppercase">{selectedIconLabel}</Text>
+        <Text className="text-app-textSecondary text-xs uppercase">{resolvedSelectedIconLabel}</Text>
         <View className="flex-row items-center rounded-xl border border-app-border bg-app-surface px-3 py-2">
           <AppIcon name={selectedIcon} size={16} color={APP_COLORS.actionPrimary} />
           <Text className="ml-2 text-xs text-app-textPrimary">{selectedIcon}</Text>
@@ -243,7 +251,7 @@ export function IconColorPicker({
           onPress={() => setIsIconSelectorOpen(true)}
           className="mt-3 rounded-xl border border-app-border bg-app-surface px-3 py-3 flex-row items-center justify-between"
         >
-          <Text className="text-sm text-app-textPrimary">Open icon selector</Text>
+          <Text className="text-sm text-app-textPrimary">{t("common.iconPicker.openSelector")}</Text>
           <AppIcon name="ChevronDown" size={16} color={APP_COLORS.textSecondary} />
         </Pressable>
       ) : (
@@ -252,7 +260,7 @@ export function IconColorPicker({
 
       {showColorSection ? (
         <>
-          <Text className="text-app-textSecondary text-xs uppercase mt-4 mb-2">{colorSectionLabel}</Text>
+          <Text className="text-app-textSecondary text-xs uppercase mt-4 mb-2">{resolvedColorSectionLabel}</Text>
           <View className="rounded-xl border border-app-border bg-app-surface p-3 mb-2">
             <View className="flex-row flex-wrap gap-3">
               {ICON_COLOR_OPTIONS.map((color, index) => {
@@ -283,7 +291,7 @@ export function IconColorPicker({
         stackBehavior="push"
       >
         <View className="px-5 pt-4 pb-2 border-b border-app-border">
-          <Text className="text-app-textPrimary text-lg font-semibold">{bottomSheetTitle}</Text>
+          <Text className="text-app-textPrimary text-lg font-semibold">{resolvedBottomSheetTitle}</Text>
         </View>
         <View className="px-5 pb-4 flex-1">{renderIconSelectorContent()}</View>
       </AppBottomSheetModal>
