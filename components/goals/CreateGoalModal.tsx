@@ -351,6 +351,9 @@ export function CreateGoalModal({
                       }}
                       selectedIconLabel="Ícono seleccionado"
                       colorSectionLabel="Color"
+                      useBottomSheetSelector
+                      bottomSheetTitle="Selecciona un icono"
+                      bottomSheetSnapPoints={["78%"]}
                     />
                   </View>
                 </>

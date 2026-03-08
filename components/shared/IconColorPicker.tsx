@@ -1,6 +1,7 @@
 import { APP_COLORS } from "../../constants/colors";
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { AppBottomSheetModal } from "./AppBottomSheetModal";
 import { AppIcon } from "./AppIcon";
 
 // Lazy load de iconos - solo se ejecuta cuando se necesita
@@ -83,6 +84,9 @@ type IconColorPickerProps = {
   iconListMaxHeight?: number;
   onIconListTouchStart?: () => void;
   onIconListTouchEnd?: () => void;
+  useBottomSheetSelector?: boolean;
+  bottomSheetSnapPoints?: Array<string | number>;
+  bottomSheetTitle?: string;
 };
 
 export function IconColorPicker({
@@ -98,9 +102,13 @@ export function IconColorPicker({
   iconListMaxHeight = 260,
   onIconListTouchStart,
   onIconListTouchEnd,
+  useBottomSheetSelector = false,
+  bottomSheetSnapPoints = ["72%"],
+  bottomSheetTitle = "Select icon",
 }: IconColorPickerProps) {
   const [iconSearch, setIconSearch] = useState("");
   const [visibleIconCount, setVisibleIconCount] = useState(INITIAL_ICONS_BATCH);
+  const [isIconSelectorOpen, setIsIconSelectorOpen] = useState(false);
 
   // Lazy load de iconos
   const iconOptions = useMemo(() => getIconOptions(), []);
@@ -129,6 +137,97 @@ export function IconColorPicker({
     setVisibleIconCount(INITIAL_ICONS_BATCH);
   }, [iconSearch]);
 
+  function renderIconSelectorContent() {
+    const iconListContainerStyle = useBottomSheetSelector
+      ? { flex: 1, minHeight: 0 }
+      : { maxHeight: iconListMaxHeight };
+
+    return (
+      <>
+        <View className="mt-3 rounded-xl border border-app-border bg-app-surface px-3 py-2 flex-row items-center">
+          <AppIcon name="Search" size={15} color={APP_COLORS.textSecondary} />
+          <TextInput
+            value={iconSearch}
+            onChangeText={setIconSearch}
+            placeholder={searchPlaceholder}
+            placeholderTextColor={APP_COLORS.textMuted}
+            autoCapitalize="none"
+            className="ml-2 flex-1 text-sm text-app-textPrimary"
+          />
+        </View>
+
+        <Text className="text-app-textSecondary text-xs uppercase mt-4 mb-2">{iconSectionLabel}</Text>
+
+        <View style={iconListContainerStyle}>
+          <ScrollView
+            style={useBottomSheetSelector ? { flex: 1 } : undefined}
+            nestedScrollEnabled
+            showsVerticalScrollIndicator
+            keyboardShouldPersistTaps="handled"
+            onTouchStart={() => {
+              onIconListTouchStart?.();
+            }}
+            onTouchCancel={() => {
+              onIconListTouchEnd?.();
+            }}
+            onTouchEnd={() => {
+              onIconListTouchEnd?.();
+            }}
+            onScrollBeginDrag={() => {
+              onIconListTouchStart?.();
+            }}
+            onScrollEndDrag={() => {
+              onIconListTouchEnd?.();
+            }}
+            onMomentumScrollBegin={() => {
+              onIconListTouchStart?.();
+            }}
+            onMomentumScrollEnd={() => {
+              onIconListTouchEnd?.();
+            }}
+            onScroll={({ nativeEvent }) => {
+              const { layoutMeasurement, contentOffset, contentSize } = nativeEvent;
+              const isCloseToBottom =
+                layoutMeasurement.height + contentOffset.y >= contentSize.height - 100;
+              if (isCloseToBottom) {
+                setVisibleIconCount((current) => {
+                  if (current >= filteredIcons.length) {
+                    return current;
+                  }
+                  return Math.min(current + ICONS_BATCH_STEP, filteredIcons.length);
+                });
+              }
+            }}
+            scrollEventThrottle={400}
+            contentContainerStyle={{ paddingBottom: 6 }}
+          >
+            <View className="flex-row flex-wrap gap-2">
+              {visibleIcons.length === 0 ? (
+                <View className="w-full py-6">
+                  <Text className="text-center text-sm text-app-textSecondary">No se encontraron iconos</Text>
+                </View>
+              ) : (
+                visibleIcons.map((iconName) => (
+                  <IconItem
+                    key={iconName}
+                    iconName={iconName}
+                    isSelected={iconName === selectedIcon}
+                    onPress={() => {
+                      handleIconPress(iconName);
+                      if (useBottomSheetSelector) {
+                        setIsIconSelectorOpen(false);
+                      }
+                    }}
+                  />
+                ))
+              )}
+            </View>
+          </ScrollView>
+        </View>
+      </>
+    );
+  }
+
   return (
     <>
       <View className="mt-4 flex-row items-center justify-between">
@@ -139,80 +238,17 @@ export function IconColorPicker({
         </View>
       </View>
 
-      <View className="mt-3 rounded-xl border border-app-border bg-app-surface px-3 py-2 flex-row items-center">
-        <AppIcon name="Search" size={15} color={APP_COLORS.textSecondary} />
-        <TextInput
-          value={iconSearch}
-          onChangeText={setIconSearch}
-          placeholder={searchPlaceholder}
-          placeholderTextColor={APP_COLORS.textMuted}
-          autoCapitalize="none"
-          className="ml-2 flex-1 text-sm text-app-textPrimary"
-        />
-      </View>
-
-      <Text className="text-app-textSecondary text-xs uppercase mt-4 mb-2">{iconSectionLabel}</Text>
-
-      <View style={{ maxHeight: iconListMaxHeight }}>
-        <ScrollView
-          nestedScrollEnabled
-          showsVerticalScrollIndicator
-          keyboardShouldPersistTaps="handled"
-          onTouchStart={() => {
-            onIconListTouchStart?.();
-          }}
-          onTouchCancel={() => {
-            onIconListTouchEnd?.();
-          }}
-          onTouchEnd={() => {
-            onIconListTouchEnd?.();
-          }}
-          onScrollBeginDrag={() => {
-            onIconListTouchStart?.();
-          }}
-          onScrollEndDrag={() => {
-            onIconListTouchEnd?.();
-          }}
-          onMomentumScrollBegin={() => {
-            onIconListTouchStart?.();
-          }}
-          onMomentumScrollEnd={() => {
-            onIconListTouchEnd?.();
-          }}
-          onScroll={({ nativeEvent }) => {
-            const { layoutMeasurement, contentOffset, contentSize } = nativeEvent;
-            const isCloseToBottom =
-              layoutMeasurement.height + contentOffset.y >= contentSize.height - 100;
-            if (isCloseToBottom) {
-              setVisibleIconCount((current) => {
-                if (current >= filteredIcons.length) {
-                  return current;
-                }
-                return Math.min(current + ICONS_BATCH_STEP, filteredIcons.length);
-              });
-            }
-          }}
-          scrollEventThrottle={400}
-          contentContainerStyle={{ paddingBottom: 6 }}
+      {useBottomSheetSelector ? (
+        <Pressable
+          onPress={() => setIsIconSelectorOpen(true)}
+          className="mt-3 rounded-xl border border-app-border bg-app-surface px-3 py-3 flex-row items-center justify-between"
         >
-          <View className="flex-row flex-wrap gap-2">
-            {visibleIcons.length === 0 ? (
-              <View className="w-full py-6">
-                <Text className="text-center text-sm text-app-textSecondary">No se encontraron iconos</Text>
-              </View>
-            ) : (
-              visibleIcons.map((iconName) => (
-                <IconItem
-                  key={iconName}
-                  iconName={iconName}
-                  isSelected={iconName === selectedIcon}
-                  onPress={() => handleIconPress(iconName)}
-                />
-              ))
-            )}
-          </View>
-        </ScrollView>
-      </View>
+          <Text className="text-sm text-app-textPrimary">Open icon selector</Text>
+          <AppIcon name="ChevronDown" size={16} color={APP_COLORS.textSecondary} />
+        </Pressable>
+      ) : (
+        renderIconSelectorContent()
+      )}
 
       {showColorSection ? (
         <>
@@ -238,6 +274,19 @@ export function IconColorPicker({
           </View>
         </>
       ) : null}
+
+      <AppBottomSheetModal
+        visible={useBottomSheetSelector && isIconSelectorOpen}
+        onClose={() => setIsIconSelectorOpen(false)}
+        snapPoints={bottomSheetSnapPoints}
+        debugName="IconColorPickerSelect"
+        stackBehavior="push"
+      >
+        <View className="px-5 pt-4 pb-2 border-b border-app-border">
+          <Text className="text-app-textPrimary text-lg font-semibold">{bottomSheetTitle}</Text>
+        </View>
+        <View className="px-5 pb-4 flex-1">{renderIconSelectorContent()}</View>
+      </AppBottomSheetModal>
     </>
   );
 }
