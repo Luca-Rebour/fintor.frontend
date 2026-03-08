@@ -89,7 +89,7 @@ export default function AccountsScreen() {
       const normalizedInitialBalance = Number(payload.initialBalance);
 
       if (!Number.isFinite(normalizedInitialBalance)) {
-        Alert.alert("Error", "El saldo inicial no es válido.");
+        Alert.alert(t("accounts.errors.genericTitle"), t("accounts.errors.invalidInitialBalance"));
         return;
       }
 
@@ -101,7 +101,7 @@ export default function AccountsScreen() {
         const resolvedRate = await getExchangeRateForCurrencies(accountCurrencyCode, userBaseCurrencyCode);
 
         if (resolvedRate === null) {
-          Alert.alert("Error", "No se pudo obtener el tipo de cambio para crear la cuenta.");
+          Alert.alert(t("accounts.errors.genericTitle"), t("accounts.errors.exchangeRateUnavailable"));
           return;
         }
 
@@ -118,8 +118,8 @@ export default function AccountsScreen() {
       setIsCreateAccountModalVisible(false);
       await loadAccounts(false);
     } catch (createError) {
-      const message = createError instanceof Error ? createError.message : "No se pudo crear la cuenta";
-      Alert.alert("Error", message);
+      const message = createError instanceof Error ? createError.message : t("accounts.errors.createAccountFailed");
+      Alert.alert(t("accounts.errors.genericTitle"), message);
     }
   }
 
@@ -147,8 +147,8 @@ export default function AccountsScreen() {
           ListHeaderComponent={
             <>
               <AccountsSectionHeader
-                activeAccountsLabel="ACTIVE ACCOUNTS"
-                accountsCountLabel={`${decoratedAccounts.length} ACCOUNTS`}
+                activeAccountsLabel={t("accounts.activeAccounts")}
+                accountsCountLabel={t("accounts.accountsCount", { count: decoratedAccounts.length })}
               />
             </>
           }
@@ -158,15 +158,15 @@ export default function AccountsScreen() {
             </View>
           }
           ListFooterComponent={
-            <ConnectBankAccountButton label="Add Account" onPress={() => setIsCreateAccountModalVisible(true)} />
+            <ConnectBankAccountButton label={t("accounts.addAccountButton")} onPress={() => setIsCreateAccountModalVisible(true)} />
           }
           renderItem={({ item }) => (
             <AccountListCard
               iconName={item.iconName}
               accountName={item.label}
               subtitle={item.subtitle}
-              totalBalanceLabel="TOTAL BALANCE"
-              availableLabel="AVAILABLE"
+              totalBalanceLabel={t("accounts.totalBalanceLabel")}
+              availableLabel={t("accounts.availableLabel")}
               totalBalance={formatCurrency(item.totalBalance, item.currencyCode)}
               availableBalance={formatCurrency(item.availableBalance, item.currencyCode)}
               onPress={() =>

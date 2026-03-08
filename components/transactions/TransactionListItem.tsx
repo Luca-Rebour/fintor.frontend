@@ -1,6 +1,7 @@
 import { APP_COLORS } from "../../constants/colors";
 import { useMemo, useRef } from "react";
 import { Animated, PanResponder, Pressable, Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
 import { AppIcon } from "../shared/AppIcon";
 
 import { TransactionModel as TransactionDTO } from "../../types/models/transaction.model";
@@ -51,6 +52,7 @@ function TransactionExpandedDetails({
   transaction: TransactionDTO;
   onDeleteRequest?: (id: string) => void;
 }) {
+  const { t } = useTranslation();
   const txnDate = new Date(transaction.date);
 
   return (
@@ -59,10 +61,10 @@ function TransactionExpandedDetails({
         <View className="flex-row items-start justify-between">
           <View className="flex-1 pr-3">
             <Text className="text-[11px] uppercase tracking-wide text-app-textSecondary">
-              Descripción
+              {t("transactions.fields.description")}
             </Text>
             <Text className="text-sm text-app-textPrimary mt-1 leading-5">
-              {transaction.description?.trim() || "Sin descripción"}
+              {transaction.description?.trim() || t("transactions.labels.noDescription")}
             </Text>
           </View>
 
@@ -77,7 +79,7 @@ function TransactionExpandedDetails({
         <View className="mt-3 pt-3 border-t border-app-border flex-row">
           <View className="flex-1 pr-2">
             <Text className="text-[11px] uppercase tracking-wide text-app-textSecondary">
-              Fecha
+              {t("transactions.fields.date")}
             </Text>
             <Text className="text-sm text-app-textPrimary mt-1">
               {txnDate.toLocaleDateString("es-ES", {
@@ -90,7 +92,7 @@ function TransactionExpandedDetails({
 
           <View className="flex-1 pl-2">
             <Text className="text-[11px] uppercase tracking-wide text-app-textSecondary">
-              Hora
+              {t("transactions.fields.time")}
             </Text>
             <Text className="text-sm text-app-textPrimary mt-1">
               {txnDate.toLocaleTimeString("es-ES", {
@@ -116,6 +118,7 @@ export function TransactionListItem({
   displayAmount,
   displayCurrencyCode,
 }: TransactionListItemProps) {
+  const { t } = useTranslation();
   const SWIPE_TRIGGER_DISTANCE = 72;
   const translateX = useRef(new Animated.Value(0)).current;
   const deleteRevealOpacity = translateX.interpolate({
@@ -175,8 +178,8 @@ export function TransactionListItem({
   );
 
   const color = transaction.categoryColor || APP_COLORS.actionPrimary;
-  const categoryLabel = transaction.categoryName?.trim() || "Other";
-  const accountLabel = transaction.accountName?.trim() || "Main account";
+  const categoryLabel = transaction.categoryName?.trim() || t("transactions.labels.otherCategory");
+  const accountLabel = transaction.accountName?.trim() || t("transactions.labels.mainAccount");
   const currencyCode = displayCurrencyCode?.trim().toUpperCase() || transaction.currencyCode?.trim().toUpperCase() || "USD";
   const amountToDisplay = Number.isFinite(displayAmount) ? Math.abs(displayAmount as number) : Math.abs(transaction.amount);
 

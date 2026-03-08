@@ -214,12 +214,12 @@ export default function AccountDetailsScreen() {
 
   function handleRequestDeleteTransaction(transactionId: string) {
     Alert.alert(
-      "Eliminar transacción",
-      "¿Seguro que quieres eliminar esta transacción? Esta acción no se puede deshacer.",
+      t("transactions.delete.title"),
+      t("transactions.delete.message"),
       [
-        { text: "Cancelar", style: "cancel" },
+        { text: t("common.cancel"), style: "cancel" },
         {
-          text: "Eliminar",
+          text: t("transactions.delete.confirm"),
           style: "destructive",
           onPress: async () => {
             try {
@@ -234,8 +234,8 @@ export default function AccountDetailsScreen() {
                   : previous,
               );
             } catch (deleteError) {
-              const message = deleteError instanceof Error ? deleteError.message : "No se pudo eliminar la transacción";
-              Alert.alert("Error", message);
+              const message = deleteError instanceof Error ? deleteError.message : t("transactions.errors.deleteTransactionFailed");
+              Alert.alert(t("transactions.errors.genericTitle"), message);
             }
           },
         },

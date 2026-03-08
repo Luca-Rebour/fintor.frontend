@@ -272,7 +272,7 @@ export function NetWorthSection({ refreshKey = 0 }: NetWorthSectionProps) {
                 className="mt-1 items-center justify-center rounded-xl border border-app-border bg-app-cardSoft px-3 py-2"
               >
                 <Text className="text-sm font-semibold text-app-primary">
-                  {isDetailsExpanded ? "Ver menos" : "Expandir y ver todas"}
+                  {isDetailsExpanded ? t("home.expenseChart.showLess") : t("home.expenseChart.showAll")}
                 </Text>
               </Pressable>
             ) : null}

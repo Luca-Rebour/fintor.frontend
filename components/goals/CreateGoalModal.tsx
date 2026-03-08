@@ -1,5 +1,6 @@
 import { APP_COLORS } from "../../constants/colors";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   FlatList,
   KeyboardAvoidingView,
@@ -50,7 +51,7 @@ function formatAccountOptionLabel(option: AccountOption) {
 
 function getSelectedAccountLabel(options: AccountOption[], value: string) {
   const selected = options.find((option) => option.value === value);
-  return selected ? formatAccountOptionLabel(selected) : "Seleccioná una cuenta";
+  return selected ? formatAccountOptionLabel(selected) : "";
 }
 
 function resolveExchangeRateFromAccount(
@@ -79,6 +80,7 @@ export function CreateGoalModal({
   onClose,
   onCreateTarget,
 }: CreateGoalModalProps) {
+  const { t } = useTranslation();
   const targetDateInitial = useMemo(() => new Date(), []);
   const targetDateMinimum = useMemo(() => new Date(1970, 0, 1), []);
   const targetDateMaximum = useMemo(() => new Date(2100, 11, 31), []);
@@ -166,17 +168,17 @@ export function CreateGoalModal({
     const parsedTargetAmount = Number(targetAmount.replace(",", "."));
     const parsedCurrentAmount = Number((currentAmount || "0").replace(",", "."));
 
-    const nextTitleError = title.trim() ? "" : "Ingresá un título";
+    const nextTitleError = title.trim() ? "" : t("goals.form.validation.titleRequired");
     const nextTargetAmountError =
       Number.isFinite(parsedTargetAmount) && parsedTargetAmount > 0
         ? ""
-        : "Ingresá un monto objetivo válido";
+        : t("goals.form.validation.targetAmountInvalid");
     const nextCurrentAmountError =
       Number.isFinite(parsedCurrentAmount) && parsedCurrentAmount >= 0
         ? ""
-        : "Ingresá un monto actual válido";
-    const nextDateError = targetDate ? "" : "Seleccioná una fecha objetivo";
-    const nextAccountError = accountId ? "" : "Seleccioná una cuenta";
+        : t("goals.form.validation.currentAmountInvalid");
+    const nextDateError = targetDate ? "" : t("goals.form.validation.targetDateRequired");
+    const nextAccountError = accountId ? "" : t("goals.form.validation.accountRequired");
 
     setTitleError(nextTitleError);
     setTargetAmountError(nextTargetAmountError);
@@ -190,7 +192,7 @@ export function CreateGoalModal({
 
     const exchangeRate = await resolveExchangeRateFromAccount(accountId, accountOptions);
     if (!exchangeRate || exchangeRate <= 0) {
-      setAccountError("No se pudo calcular el tipo de cambio de la cuenta");
+      setAccountError(t("goals.form.validation.exchangeRateUnavailable"));
       return;
     }
 
@@ -218,7 +220,7 @@ export function CreateGoalModal({
       >
           <View className="h-full max-h-[92%] rounded-t-3xl border-t border-app-border bg-app-bgSecondary">
             <View className="px-5 pt-4 pb-3 border-b border-app-border flex-row items-center justify-between">
-              <Text className="text-app-textPrimary text-xl font-bold">Crear target</Text>
+              <Text className="text-app-textPrimary text-xl font-bold">{t("goals.form.title")}</Text>
               <Pressable onPress={handleClose} className="p-1">
                 <AppIcon name="X" size={18} color={APP_COLORS.textSecondary} />
               </Pressable>
@@ -236,7 +238,7 @@ export function CreateGoalModal({
               keyboardDismissMode="on-drag"
               ListHeaderComponent={
                 <>
-                  <Text className="text-app-textSecondary text-xs uppercase mb-2">Título</Text>
+                  <Text className="text-app-textSecondary text-xs uppercase mb-2">{t("goals.form.fields.title")}</Text>
                   <TextInput
                     value={title}
                     onChangeText={(text) => {
@@ -245,22 +247,22 @@ export function CreateGoalModal({
                         setTitleError("");
                       }
                     }}
-                    placeholder="Ej: Viaje a Europa"
+                    placeholder={t("goals.form.placeholders.title")}
                     placeholderTextColor={APP_COLORS.textMuted}
                     className="bg-app-surface border border-app-border rounded-xl px-3 py-3 text-app-textPrimary"
                   />
                   {titleError ? <Text className="text-red-400 text-xs mt-2">{titleError}</Text> : null}
 
-                  <Text className="text-app-textSecondary text-xs uppercase mt-3 mb-2">Descripción (opcional)</Text>
+                  <Text className="text-app-textSecondary text-xs uppercase mt-3 mb-2">{t("goals.form.fields.descriptionOptional")}</Text>
                   <TextInput
                     value={description}
                     onChangeText={setDescription}
-                    placeholder="Ej: Summer 2026"
+                    placeholder={t("goals.form.placeholders.description")}
                     placeholderTextColor={APP_COLORS.textMuted}
                     className="bg-app-surface border border-app-border rounded-xl px-3 py-3 text-app-textPrimary"
                   />
 
-                  <Text className="text-app-textSecondary text-xs uppercase mt-3 mb-2">Monto objetivo</Text>
+                  <Text className="text-app-textSecondary text-xs uppercase mt-3 mb-2">{t("goals.form.fields.targetAmount")}</Text>
                   <TextInput
                     value={targetAmount}
                     onChangeText={(text) => {
@@ -270,13 +272,13 @@ export function CreateGoalModal({
                       }
                     }}
                     keyboardType="decimal-pad"
-                    placeholder="0.00"
+                    placeholder={t("goals.form.placeholders.amount")}
                     placeholderTextColor={APP_COLORS.textMuted}
                     className="bg-app-surface border border-app-border rounded-xl px-3 py-3 text-app-textPrimary"
                   />
                   {targetAmountError ? <Text className="text-red-400 text-xs mt-2">{targetAmountError}</Text> : null}
 
-                  <Text className="text-app-textSecondary text-xs uppercase mt-3 mb-2">Monto actual</Text>
+                  <Text className="text-app-textSecondary text-xs uppercase mt-3 mb-2">{t("goals.form.fields.currentAmount")}</Text>
                   <TextInput
                     value={currentAmount}
                     onChangeText={(text) => {
@@ -286,22 +288,22 @@ export function CreateGoalModal({
                       }
                     }}
                     keyboardType="decimal-pad"
-                    placeholder="0.00"
+                    placeholder={t("goals.form.placeholders.amount")}
                     placeholderTextColor={APP_COLORS.textMuted}
                     className="bg-app-surface border border-app-border rounded-xl px-3 py-3 text-app-textPrimary"
                   />
                   {currentAmountError ? <Text className="text-red-400 text-xs mt-2">{currentAmountError}</Text> : null}
 
                   <AppDatePicker
-                    label="Fecha objetivo"
+                    label={t("goals.form.fields.targetDate")}
                     value={targetDate}
-                    placeholder="Seleccionar fecha objetivo"
+                    placeholder={t("goals.form.placeholders.targetDate")}
                     initialDate={targetDateInitial}
                     minimumDate={targetDateMinimum}
                     maximumDate={targetDateMaximum}
-                    iosTitle="Fecha objetivo"
-                    cancelLabel="Cancelar"
-                    doneLabel="Listo"
+                    iosTitle={t("goals.form.fields.targetDate")}
+                    cancelLabel={t("common.cancel")}
+                    doneLabel={t("common.done")}
                     onChange={(nextDate) => {
                       setTargetDate(nextDate);
                       if (dateError) {
@@ -311,13 +313,13 @@ export function CreateGoalModal({
                   />
                   {dateError ? <Text className="text-red-400 text-xs mt-2">{dateError}</Text> : null}
 
-                  <Text className="text-app-textSecondary text-xs uppercase mt-3 mb-2">Cuenta</Text>
+                  <Text className="text-app-textSecondary text-xs uppercase mt-3 mb-2">{t("goals.form.fields.account")}</Text>
                   <Pressable
                     ref={accountTriggerRef}
                     onPress={openAccountSelect}
                     className="bg-app-surface border border-app-border rounded-xl px-3 py-3 flex-row items-center justify-between"
                   >
-                    <Text className="text-app-textPrimary text-sm">{getSelectedAccountLabel(accountOptions, accountId)}</Text>
+                    <Text className="text-app-textPrimary text-sm">{getSelectedAccountLabel(accountOptions, accountId) || t("goals.form.selectAccount")}</Text>
                     <AppIcon name={isAccountOpen ? "ChevronUp" : "ChevronDown"} size={16} color={APP_COLORS.textSecondary} />
                   </Pressable>
                   {accountError ? <Text className="text-red-400 text-xs mt-2">{accountError}</Text> : null}
@@ -349,10 +351,10 @@ export function CreateGoalModal({
                       onIconListTouchEnd={() => {
                         setIsFormScrollEnabled(true);
                       }}
-                      selectedIconLabel="Ícono seleccionado"
-                      colorSectionLabel="Color"
+                      selectedIconLabel={t("common.iconPicker.selectedIcon")}
+                      colorSectionLabel={t("common.iconPicker.color")}
                       useBottomSheetSelector
-                      bottomSheetTitle="Selecciona un icono"
+                      bottomSheetTitle={t("common.iconPicker.selectIconTitle")}
                       bottomSheetSnapPoints={["78%"]}
                     />
                   </View>
@@ -367,7 +369,7 @@ export function CreateGoalModal({
                 className="items-center justify-center py-4 rounded-2xl bg-app-accentBlue"
               >
                 <Text className="text-app-bgPrimary text-base font-bold">
-                  {isSubmitting ? "Guardando..." : "Crear target"}
+                  {isSubmitting ? t("goals.form.actions.saving") : t("goals.form.actions.create")}
                 </Text>
               </Pressable>
             </View>
@@ -395,7 +397,7 @@ export function CreateGoalModal({
                 className="bg-app-surface border border-app-border rounded-xl overflow-hidden"
               >
                 <View className="px-3 py-2 border-b border-app-border">
-                  <Text className="text-app-textSecondary text-xs uppercase">Seleccioná cuenta</Text>
+                  <Text className="text-app-textSecondary text-xs uppercase">{t("goals.form.selectAccount")}</Text>
                 </View>
 
                 <ScrollView nestedScrollEnabled>

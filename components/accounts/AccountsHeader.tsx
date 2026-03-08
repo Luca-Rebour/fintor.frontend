@@ -1,4 +1,5 @@
 import { APP_COLORS } from "../../constants/colors";
+import { useTranslation } from "react-i18next";
 import { Pressable, Text, View } from "react-native";
 import { AppIcon } from "../shared/AppIcon";
 
@@ -7,13 +8,15 @@ type AccountsHeaderProps = {
 };
 
 export function AccountsHeader({ onAddPress }: AccountsHeaderProps) {
+  const { t } = useTranslation();
+
   return (
     <View className="mb-5 flex-row items-center justify-between">
       <View className="flex-row items-center gap-3">
         <View className="h-9 w-9 items-center justify-center rounded-xl bg-app-surface">
           <AppIcon name="SquareStack" size={17} color={APP_COLORS.actionPrimary} />
         </View>
-        <Text className="text-2xl font-bold text-app-textPrimary">My Accounts</Text>
+        <Text className="text-2xl font-bold text-app-textPrimary">{t("accounts.title")}</Text>
       </View>
 
       <Pressable
