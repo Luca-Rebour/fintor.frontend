@@ -13,6 +13,7 @@ import {
   mapSignUpResponseDtoToModel,
 } from "../mappers/auth.mapper";
 import { AuthUserModel as User, LoginModel, SignUpModel } from "../types/models/auth.model";
+import { isApiError } from "../types/api/api-error";
 
 type AuthUserObserver = (user: User | null) => void;
 
@@ -138,11 +139,20 @@ export async function signInWithEmail(email: string, password: string): Promise<
     setAuthUser(normalizedUser);
 
     return mapLoginModelToLegacy({ ...loginModel, token });
-  } catch (error) {
+  }catch (error: unknown) {
+    if (isApiError(error)) {
+      throw error;
+    }
+
     if (error instanceof Error) {
       throw error;
     }
-    throw new Error("Network error - please check your connection");
+
+    throw {
+      message: "Network error - please check your connection",
+      status: 0,
+      code: "NETWORK_ERROR",
+    };
   }
 }
 
@@ -204,11 +214,20 @@ export async function signUpWithEmail(
     setAuthUser(normalizedUser);
 
     return mapSignUpModelToLegacy({ ...signUpModel, token });
-  } catch (error) {
+  } catch (error: unknown) {
+    if (isApiError(error)) {
+      throw error;
+    }
+
     if (error instanceof Error) {
       throw error;
     }
-    throw new Error("Network error - please check your connection");
+
+    throw {
+      message: "Network error - please check your connection",
+      status: 0,
+      code: "NETWORK_ERROR",
+    };
   }
 }
 
@@ -223,10 +242,19 @@ export async function me(): Promise<User> {
     const user = normalizeMeResponse(data);
     setAuthUser(user);
     return user;
-  } catch (error) {
+  } catch (error: unknown) {
+    if (isApiError(error)) {
+      throw error;
+    }
+
     if (error instanceof Error) {
       throw error;
     }
-    throw new Error("Network error - please check your connection");
+
+    throw {
+      message: "Network error - please check your connection",
+      status: 0,
+      code: "NETWORK_ERROR",
+    };
   }
 }

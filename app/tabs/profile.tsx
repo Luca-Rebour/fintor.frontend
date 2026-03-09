@@ -11,6 +11,7 @@ import { clearStoredJwt, getAuthUserSnapshot, subscribeToAuthUser } from "../../
 import { getProfileData } from "../../services/profile.service";
 import { ProfileData } from "../../types/profile";
 import { AuthUserModel as User } from "../../types/models/auth.model";
+import { resolveApiErrorMessage } from "../../i18n/resolve-api-error-message";
 
 export default function ProfileScreen() {
 	const { t, i18n } = useTranslation();
@@ -32,7 +33,7 @@ export default function ProfileScreen() {
 				const data = await getProfileData();
 				setProfileData(data);
 			} catch (loadError) {
-				const message = loadError instanceof Error ? loadError.message : t("profile.errors.failedToLoad");
+				const message = resolveApiErrorMessage(loadError, t, "profile.errors.failedToLoad");
 				setError(message);
 			} finally {
 				setIsLoading(false);

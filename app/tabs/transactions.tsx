@@ -33,6 +33,7 @@ import { CreateCategoryModal } from "../../components/transactions/CreateCategor
 import { TransactionListItem } from "../../components/transactions/TransactionListItem";
 import { TransactionSummaryCards } from "../../components/transactions/TransactionSummaryCards";
 import { AppBottomSheetModal } from "../../components/shared/AppBottomSheetModal";
+import { resolveApiErrorMessage } from "../../i18n/resolve-api-error-message";
 
 type TransactionGroup = {
   dateKey: string;
@@ -243,10 +244,7 @@ export default function TransactionsScreen() {
       setError("");
       await getTransactionsData();
     } catch (loadError) {
-      const message =
-        loadError instanceof Error
-          ? loadError.message
-          : t("transactions.errors.failedToLoad");
+      const message = resolveApiErrorMessage(loadError, t, "transactions.errors.failedToLoad");
       setError(message);
     } finally {
       if (showInitialLoader) {
@@ -386,21 +384,33 @@ export default function TransactionsScreen() {
   };
 
   async function handleCreateExpense(payload: CreateTransactionDTO) {
-    const toCreate = await buildTransactionPayload(payload, 1);
-    if (!toCreate) {
-      return;
-    }
+    try {
+      const toCreate = await buildTransactionPayload(payload, 1);
+      if (!toCreate) {
+        return;
+      }
 
-    await addNewTransaction(toCreate);
+      await addNewTransaction(toCreate);
+    } catch (createError) {
+      const message = resolveApiErrorMessage(createError, t, "transactions.errors.createTransactionFailed");
+      Alert.alert(t("transactions.errors.genericTitle"), message);
+      throw createError;
+    }
   }
 
   async function handleCreateIncome(payload: CreateTransactionDTO) {
-    const toCreate = await buildTransactionPayload(payload, 0);
-    if (!toCreate) {
-      return;
-    }
+    try {
+      const toCreate = await buildTransactionPayload(payload, 0);
+      if (!toCreate) {
+        return;
+      }
 
-    await addNewTransaction(toCreate);
+      await addNewTransaction(toCreate);
+    } catch (createError) {
+      const message = resolveApiErrorMessage(createError, t, "transactions.errors.createTransactionFailed");
+      Alert.alert(t("transactions.errors.genericTitle"), message);
+      throw createError;
+    }
   }
 
   async function handleCreateAccount(payload: Omit<CreateAccountDTO, "exchangeRate">) {
@@ -436,7 +446,7 @@ export default function TransactionsScreen() {
       await loadAccounts();
       setSelectedAccountValue(ALL_ACCOUNTS_VALUE);
     } catch (createError) {
-      const message = createError instanceof Error ? createError.message : t("transactions.errors.createAccountFailed");
+      const message = resolveApiErrorMessage(createError, t, "transactions.errors.createAccountFailed");
       Alert.alert(t("transactions.errors.genericTitle"), message);
     }
   }
@@ -449,7 +459,7 @@ export default function TransactionsScreen() {
         t("transactions.success.categoryCreatedMessage", { name: payload.name }),
       );
     } catch (createError) {
-      const message = createError instanceof Error ? createError.message : t("transactions.errors.createCategoryFailed");
+      const message = resolveApiErrorMessage(createError, t, "transactions.errors.createCategoryFailed");
       Alert.alert(t("transactions.errors.genericTitle"), message);
     }
   }
@@ -467,7 +477,7 @@ export default function TransactionsScreen() {
             try {
               await deleteTransactionById(transactionId);
             } catch (deleteError) {
-              const message = deleteError instanceof Error ? deleteError.message : t("transactions.errors.deleteTransactionFailed");
+              const message = resolveApiErrorMessage(deleteError, t, "transactions.errors.deleteTransactionFailed");
               Alert.alert(t("transactions.errors.genericTitle"), message);
             }
           },

@@ -8,6 +8,7 @@ import { AppIcon } from "../../components/shared/AppIcon";
 import { TransactionListItem } from "../../components/transactions/TransactionListItem";
 import { getGoalTransactionsData } from "../../services/goals.service";
 import { TransactionModel as TransactionDTO } from "../../types/models/transaction.model";
+import { resolveApiErrorMessage } from "../../i18n/resolve-api-error-message";
 
 function resolveParamValue(input: string | string[] | undefined): string {
   if (Array.isArray(input)) {
@@ -45,7 +46,7 @@ export default function GoalTransactionsScreen() {
         const transactions = await getGoalTransactionsData(goalId);
         setTransactionsData(transactions);
       } catch (loadError) {
-        const message = loadError instanceof Error ? loadError.message : t("goals.errors.failedToLoad");
+        const message = resolveApiErrorMessage(loadError, t, "goals.errors.failedToLoad");
         setError(message);
       } finally {
         setIsLoading(false);

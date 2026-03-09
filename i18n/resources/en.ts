@@ -14,6 +14,16 @@ const en = {
       selectIconTitle: "Select icon",
     },
   },
+  apiErrors: {
+    InvalidCredentials: "The credentials are invalid.",
+    InsufficientBalance: "You do not have enough balance to complete this action.",
+    GoalCompleted: "This goal is already completed.",
+    Forbidden: "You are not allowed to perform this action.",
+    ValidationError: "Some values are invalid. Please review and try again.",
+    INTERNAL_ERROR: "An internal error occurred. Please try again shortly.",
+    NetworkError: "Could not connect to the server. Check your connection.",
+    UnknownError: "An unexpected error occurred.",
+  },
   tabs: {
     home: "Home",
     transactions: "Transactions",
@@ -418,6 +428,7 @@ const en = {
     errors: {
       genericTitle: "Error",
       failedToLoad: "Failed to load transactions",
+      createTransactionFailed: "Could not create transaction",
       exchangeRateForTransaction: "Could not get exchange rate for this transaction.",
       exchangeRateForAccount: "Could not get exchange rate to create the account.",
       invalidInitialBalance: "Initial balance is invalid.",

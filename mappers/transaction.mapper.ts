@@ -51,13 +51,18 @@ export function mapTransactionDtoToModel(
 export function mapCreateTransactionInputModelToRequestDto(
   model: CreateTransactionInputModel,
 ): CreateTransactionRequestDTO {
+  const normalizedDescription =
+    typeof model.description === "string" && model.description.trim().length > 0
+      ? model.description.trim()
+      : "Sin descripcion";
+
   return {
     accountId: model.accountId,
     categoryId: model.categoryId,
     recurringTransactionId: model.recurringTransactionId ?? null,
     goalId: model.goalId ?? null,
     amount: model.amount,
-    description: model.description,
+    description: normalizedDescription,
     exchangeRate: Number.isFinite(Number(model.exchangeRate)) && Number(model.exchangeRate) > 0 ? Number(model.exchangeRate) : 1,
     transactionType: model.transactionType,
   };

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, Pressable, ScrollView, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "expo-router";
+import { resolveApiErrorMessage } from "../../i18n/resolve-api-error-message";
 
 import { CreateGoalModal } from "../../components/goals/CreateGoalModal";
 import { GoalTargetCard } from "../../components/goals/GoalTargetCard";
@@ -29,10 +30,7 @@ export default function GoalsScreen() {
 			const data = await getGoalsData();
 			setGoalsData(data);
 		} catch (loadError) {
-			const message =
-				loadError instanceof Error
-					? loadError.message
-					: t("goals.errors.failedToLoad");
+			const message = resolveApiErrorMessage(loadError, t, "goals.errors.failedToLoad");
 			setError(message);
 		} finally {
 			setIsLoading(false);
@@ -54,7 +52,7 @@ export default function GoalsScreen() {
 			setGoalsData((previous) => [createdGoal, ...previous]);
 			setIsCreateModalVisible(false);
 		} catch (createError) {
-			const message = createError instanceof Error ? createError.message : t("goals.errors.failedToCreateTarget");
+			const message = resolveApiErrorMessage(createError, t, "goals.errors.failedToCreateTarget");
 			Alert.alert(t("goals.errors.genericTitle"), message);
 		} finally {
 			setIsCreatingTarget(false);

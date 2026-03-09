@@ -30,7 +30,7 @@ const NO_GOAL_LABEL = "";
 type CreateIncomeModalProps = {
   visible: boolean;
   onClose: () => void;
-  onCreateIncome: (payload: CreateTransactionDTO) => void;
+  onCreateIncome: (payload: CreateTransactionDTO) => Promise<void>;
 };
 
 const DEFAULT_INCOME_ICON = "DollarSign";
@@ -187,26 +187,30 @@ export function CreateIncomeModal({
     onClose();
   }
 
-  function handleCreate() {
+  async function handleCreate() {
     const parsedAmount = Number(amount.replace(",", "."));
     if (!Number.isFinite(parsedAmount) || parsedAmount <= 0) {
       setAmountError(t("transactions.errors.invalidAmount"));
       return;
     }
 
-    onCreateIncome({
-      amount: parsedAmount,
-      description: description.trim(),
-      transactionType: 0,
-      categoryId: category,
-      icon: DEFAULT_INCOME_ICON,
-      accountId: account,
-      goalId: goal || null,
-      exchangeRate: null,
-    });
+    try {
+      await onCreateIncome({
+        amount: parsedAmount,
+        description: description.trim(),
+        transactionType: 0,
+        categoryId: category,
+        icon: DEFAULT_INCOME_ICON,
+        accountId: account,
+        goalId: goal || null,
+        exchangeRate: null,
+      });
 
-    resetForm();
-    onClose();
+      resetForm();
+      onClose();
+    } catch {
+      // Parent screen handles and displays translated errors.
+    }
   }
 
   return (

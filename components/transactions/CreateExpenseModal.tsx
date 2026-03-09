@@ -30,7 +30,7 @@ const NO_GOAL_LABEL = "";
 type CreateExpenseModalProps = {
   visible: boolean;
   onClose: () => void;
-  onCreateExpense: (payload: CreateTransactionDTO) => void;
+  onCreateExpense: (payload: CreateTransactionDTO) => Promise<void>;
 };
 
 const DEFAULT_EXPENSE_ICON = "ShoppingCart";
@@ -187,26 +187,30 @@ export function CreateExpenseModal({
     onClose();
   }
 
-  function handleCreate() {
+  async function handleCreate() {
     const parsedAmount = Number(amount.replace(",", "."));
     if (!Number.isFinite(parsedAmount) || parsedAmount <= 0) {
       setAmountError(t("transactions.errors.invalidAmount"));
       return;
     }
 
-    onCreateExpense({
-      amount: parsedAmount,
-      description: description.trim(),
-      transactionType: 1,
-      categoryId: category,
-      icon: DEFAULT_EXPENSE_ICON,
-      accountId: account,
-      goalId: goal || null,
-      exchangeRate: null,
-    });
+    try {
+      await onCreateExpense({
+        amount: parsedAmount,
+        description: description.trim(),
+        transactionType: 1,
+        categoryId: category,
+        icon: DEFAULT_EXPENSE_ICON,
+        accountId: account,
+        goalId: goal || null,
+        exchangeRate: null,
+      });
 
-    resetForm();
-    onClose();
+      resetForm();
+      onClose();
+    } catch {
+      // Parent screen handles and displays translated errors.
+    }
   }
 
   return (
