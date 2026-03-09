@@ -109,16 +109,9 @@ export default function ProfileScreen() {
 					</View>
 				</View>
 
-				<LinearGradient
-					colors={[APP_COLORS.danger, APP_COLORS.actionSecondary]}
-					start={{ x: 0, y: 0.5 }}
-					end={{ x: 1, y: 0.5 }}
-					style={{ borderRadius: 9999 }}
-				>
-					<Pressable onPress={handleLogout} className="rounded-full py-4">
+					<Pressable onPress={handleLogout} className="rounded-full py-4" style={{ backgroundColor: APP_COLORS.danger }}>
 						<Text className="text-center text-base font-bold text-app-textPrimary">{t("profile.logout.button")}</Text>
 					</Pressable>
-				</LinearGradient>
 
 				<Text className="mt-4 text-center text-xs text-app-textSecondary">{profileData.appVersion}</Text>
 			</ScrollView>

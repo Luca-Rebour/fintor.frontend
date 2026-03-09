@@ -47,8 +47,6 @@ export async function apiGet<T>(
       }
     : headers;
 
-    console.log(path);
-    
   return requestJson<T>(path, { method: "GET", headers: authHeaders });
 }
 

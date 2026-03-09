@@ -57,7 +57,7 @@ function TransactionExpandedDetails({
 
   return (
     <View className="px-4 pb-4 pt-2 border-t border-app-border">
-      <View className="rounded-xl border border-[#223250] bg-app-surface p-3">
+      <View className="rounded-xl p-3">
         <View className="flex-row items-start justify-between">
           <View className="flex-1 pr-3">
             <Text className="text-[11px] uppercase tracking-wide text-app-textSecondary">

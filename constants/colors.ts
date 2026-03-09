@@ -13,6 +13,7 @@ export const APP_THEME_COLORS = {
   accentPink: "#FF5C8A",
   success: "#22C55E",
   danger: "#EF4444",
+  dangerDark: "#B91C1C",
 } as const;
 
 export const APP_GRADIENTS = {
@@ -37,4 +38,5 @@ export const APP_COLORS = {
   actionNeutral: APP_THEME_COLORS.surface,
   success: APP_THEME_COLORS.success,
   danger: APP_THEME_COLORS.danger,
+  dangerDark: APP_THEME_COLORS.dangerDark,
 };
