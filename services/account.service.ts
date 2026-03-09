@@ -31,7 +31,7 @@ export async function getAccountsData(): Promise<AccountOption[]> {
 
 export async function getAccountsSummaryData(): Promise<AccountSummary[]> {
   try {
-    const dtoItems = await apiGet<GetAccountsResponseDTO>("/accounts");
+    const dtoItems = await apiGet<GetAccountsResponseDTO>("/accounts");    
     return mapAccountsDtoToSummaryModels(dtoItems);
   } catch (error) {
     console.error("Error fetching account summaries:", error);
@@ -48,7 +48,6 @@ export async function getAccountDetailData(accountId: string): Promise<AccountDe
 
   try {
     const response = await apiGet<GetAccountDetailResponseDTODTO>(`/accounts/${encodeURIComponent(normalizedAccountId)}/detail`);
-    console.log(response);
     return mapAccountDetailDtoToModel(response);
     
     

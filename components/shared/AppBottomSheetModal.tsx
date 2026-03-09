@@ -15,19 +15,8 @@ type AppBottomSheetModalProps = PropsWithChildren<{
   stackBehavior?: "push" | "switch" | "replace";
 }>;
 
-const BOTTOM_SHEET_DEBUG = true;
-
-function debugLog(debugName: string, message: string, payload?: Record<string, unknown>) {
-  if (!BOTTOM_SHEET_DEBUG) {
-    return;
-  }
-
-  if (payload) {
-    console.log(`[BottomSheet:${debugName}] ${message}`, payload);
-    return;
-  }
-
-  console.log(`[BottomSheet:${debugName}] ${message}`);
+function debugLog(_debugName: string, _message: string, _payload?: Record<string, unknown>) {
+  return;
 }
 
 export function AppBottomSheetModal({

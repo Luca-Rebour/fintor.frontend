@@ -15,6 +15,27 @@ import {
 } from "../types/models/account.model";
 import { mapTransactionDtoToModel } from "./transaction.mapper";
 
+function resolveCurrencyCode(input: unknown): string {
+  const item = input as {
+    currency?: { code?: string; Code?: string } | string;
+    currencyCode?: string;
+    CurrencyCode?: string;
+    currency_code?: string;
+  };
+
+  const rawCode =
+    item.currencyCode ??
+    item.CurrencyCode ??
+    item.currency_code ??
+    (typeof item.currency === "string" ? item.currency : undefined) ??
+    (typeof item.currency === "object" && item.currency
+      ? item.currency.code ?? item.currency.Code
+      : undefined);
+
+  const normalizedCode = String(rawCode ?? "").trim().toUpperCase();
+  return normalizedCode || "USD";
+}
+
 function mapAccountListItemToOption(item: GetAccountDTO): AccountOptionModel | null {
   const id = String(item.id ?? "").trim();
   const name = String(item.name ?? "").trim();
@@ -26,7 +47,7 @@ function mapAccountListItemToOption(item: GetAccountDTO): AccountOptionModel | n
   return {
     value: id,
     label: name,
-    currencyCode: String(item.currency?.code ?? "USD").trim().toUpperCase() || "USD",
+    currencyCode: resolveCurrencyCode(item),
     icon: String(item.icon ?? "WalletCards").trim() || "WalletCards",
   };
 }
@@ -99,7 +120,7 @@ export function mapCreateAccountResponseDtoToModel(dto: CreateAccountResponseDTO
     id: String(dto.id ?? ""),
     name: String(dto.name ?? "").trim(),
     balance: Number.isFinite(Number(dto.balance)) ? Number(dto.balance) : 0,
-    currencyCode: String(dto.currency?.code ?? "USD").trim().toUpperCase() || "USD",
+    currencyCode: resolveCurrencyCode(dto),
     icon: String(dto.icon ?? "WalletCards").trim() || "WalletCards",
   };
 }
