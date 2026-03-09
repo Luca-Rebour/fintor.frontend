@@ -82,7 +82,6 @@ export async function getTransactionsData(): Promise<TransactionDTO[]> {
     updateTransactionsStore(mappedTransactions);
     return mappedTransactions;
   } catch (error) {
-    console.error("Error fetching transactions:", error);
     updateTransactionsStore([]);
     return [];
   }
@@ -106,7 +105,6 @@ export async function addNewTransaction(
 
     return createdTransaction;
   } catch (error) {
-    console.error("Error creating transaction:", error);
     throw error;
   }
 }
@@ -127,7 +125,6 @@ export async function deleteTransactionById(transactionId: string): Promise<void
 
     notifyTransactionDeletedObservers();
   } catch (error) {
-    console.error("Error deleting transaction:", error);
     throw error;
   }
 }

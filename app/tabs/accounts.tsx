@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Alert, FlatList, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
+import { resolveApiErrorMessage } from "../../i18n/resolve-api-error-message";
 
 import { AccountListCard } from "../../components/accounts/AccountListCard";
 import { AccountsHeader } from "../../components/accounts/AccountsHeader";
@@ -118,7 +119,7 @@ export default function AccountsScreen() {
       setIsCreateAccountModalVisible(false);
       await loadAccounts(false);
     } catch (createError) {
-      const message = createError instanceof Error ? createError.message : t("accounts.errors.createAccountFailed");
+      const message = resolveApiErrorMessage(createError, t, "accounts.errors.createAccountFailed");
       Alert.alert(t("accounts.errors.genericTitle"), message);
     }
   }

@@ -14,6 +14,16 @@ const es = {
       selectIconTitle: "Seleccionar icono",
     },
   },
+  apiErrors: {
+    InvalidCredentials: "Las credenciales no son validas.",
+    InsufficientBalance: "No tienes saldo suficiente para completar la operacion.",
+    GoalCompleted: "La meta ya fue completada.",
+    Forbidden: "No tienes permisos para realizar esta accion.",
+    ValidationError: "Algunos datos no son validos. Revisa e intenta nuevamente.",
+    INTERNAL_ERROR: "Ocurrio un error interno. Intenta nuevamente en unos minutos.",
+    NetworkError: "No se pudo conectar con el servidor. Revisa tu conexion.",
+    UnknownError: "Ocurrio un error inesperado.",
+  },
   tabs: {
     home: "Inicio",
     transactions: "Movimientos",
@@ -418,6 +428,7 @@ const es = {
     errors: {
       genericTitle: "Error",
       failedToLoad: "No se pudieron cargar las transacciones",
+      createTransactionFailed: "No se pudo crear la transaccion",
       exchangeRateForTransaction: "No se pudo obtener el tipo de cambio para esta transacción.",
       exchangeRateForAccount: "No se pudo obtener el tipo de cambio para crear la cuenta.",
       invalidInitialBalance: "El saldo inicial no es válido.",

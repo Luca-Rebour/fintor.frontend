@@ -32,6 +32,7 @@ import {
 import { RecurringPendingApprovalApiDTO, RecurringTransactionApiDTO, RecurringTransactionsData } from "../../types/recurring";
 import { PendingTransactionStatus } from "../../types/enums/pendingTransactionStatus";
 import { TransactionType } from "../../types/enums/transactionType";
+import { resolveApiErrorMessage } from "../../i18n/resolve-api-error-message";
 
 function resolveTransactionType(value: unknown): TransactionType | null {
 	if (typeof value === "number") {
@@ -124,8 +125,7 @@ export default function RecurringTransactionsScreen() {
 			setError("");
 			await refreshRecurringTransactionsData();
 		} catch (loadError) {
-			const message =
-				loadError instanceof Error ? loadError.message : t("recurring.errors.failedToLoad");
+			const message = resolveApiErrorMessage(loadError, t, "recurring.errors.failedToLoad");
 			setError(message);
 		} finally {
 			if (showInitialLoader) {
@@ -150,7 +150,7 @@ export default function RecurringTransactionsScreen() {
 			await confirmPendingRecurringApproval(approval.id, approval.currencyCode);
 			await loadRecurringTransactions(false);
 		} catch (actionError) {
-			const message = actionError instanceof Error ? actionError.message : t("recurring.errors.couldNotConfirm");
+			const message = resolveApiErrorMessage(actionError, t, "recurring.errors.couldNotConfirm");
 			Alert.alert(t("recurring.errors.genericTitle"), message);
 		} finally {
 			setIsSubmittingAction(false);
@@ -190,7 +190,7 @@ export default function RecurringTransactionsScreen() {
 			await loadRecurringTransactions(false);
 			setRescheduleApproval(null);
 		} catch (actionError) {
-			const message = actionError instanceof Error ? actionError.message : t("recurring.errors.couldNotReschedule");
+			const message = resolveApiErrorMessage(actionError, t, "recurring.errors.couldNotReschedule");
 			Alert.alert(t("recurring.errors.genericTitle"), message);
 		} finally {
 			setIsSubmittingAction(false);
@@ -239,8 +239,7 @@ export default function RecurringTransactionsScreen() {
 							await cancelPendingRecurringApproval(approval.id);
 							await loadRecurringTransactions(false);
 						} catch (actionError) {
-							const message =
-								actionError instanceof Error ? actionError.message : t("recurring.errors.couldNotCancel");
+							const message = resolveApiErrorMessage(actionError, t, "recurring.errors.couldNotCancel");
 							Alert.alert(t("recurring.errors.genericTitle"), message);
 						} finally {
 							setIsSubmittingAction(false);
@@ -270,10 +269,7 @@ export default function RecurringTransactionsScreen() {
 							await deleteRecurringTransaction(recurringTransaction.id);
 							await loadRecurringTransactions(false);
 						} catch (actionError) {
-							const message =
-								actionError instanceof Error
-									? actionError.message
-									: t("recurring.errors.couldNotDelete");
+							const message = resolveApiErrorMessage(actionError, t, "recurring.errors.couldNotDelete");
 							Alert.alert(t("recurring.errors.genericTitle"), message);
 						} finally {
 							setIsSubmittingAction(false);

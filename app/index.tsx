@@ -10,6 +10,7 @@ import { AuthScreenFrame } from "../components/auth/AuthScreenFrame";
 import { AppIcon } from "../components/shared/AppIcon";
 import { APP_GRADIENTS } from "../constants/colors";
 import { signInWithEmail } from "../services/auth.service";
+import { resolveApiErrorMessage } from "../i18n/resolve-api-error-message";
 
 export default function Index() {
   const { t } = useTranslation();
@@ -30,7 +31,7 @@ export default function Index() {
       router.replace("/tabs/home");
       
     } catch (error) {
-      const message = error instanceof Error ? error.message : t("auth.errors.unableToSignIn");
+      const message = resolveApiErrorMessage(error, t, "auth.errors.unableToSignIn");
       setAuthMessage(`❌ ${message}`);
     } finally {
       setIsSubmitting(false);

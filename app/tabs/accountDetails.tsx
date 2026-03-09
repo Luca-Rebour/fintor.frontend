@@ -4,6 +4,7 @@ import { ActivityIndicator, Alert, FlatList, Pressable, Text, View } from "react
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useFocusEffect } from "@react-navigation/native";
 import { useTranslation } from "react-i18next";
+import { resolveApiErrorMessage } from "../../i18n/resolve-api-error-message";
 
 import { AppIcon } from "../../components/shared/AppIcon";
 import { TransactionListItem } from "../../components/transactions/TransactionListItem";
@@ -234,7 +235,7 @@ export default function AccountDetailsScreen() {
                   : previous,
               );
             } catch (deleteError) {
-              const message = deleteError instanceof Error ? deleteError.message : t("transactions.errors.deleteTransactionFailed");
+              const message = resolveApiErrorMessage(deleteError, t, "transactions.errors.deleteTransactionFailed");
               Alert.alert(t("transactions.errors.genericTitle"), message);
             }
           },

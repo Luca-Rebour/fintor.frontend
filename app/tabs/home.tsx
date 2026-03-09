@@ -28,6 +28,7 @@ import { GoalModel as GoalApi } from "../../types/models/goal.model";
 import { RecurringPendingApprovalApiDTO, RecurringTransactionsData } from "../../types/recurring";
 import { PendingTransactionStatus } from "../../types/enums/pendingTransactionStatus";
 import { TransactionModel as TransactionDTO } from "../../types/models/transaction.model";
+import { resolveApiErrorMessage } from "../../i18n/resolve-api-error-message";
 
 function isPendingStatus(value: unknown): boolean {
 	if (typeof value === "number") {
@@ -107,7 +108,7 @@ export default function HomeScreen() {
 			setDashboardData(data);
 			setGoalsData(goals);
 		} catch (loadError) {
-			const message = loadError instanceof Error ? loadError.message : t("home.errors.failedToLoadDashboard");
+			const message = resolveApiErrorMessage(loadError, t, "home.errors.failedToLoadDashboard");
 			setError(message);
 		} finally {
 			if (showInitialLoader) {
@@ -133,7 +134,7 @@ export default function HomeScreen() {
 			await confirmPendingRecurringApproval(pendingTransaction.id, pendingTransaction.currencyCode);
 			await loadDashboard(false);
 		} catch (confirmError) {
-			const message = confirmError instanceof Error ? confirmError.message : t("home.errors.couldNotConfirmPending");
+			const message = resolveApiErrorMessage(confirmError, t, "home.errors.couldNotConfirmPending");
 			Alert.alert(t("home.errors.genericTitle"), message);
 		} finally {
 			setIsConfirmingPending(false);

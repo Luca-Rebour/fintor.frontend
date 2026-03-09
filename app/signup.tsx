@@ -13,6 +13,7 @@ import { AppDatePicker } from "../components/shared/DatePicker";
 import { APP_GRADIENTS } from "../constants/colors";
 import { CurrencyOption, loadCurrencyOptions } from "../services/currencies.service";
 import { signUpWithEmail } from "../services/auth.service";
+import { resolveApiErrorMessage } from "../i18n/resolve-api-error-message";
 
 type PasswordStrengthLabelKey =
   | ""
@@ -132,7 +133,7 @@ export default function SignupScreen() {
       setAuthMessage(`✅ ${t("auth.signup.accountCreatedFor", { name: displayName })}`);
       router.replace("/tabs/home");
     } catch (error) {
-      const message = error instanceof Error ? error.message : t("auth.errors.unableToCreateAccount");
+      const message = resolveApiErrorMessage(error, t, "auth.errors.unableToCreateAccount");
       setAuthMessage(`❌ ${message}`);
     } finally {
       setIsSubmitting(false);

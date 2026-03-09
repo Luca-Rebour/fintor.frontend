@@ -22,6 +22,7 @@ import { CreateRecurringTransactionInput, RecurringTransactionApiDTO, UpdateRecu
 import { AccountOptionModel as AccountOption } from "../../types/models/account.model";
 import { CategoryOptionModel as CategoryOption } from "../../types/models/category.model";
 import { AppIcon } from "../../components/shared/AppIcon";
+import { resolveApiErrorMessage } from "../../i18n/resolve-api-error-message";
 
 type GoalOption = {
   value: string;
@@ -144,7 +145,7 @@ export default function RecurringAdminScreen() {
         ...goals.map((goal) => ({ value: goal.id, label: goal.title })),
       ]);
     } catch (loadError) {
-      const message = loadError instanceof Error ? loadError.message : t("recurringAdmin.errors.failedToLoad");
+      const message = resolveApiErrorMessage(loadError, t, "recurringAdmin.errors.failedToLoad");
       setError(message);
     } finally {
       if (showInitialLoader) {
@@ -218,7 +219,7 @@ export default function RecurringAdminScreen() {
       setIsFormVisible(false);
       setEditingTransactionId(null);
     } catch (submitError) {
-      const message = submitError instanceof Error ? submitError.message : t("recurringAdmin.errors.couldNotSave");
+      const message = resolveApiErrorMessage(submitError, t, "recurringAdmin.errors.couldNotSave");
       Alert.alert(t("recurringAdmin.errors.genericTitle"), message);
     } finally {
       setIsSubmitting(false);
@@ -239,7 +240,7 @@ export default function RecurringAdminScreen() {
               await deleteRecurringTransaction(transaction.id);
               await loadRecurringList(false);
             } catch (deleteError) {
-              const message = deleteError instanceof Error ? deleteError.message : t("recurringAdmin.errors.couldNotDelete");
+              const message = resolveApiErrorMessage(deleteError, t, "recurringAdmin.errors.couldNotDelete");
               Alert.alert(t("recurringAdmin.errors.genericTitle"), message);
             }
           },
