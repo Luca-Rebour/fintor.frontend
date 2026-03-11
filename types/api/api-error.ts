@@ -1,12 +1,12 @@
 export type ApiErrorCode =
-  | "InvalidCredentials"
+  | "Unknown"
   | "InsufficientBalance"
   | "GoalCompleted"
+  | "AccountNotFound"
   | "Forbidden"
   | "ValidationError"
-  | "INTERNAL_ERROR"
-  | "NetworkError"
-  | "UnknownError";
+  | "EmailAlreadyInUse"
+  | "NotFound";
 
 export interface ApiError {
   message: string;
