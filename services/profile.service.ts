@@ -3,6 +3,8 @@ import { apiGet } from "./api.client";
 
 type ProfileApiResponse = ProfileData;
 
+const ALLOWED_PROFILE_ITEM_IDS = new Set(["personal", "notifications", "help"]);
+
 const MOCK_PROFILE_RESPONSE: ProfileData = {
   fullName: "Alex Rivera",
   membershipLabel: "Premium Member",
@@ -12,26 +14,33 @@ const MOCK_PROFILE_RESPONSE: ProfileData = {
       id: "preferences",
       items: [
         { id: "personal", title: "Personal Information", icon: "User" },
-        { id: "security", title: "Security & Biometrics", icon: "Key" },
         { id: "notifications", title: "Notification Preferences", icon: "Bell" },
       ],
     },
     {
       id: "support",
       items: [
-        { id: "bank", title: "Linked Bank Accounts", icon: "CreditCard", badgeText: "3 Active" },
         { id: "help", title: "Help & Support", icon: "CircleHelp" },
       ],
     },
   ],
 };
 
+function sanitizeProfileSections(sections: ProfileData["sections"]): ProfileData["sections"] {
+  return sections
+    .map((section) => ({
+      ...section,
+      items: section.items.filter((item) => ALLOWED_PROFILE_ITEM_IDS.has(item.id)),
+    }))
+    .filter((section) => section.items.length > 0);
+}
+
 function mapProfileResponse(response: ProfileApiResponse): ProfileData {
   return {
     fullName: response.fullName,
     membershipLabel: response.membershipLabel,
     appVersion: response.appVersion,
-    sections: response.sections,
+    sections: sanitizeProfileSections(response.sections),
   };
 }
 
