@@ -3,7 +3,7 @@ import { apiGet } from "./api.client";
 
 type ProfileApiResponse = ProfileData;
 
-const ALLOWED_PROFILE_ITEM_IDS = new Set(["personal", "notifications", "help"]);
+const ALLOWED_PROFILE_ITEM_IDS = new Set(["changePassword", "notifications", "help"]);
 
 const MOCK_PROFILE_RESPONSE: ProfileData = {
   fullName: "Alex Rivera",
@@ -13,7 +13,7 @@ const MOCK_PROFILE_RESPONSE: ProfileData = {
     {
       id: "preferences",
       items: [
-        { id: "personal", title: "Personal Information", icon: "User" },
+        { id: "changePassword", title: "Change Password", icon: "Key" },
         { id: "notifications", title: "Notification Preferences", icon: "Bell" },
       ],
     },
@@ -26,11 +26,26 @@ const MOCK_PROFILE_RESPONSE: ProfileData = {
   ],
 };
 
+function normalizeProfileItem(item: ProfileData["sections"][number]["items"][number]) {
+  if (item.id === "personal") {
+    return {
+      ...item,
+      id: "changePassword",
+      title: "Change Password",
+      icon: "Key" as const,
+    };
+  }
+
+  return item;
+}
+
 function sanitizeProfileSections(sections: ProfileData["sections"]): ProfileData["sections"] {
   return sections
     .map((section) => ({
       ...section,
-      items: section.items.filter((item) => ALLOWED_PROFILE_ITEM_IDS.has(item.id)),
+      items: section.items
+        .map(normalizeProfileItem)
+        .filter((item) => ALLOWED_PROFILE_ITEM_IDS.has(item.id)),
     }))
     .filter((section) => section.items.length > 0);
 }

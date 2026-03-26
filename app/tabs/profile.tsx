@@ -8,8 +8,10 @@ import { useTranslation } from "react-i18next";
 import { ProfileHeader } from "../../components/profile/ProfileHeader";
 import { ProfileMenuSection } from "../../components/profile/ProfileMenuSection";
 import { clearStoredJwt, getAuthUserSnapshot, subscribeToAuthUser } from "../../services/auth.service";
+import { areNotificationsEnabledOnDevice, requestPushNotificationPermissionAndToken } from "../../services/notification-permissions.service";
+import { getServerNotificationPreferencesEnabled, sendNotificationTokenToBackend } from "../../services/notifications.service";
 import { getProfileData } from "../../services/profile.service";
-import { ProfileData } from "../../types/profile";
+import { ProfileData, ProfileMenuItem } from "../../types/profile";
 import { AuthUserModel as User } from "../../types/models/auth.model";
 import { resolveApiErrorMessage } from "../../i18n/resolve-api-error-message";
 
@@ -19,6 +21,7 @@ export default function ProfileScreen() {
 	const [profileData, setProfileData] = useState<ProfileData | null>(null);
 	const [authUser, setAuthUser] = useState<User | null>(getAuthUserSnapshot());
 	const [isLoading, setIsLoading] = useState(true);
+	const [isOpeningNotifications, setIsOpeningNotifications] = useState(false);
 	const [error, setError] = useState("");
 
 	useEffect(() => {
@@ -59,6 +62,59 @@ export default function ProfileScreen() {
 		void i18n.changeLanguage(language);
 	}
 
+	function handleProfileItemPress(item: ProfileMenuItem) {
+		if (isOpeningNotifications) {
+			return;
+		}
+
+		if (item.id === "changePassword") {
+			router.push("/tabs/changePassword");
+			return;
+		}
+
+		if (item.id === "notifications") {
+			void handleOpenNotificationPreferences();
+			return;
+		}
+
+		Alert.alert(item.title, t("common.comingSoon"));
+	}
+
+	async function handleOpenNotificationPreferences() {
+		try {
+			setIsOpeningNotifications(true);
+
+			const isServerEnabled = await getServerNotificationPreferencesEnabled();
+			const isDeviceEnabled = await areNotificationsEnabledOnDevice();
+
+			if (isServerEnabled && isDeviceEnabled) {
+				router.push({ pathname: "/tabs/notificationPreferences", params: { mode: "enabled" } });
+				return;
+			}
+
+			const permissionResult = await requestPushNotificationPermissionAndToken();
+
+			if (!permissionResult.granted) {
+				router.push({ pathname: "/tabs/notificationPreferences", params: { mode: "disabled" } });
+				return;
+			}
+
+			if (!permissionResult.expoPushToken) {
+				Alert.alert(t("notifications.errorTitle"), t("notifications.tokenUnavailable"));
+				router.push({ pathname: "/tabs/notificationPreferences", params: { mode: "disabled" } });
+				return;
+			}
+
+			await sendNotificationTokenToBackend(permissionResult.expoPushToken);
+			router.push({ pathname: "/tabs/notificationPreferences", params: { mode: "enabled" } });
+		} catch (loadError) {
+			const message = resolveApiErrorMessage(loadError, t, "notifications.enableFailed");
+			Alert.alert(t("notifications.errorTitle"), message);
+		} finally {
+			setIsOpeningNotifications(false);
+		}
+	}
+
 	if (isLoading) {
 		return (
 			<View className="flex-1 items-center justify-center bg-app-bgPrimary">
@@ -85,7 +141,7 @@ export default function ProfileScreen() {
 				/>
 
 				{profileData.sections.map((section) => (
-					<ProfileMenuSection key={section.id} section={section} />
+					<ProfileMenuSection key={section.id} section={section} onItemPress={handleProfileItemPress} />
 				))}
 
 				<View className="mb-4 rounded-2xl bg-app-cardSoft px-4 py-4">

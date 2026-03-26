@@ -165,6 +165,20 @@ export default function ProtectedTabsLayout() {
         />
 
         <Tabs.Screen
+          name="changePassword"
+          options={{
+            href: null,
+          }}
+        />
+
+        <Tabs.Screen
+          name="notificationPreferences"
+          options={{
+            href: null,
+          }}
+        />
+
+        <Tabs.Screen
           name="goals"
           options={{
             href: null,
@@ -189,7 +203,7 @@ export default function ProtectedTabsLayout() {
         />
       </Tabs>
 
-      <AppBottomSheetModal visible={isMoreMenuVisible} onClose={closeMoreMenu} snapPoints={["44%"]} debugName="Tabs:MoreMenu">
+      <AppBottomSheetModal visible={isMoreMenuVisible} onClose={closeMoreMenu} snapPoints={["32%"]} debugName="Tabs:MoreMenu">
           <View className="rounded-2xl bg-app-bgSecondary p-4">
             <TouchableOpacity
               className="mb-2 flex-row items-center rounded-xl bg-app-border px-3 py-3"
@@ -200,7 +214,7 @@ export default function ProtectedTabsLayout() {
             </TouchableOpacity>
 
             <TouchableOpacity
-              className="flex-row items-center rounded-xl bg-app-border px-3 py-3"
+              className="flex-row items-center rounded-xl bg-app-border px-3 py-3 text-3xl"
               onPress={() => navigateToTab("/tabs/recurringAdmin")}
             >
               <AppIcon name="Settings" color={APP_COLORS.actionPrimary} size={18} />

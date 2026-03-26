@@ -258,3 +258,14 @@ export async function me(): Promise<User> {
     };
   }
 }
+
+export async function changePassword(currentPassword: string, newPassword: string): Promise<void> {
+  if (!currentPassword.trim() || !newPassword.trim()) {
+    throw new Error("Current and new password are required");
+  }
+
+  await apiPost<unknown>("/users/password", {
+    currentPassword,
+    newPassword,
+  });
+}
