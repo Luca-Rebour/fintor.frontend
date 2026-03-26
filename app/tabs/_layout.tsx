@@ -182,7 +182,7 @@ export default function ProtectedTabsLayout() {
         />
       </Tabs>
 
-      <AppBottomSheetModal visible={isMoreMenuVisible} onClose={closeMoreMenu} snapPoints={["34%"]} debugName="Tabs:MoreMenu">
+      <AppBottomSheetModal visible={isMoreMenuVisible} onClose={closeMoreMenu} snapPoints={["44%"]} debugName="Tabs:MoreMenu">
           <View className="rounded-2xl bg-app-bgSecondary p-4">
             <TouchableOpacity
               className="mb-2 flex-row items-center rounded-xl bg-app-border px-3 py-3"
@@ -206,6 +206,14 @@ export default function ProtectedTabsLayout() {
             >
               <AppIcon name="Target" color={APP_COLORS.actionPrimary} size={18} />
               <Text className="ml-2 text-base font-medium text-white">{t("tabs.goals")}</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              className="mt-2 flex-row items-center rounded-xl bg-app-border px-3 py-3"
+              onPress={() => navigateToTab("/tabs/more")}
+            >
+              <AppIcon name="Tag" color={APP_COLORS.actionPrimary} size={18} />
+              <Text className="ml-2 text-base font-medium text-white">{t("tabs.categories")}</Text>
             </TouchableOpacity>
           </View>
       </AppBottomSheetModal>

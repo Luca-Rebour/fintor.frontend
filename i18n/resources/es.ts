@@ -28,6 +28,7 @@ const es = {
     home: "Inicio",
     transactions: "Movimientos",
     more: "Más",
+    categories: "Categorías",
     goals: "Metas",
     accounts: "Cuentas",
     profile: "Perfil",
@@ -347,6 +348,26 @@ const es = {
     },
     actions: {
       addNewRecurring: "Agregar nueva recurrente",
+    },
+  },
+  categories: {
+    title: "Categorías",
+    subtitle: "Gestiona tus categorías y revisa el total gastado en cada una.",
+    empty: "No hay categorías disponibles.",
+    spent: "Gastado: {{amount}}",
+    actions: {
+      create: "Crear categoría",
+      delete: "Eliminar",
+    },
+    errors: {
+      genericTitle: "Error",
+      failedToLoad: "No se pudieron cargar las categorías",
+      deleteFailed: "No se pudo eliminar la categoría",
+    },
+    delete: {
+      title: "Eliminar categoría",
+      message: "¿Seguro que quieres eliminar {{name}}?",
+      confirm: "Eliminar",
     },
   },
   transactions: {
