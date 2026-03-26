@@ -1,7 +1,12 @@
 {
   "expo": {
-    "name": "finance-app",
-    "slug": "finance-app",
+    "name": "fintor",
+    "slug": "fintor",
+    "extra": {
+      "eas": {
+        "projectId": "ae698f8d-2f81-48a0-b4f7-558e85629471"
+      }
+    },
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -20,13 +25,15 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.lucarebour.fintor"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
       "expo-router",
+      "expo-notifications",
       "expo-secure-store",
       "@react-native-community/datetimepicker"
     ]

@@ -4,6 +4,7 @@ const es = {
     done: "Listo",
     cancel: "Cancelar",
     viewAll: "Ver todo",
+    comingSoon: "Esta funcionalidad estara disponible pronto.",
     iconPicker: {
       selectedIcon: "Icono seleccionado",
       searchPlaceholder: "Buscar icono por nombre",
@@ -110,6 +111,63 @@ const es = {
       title: "Idioma",
       spanish: "Español",
       english: "Inglés",
+    },
+    changePassword: {
+      title: "Cambiar contraseña",
+      currentPassword: "Contraseña actual",
+      newPassword: "Nueva contraseña",
+      confirmPassword: "Confirmar nueva contraseña",
+      placeholders: {
+        currentPassword: "Ingresa la contraseña actual",
+        newPassword: "Ingresa la nueva contraseña",
+        confirmPassword: "Confirma la nueva contraseña",
+      },
+      actions: {
+        save: "Guardar contraseña",
+        saving: "Guardando...",
+      },
+      success: {
+        title: "Contraseña actualizada",
+        message: "Tu contraseña se actualizo correctamente.",
+      },
+      errors: {
+        title: "Cambiar contraseña",
+        requiredFields: "Completa todos los campos.",
+        minLength: "La nueva contraseña debe tener al menos 6 caracteres.",
+        passwordMismatch: "Las contraseñas no coinciden.",
+        samePassword: "La nueva contraseña debe ser distinta a la actual.",
+        generic: "No se pudo actualizar la contraseña",
+      },
+    },
+  },
+  notifications: {
+    title: "Preferencias de notificaciones",
+    permissionRequiredTitle: "Permiso requerido",
+    permissionRequiredMessage: "Para recibir notificaciones, habilita el permiso del sistema para esta app.",
+    permissionDeniedTitle: "Permiso denegado",
+    permissionDeniedMessage: "No otorgaste permiso de notificaciones. Puedes habilitarlo desde ajustes.",
+    enabledTitle: "Notificaciones habilitadas",
+    enabledMessage: "Tus notificaciones push estan habilitadas.",
+    errorTitle: "Notificaciones",
+    tokenUnavailable: "No se pudo obtener el token push de este dispositivo.",
+    enableFailed: "No se pudieron habilitar las notificaciones",
+    actions: {
+      enable: "Habilitar notificaciones",
+      requesting: "Solicitando permiso...",
+    },
+    features: {
+      recurring: {
+        label: "Recordatorios recurrentes",
+        description: "Recibe recordatorios de proximas transacciones recurrentes.",
+      },
+      goals: {
+        label: "Progreso de metas",
+        description: "Recibe novedades cuando avances en tus metas.",
+      },
+      transactions: {
+        label: "Transacciones importantes",
+        description: "Recibe avisos cuando se genere una transaccion relevante.",
+      },
     },
   },
   home: {

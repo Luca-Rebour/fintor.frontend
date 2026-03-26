@@ -1,19 +1,21 @@
 import { APP_COLORS } from "../../constants/colors";
-import { Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { AppIcon } from "../shared/AppIcon";
 
-import { ProfileMenuSection as ProfileMenuSectionType } from "../../types/profile";
+import { ProfileMenuItem, ProfileMenuSection as ProfileMenuSectionType } from "../../types/profile";
 
 type ProfileMenuSectionProps = {
   section: ProfileMenuSectionType;
+  onItemPress?: (item: ProfileMenuItem) => void;
 };
 
-export function ProfileMenuSection({ section }: ProfileMenuSectionProps) {
+export function ProfileMenuSection({ section, onItemPress }: ProfileMenuSectionProps) {
   return (
     <View className="mb-4 rounded-2xl bg-app-cardSoft px-4 py-2">
       {section.items.map((item, index) => (
-        <View
+        <Pressable
           key={item.id}
+          onPress={() => onItemPress?.(item)}
           className={`flex-row items-center justify-between py-4 ${index < section.items.length - 1 ? "border-b border-app-border" : ""}`}
         >
           <View className="flex-row items-center gap-3">
@@ -31,7 +33,7 @@ export function ProfileMenuSection({ section }: ProfileMenuSectionProps) {
             ) : null}
             <AppIcon name="ChevronRight" size={16} color={APP_COLORS.textSecondary} />
           </View>
-        </View>
+        </Pressable>
       ))}
     </View>
   );

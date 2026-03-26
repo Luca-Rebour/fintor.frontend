@@ -4,6 +4,7 @@ const en = {
     done: "Done",
     cancel: "Cancel",
     viewAll: "View All",
+    comingSoon: "This feature will be available soon.",
     iconPicker: {
       selectedIcon: "Selected icon",
       searchPlaceholder: "Search icon by name",
@@ -110,6 +111,63 @@ const en = {
       title: "Language",
       spanish: "Español",
       english: "English",
+    },
+    changePassword: {
+      title: "Change Password",
+      currentPassword: "Current password",
+      newPassword: "New password",
+      confirmPassword: "Confirm new password",
+      placeholders: {
+        currentPassword: "Enter current password",
+        newPassword: "Enter new password",
+        confirmPassword: "Confirm new password",
+      },
+      actions: {
+        save: "Save password",
+        saving: "Saving...",
+      },
+      success: {
+        title: "Password updated",
+        message: "Your password was updated successfully.",
+      },
+      errors: {
+        title: "Change password",
+        requiredFields: "Complete all fields.",
+        minLength: "The new password must have at least 6 characters.",
+        passwordMismatch: "Passwords do not match.",
+        samePassword: "The new password must be different from the current one.",
+        generic: "Could not update password",
+      },
+    },
+  },
+  notifications: {
+    title: "Notification Preferences",
+    permissionRequiredTitle: "Permission required",
+    permissionRequiredMessage: "To receive notifications, enable system permission for this app.",
+    permissionDeniedTitle: "Permission denied",
+    permissionDeniedMessage: "You denied notification permissions. You can enable them from settings.",
+    enabledTitle: "Notifications enabled",
+    enabledMessage: "Your push notifications are now enabled.",
+    errorTitle: "Notifications",
+    tokenUnavailable: "Could not get push token for this device.",
+    enableFailed: "Could not enable notifications",
+    actions: {
+      enable: "Enable notifications",
+      requesting: "Requesting permission...",
+    },
+    features: {
+      recurring: {
+        label: "Recurring reminders",
+        description: "Get reminders for upcoming recurring transactions.",
+      },
+      goals: {
+        label: "Goal progress",
+        description: "Receive updates when you make progress toward your goals.",
+      },
+      transactions: {
+        label: "Important transactions",
+        description: "Be notified when a relevant transaction is generated.",
+      },
     },
   },
   home: {

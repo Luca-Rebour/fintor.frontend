@@ -3,7 +3,6 @@ import { Link, useRouter } from "expo-router";
 import { useState } from "react";
 import { Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
-
 import { AuthInput } from "../components/auth/AuthInput";
 import { AuthPrimaryButton } from "../components/auth/AuthPrimaryButton";
 import { AuthScreenFrame } from "../components/auth/AuthScreenFrame";
@@ -32,7 +31,7 @@ export default function Index() {
       
     } catch (error) {
       const message = resolveApiErrorMessage(error, t, "auth.errors.unableToSignIn");
-      setAuthMessage(`❌ ${message}`);
+      setAuthMessage(`${message}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -89,18 +88,6 @@ export default function Index() {
         </View>
 
         <View className="mt-10">
-          <View className="mb-6 flex-row items-center">
-            <View className="h-px flex-1 bg-app-border" />
-            <Text className="mx-4 text-sm text-app-textSecondary">{t("auth.login.orSignInWith")}</Text>
-            <View className="h-px flex-1 bg-app-border" />
-          </View>
-
-          <View className="mb-7 items-center">
-            <View className="mb-2 h-14 w-14 items-center justify-center rounded-full border border-app-border bg-app-cardSoft">
-              <AppIcon name="Shield" size={22} color="#19C7FF" />
-            </View>
-            <Text className="text-app-textSecondary">{t("auth.login.faceId")}</Text>
-          </View>
 
           <Text className="text-center text-sm text-app-textSecondary">
             {t("auth.login.noAccount")} {" "}
