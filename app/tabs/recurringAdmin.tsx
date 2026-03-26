@@ -22,6 +22,7 @@ import { CreateRecurringTransactionInput, RecurringTransactionApiDTO, UpdateRecu
 import { AccountOptionModel as AccountOption } from "../../types/models/account.model";
 import { CategoryOptionModel as CategoryOption } from "../../types/models/category.model";
 import { AppIcon } from "../../components/shared/AppIcon";
+import { showErrorToast, showSuccessToast } from "../../components/shared/toast";
 import { resolveApiErrorMessage } from "../../i18n/resolve-api-error-message";
 
 type GoalOption = {
@@ -192,12 +193,12 @@ export default function RecurringAdminScreen() {
     }
 
     if (!form.accountId) {
-      Alert.alert(t("recurringAdmin.validation.title"), t("recurringAdmin.validation.selectAccount"));
+      showErrorToast(t("recurringAdmin.validation.title"), t("recurringAdmin.validation.selectAccount"));
       return;
     }
 
     if (!form.categoryId) {
-      Alert.alert(t("recurringAdmin.validation.title"), t("recurringAdmin.validation.selectCategory"));
+      showErrorToast(t("recurringAdmin.validation.title"), t("recurringAdmin.validation.selectCategory"));
       return;
     }
 
@@ -211,8 +212,10 @@ export default function RecurringAdminScreen() {
           lastGeneratedAt: new Date().toISOString(),
         };
         await updateRecurringTransaction(editingTransactionId, updatePayload);
+        showSuccessToast(t("recurringAdmin.success.updatedTitle"), t("recurringAdmin.success.updatedMessage"));
       } else {
         await createRecurringTransaction(payload);
+        showSuccessToast(t("recurringAdmin.success.createdTitle"), t("recurringAdmin.success.createdMessage"));
       }
 
       await loadRecurringList(false);
@@ -220,7 +223,7 @@ export default function RecurringAdminScreen() {
       setEditingTransactionId(null);
     } catch (submitError) {
       const message = resolveApiErrorMessage(submitError, t, "recurringAdmin.errors.couldNotSave");
-      Alert.alert(t("recurringAdmin.errors.genericTitle"), message);
+      showErrorToast(t("recurringAdmin.errors.genericTitle"), message);
     } finally {
       setIsSubmitting(false);
     }
@@ -239,14 +242,14 @@ export default function RecurringAdminScreen() {
             try {
               await deleteRecurringTransaction(transaction.id);
               await loadRecurringList(false);
+              showSuccessToast(t("recurringAdmin.success.deletedTitle"), t("recurringAdmin.success.deletedMessage"));
             } catch (deleteError) {
               const message = resolveApiErrorMessage(deleteError, t, "recurringAdmin.errors.couldNotDelete");
-              Alert.alert(t("recurringAdmin.errors.genericTitle"), message);
+              showErrorToast(t("recurringAdmin.errors.genericTitle"), message);
             }
           },
         },
       ],
-      { cancelable: true },
     );
   }
 

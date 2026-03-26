@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { AppIcon } from "../../components/shared/AppIcon";
+import { showErrorToast, showSuccessToast } from "../../components/shared/toast";
 import { CreateCategoryModal } from "../../components/transactions/CreateCategoryModal";
 import { resolveApiErrorMessage } from "../../i18n/resolve-api-error-message";
 import {
@@ -130,14 +131,14 @@ export default function CategoriesScreen() {
   async function handleCreateCategory(payload: CreateCategoryDTO) {
     try {
       await createCategory(payload);
-      Alert.alert(
+      showSuccessToast(
         t("transactions.success.categoryCreatedTitle"),
         t("transactions.success.categoryCreatedMessage", { name: payload.name }),
       );
       await loadCategories(false);
     } catch (createError) {
       const message = resolveApiErrorMessage(createError, t, "transactions.errors.createCategoryFailed");
-      Alert.alert(t("transactions.errors.genericTitle"), message);
+      showErrorToast(t("transactions.errors.genericTitle"), message);
       throw createError;
     }
   }
@@ -155,9 +156,10 @@ export default function CategoriesScreen() {
             try {
               await deleteCategoryById(category.id);
               await loadCategories(false);
+              showSuccessToast(t("categories.success.categoryDeletedTitle"), t("categories.success.categoryDeletedMessage"));
             } catch (deleteError) {
               const message = resolveApiErrorMessage(deleteError, t, "categories.errors.deleteFailed");
-              Alert.alert(t("categories.errors.genericTitle"), message);
+              showErrorToast(t("categories.errors.genericTitle"), message);
             }
           },
         },

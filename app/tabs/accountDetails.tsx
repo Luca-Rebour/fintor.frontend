@@ -5,6 +5,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useFocusEffect } from "@react-navigation/native";
 import { useTranslation } from "react-i18next";
 import { resolveApiErrorMessage } from "../../i18n/resolve-api-error-message";
+import { showErrorToast, showSuccessToast } from "../../components/shared/toast";
 
 import { AppIcon } from "../../components/shared/AppIcon";
 import { TransactionListItem } from "../../components/transactions/TransactionListItem";
@@ -234,9 +235,10 @@ export default function AccountDetailsScreen() {
                     }
                   : previous,
               );
+              showSuccessToast(t("transactions.success.transactionDeletedTitle"), t("transactions.success.transactionDeletedMessage"));
             } catch (deleteError) {
               const message = resolveApiErrorMessage(deleteError, t, "transactions.errors.deleteTransactionFailed");
-              Alert.alert(t("transactions.errors.genericTitle"), message);
+              showErrorToast(t("transactions.errors.genericTitle"), message);
             }
           },
         },
@@ -256,7 +258,7 @@ export default function AccountDetailsScreen() {
     <View className="flex-1 bg-app-bgPrimary px-4 pt-2">
       <View className="mb-4 flex-row items-center justify-between">
         <Pressable
-          onPress={() => router.back()}
+          onPress={() => router.replace("/tabs/accounts")}
           className="h-10 w-10 items-center justify-center rounded-full bg-app-surface"
         >
           <AppIcon name="ArrowLeft" size={18} color={APP_COLORS.textPrimary} />
