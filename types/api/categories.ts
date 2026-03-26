@@ -9,6 +9,8 @@ export type CreateCategoryResponseDTO = {
   name: string;
   icon: string;
   color: string;
+  totalSpent?: number;
+  TotalSpent?: number;
 }
 
 export type GetCategoryDTO = {
@@ -16,6 +18,8 @@ export type GetCategoryDTO = {
   name: string;
   icon: string;
   color: string;
+  totalSpent?: number;
+  TotalSpent?: number;
 };
 
 export type GetCategoriesResponseDTO = GetCategoryDTO[];

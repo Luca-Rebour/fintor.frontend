@@ -3,6 +3,7 @@ export type CategoryModel = {
   label: string;
   icon: string;
   color: string;
+  totalSpent: number;
 };
 
 export type CategoryOptionModel = {
