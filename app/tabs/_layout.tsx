@@ -172,6 +172,13 @@ export default function ProtectedTabsLayout() {
         />
 
         <Tabs.Screen
+          name="categories"
+          options={{
+            href: null,
+          }}
+        />
+
+        <Tabs.Screen
           name="profile"
           options={{
             title: t("tabs.profile"),
@@ -210,7 +217,7 @@ export default function ProtectedTabsLayout() {
 
             <TouchableOpacity
               className="mt-2 flex-row items-center rounded-xl bg-app-border px-3 py-3"
-              onPress={() => navigateToTab("/tabs/more")}
+              onPress={() => navigateToTab("/tabs/categories")}
             >
               <AppIcon name="Tag" color={APP_COLORS.actionPrimary} size={18} />
               <Text className="ml-2 text-base font-medium text-white">{t("tabs.categories")}</Text>
