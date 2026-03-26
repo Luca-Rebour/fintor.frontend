@@ -28,6 +28,7 @@ const en = {
     home: "Home",
     transactions: "Transactions",
     more: "More",
+    categories: "Categories",
     goals: "Goals",
     accounts: "Accounts",
     profile: "Profile",
@@ -347,6 +348,26 @@ const en = {
     },
     actions: {
       addNewRecurring: "Add New Recurring",
+    },
+  },
+  categories: {
+    title: "Categories",
+    subtitle: "Manage your categories and review the total spent in each one.",
+    empty: "No categories available.",
+    spent: "Spent: {{amount}}",
+    actions: {
+      create: "Create category",
+      delete: "Delete",
+    },
+    errors: {
+      genericTitle: "Error",
+      failedToLoad: "Could not load categories",
+      deleteFailed: "Could not delete category",
+    },
+    delete: {
+      title: "Delete category",
+      message: "Are you sure you want to delete {{name}}?",
+      confirm: "Delete",
     },
   },
   transactions: {
