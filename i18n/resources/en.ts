@@ -148,6 +148,10 @@ const en = {
   },
   goals: {
     title: "Financial Goals",
+    success: {
+      targetCreatedTitle: "Goal created",
+      targetCreatedMessage: "Goal \"{{title}}\" was created successfully.",
+    },
     errors: {
       failedToLoad: "Failed to load goals",
       failedToCreateTarget: "Could not create target",
@@ -215,6 +219,10 @@ const en = {
     addAccountButton: "Add Account",
     totalBalanceLabel: "TOTAL BALANCE",
     availableLabel: "AVAILABLE",
+    success: {
+      accountCreatedTitle: "Account created",
+      accountCreatedMessage: "The account was created successfully.",
+    },
     errors: {
       invalidInitialBalance: "Initial balance is invalid.",
       exchangeRateUnavailable: "Could not get exchange rate to create the account.",
@@ -224,6 +232,16 @@ const en = {
   },
   recurring: {
     title: "Recurring",
+    success: {
+      confirmedTitle: "Recurring confirmed",
+      confirmedMessage: "The recurring transaction was confirmed.",
+      rescheduledTitle: "Recurring rescheduled",
+      rescheduledMessage: "The recurring transaction was rescheduled.",
+      cancelledTitle: "Recurring cancelled",
+      cancelledMessage: "The recurring transaction was cancelled.",
+      deletedTitle: "Recurring deleted",
+      deletedMessage: "The recurring transaction was deleted.",
+    },
     labels: {
       pending: "PENDING",
       rescheduled: "RESCHEDULED",
@@ -279,6 +297,14 @@ const en = {
   },
   recurringAdmin: {
     title: "Manage Recurring",
+    success: {
+      createdTitle: "Recurring created",
+      createdMessage: "The recurring transaction was created.",
+      updatedTitle: "Recurring updated",
+      updatedMessage: "The recurring transaction was updated.",
+      deletedTitle: "Recurring deleted",
+      deletedMessage: "The recurring transaction was deleted.",
+    },
     labels: {
       upcomingThisMonth: "UPCOMING THIS MONTH",
     },
@@ -358,6 +384,10 @@ const en = {
     actions: {
       create: "Create category",
       delete: "Delete",
+    },
+    success: {
+      categoryDeletedTitle: "Category deleted",
+      categoryDeletedMessage: "The category was deleted successfully.",
     },
     errors: {
       genericTitle: "Error",
@@ -445,6 +475,12 @@ const en = {
     success: {
       categoryCreatedTitle: "Category created",
       categoryCreatedMessage: "Category \"{{name}}\" was created successfully.",
+      transactionCreatedTitle: "Transaction created",
+      transactionCreatedMessage: "The transaction was created successfully.",
+      accountCreatedTitle: "Account created",
+      accountCreatedMessage: "The account was created successfully.",
+      transactionDeletedTitle: "Transaction deleted",
+      transactionDeletedMessage: "The transaction was deleted successfully.",
     },
     errors: {
       genericTitle: "Error",

@@ -1,14 +1,15 @@
 import { APP_COLORS } from "../../constants/colors";
 import { useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, Alert, FlatList, Text, View } from "react-native";
+import { ActivityIndicator, FlatList, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { resolveApiErrorMessage } from "../../i18n/resolve-api-error-message";
+import { showErrorToast, showSuccessToast } from "../../components/shared/toast";
 
 import { AccountListCard } from "../../components/accounts/AccountListCard";
 import { AccountsHeader } from "../../components/accounts/AccountsHeader";
 import { AccountsSectionHeader } from "../../components/accounts/AccountsSectionHeader";
-import { ConnectBankAccountButton } from "../../components/accounts/ConnectBankAccountButton";
+import { CreateAccountButton } from "../../components/accounts/CreateAccountButton";
 import { CreateAccountModal } from "../../components/transactions/CreateAccountModal";
 import { createAccount, getAccountsSummaryData } from "../../services/account.service";
 import { getAuthUserSnapshot } from "../../services/auth.service";
@@ -90,7 +91,7 @@ export default function AccountsScreen() {
       const normalizedInitialBalance = Number(payload.initialBalance);
 
       if (!Number.isFinite(normalizedInitialBalance)) {
-        Alert.alert(t("accounts.errors.genericTitle"), t("accounts.errors.invalidInitialBalance"));
+        showErrorToast(t("accounts.errors.genericTitle"), t("accounts.errors.invalidInitialBalance"));
         return;
       }
 
@@ -102,7 +103,7 @@ export default function AccountsScreen() {
         const resolvedRate = await getExchangeRateForCurrencies(accountCurrencyCode, userBaseCurrencyCode);
 
         if (resolvedRate === null) {
-          Alert.alert(t("accounts.errors.genericTitle"), t("accounts.errors.exchangeRateUnavailable"));
+          showErrorToast(t("accounts.errors.genericTitle"), t("accounts.errors.exchangeRateUnavailable"));
           return;
         }
 
@@ -118,9 +119,10 @@ export default function AccountsScreen() {
 
       setIsCreateAccountModalVisible(false);
       await loadAccounts(false);
+      showSuccessToast(t("accounts.success.accountCreatedTitle"), t("accounts.success.accountCreatedMessage"));
     } catch (createError) {
       const message = resolveApiErrorMessage(createError, t, "accounts.errors.createAccountFailed");
-      Alert.alert(t("accounts.errors.genericTitle"), message);
+      showErrorToast(t("accounts.errors.genericTitle"), message);
     }
   }
 
@@ -159,7 +161,7 @@ export default function AccountsScreen() {
             </View>
           }
           ListFooterComponent={
-            <ConnectBankAccountButton label={t("accounts.addAccountButton")} onPress={() => setIsCreateAccountModalVisible(true)} />
+            <CreateAccountButton label={t("accounts.addAccountButton")} onPress={() => setIsCreateAccountModalVisible(true)} />
           }
           renderItem={({ item }) => (
             <AccountListCard

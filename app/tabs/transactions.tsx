@@ -33,6 +33,7 @@ import { CreateCategoryModal } from "../../components/transactions/CreateCategor
 import { TransactionListItem } from "../../components/transactions/TransactionListItem";
 import { TransactionSummaryCards } from "../../components/transactions/TransactionSummaryCards";
 import { AppBottomSheetModal } from "../../components/shared/AppBottomSheetModal";
+import { showErrorToast, showSuccessToast } from "../../components/shared/toast";
 import { resolveApiErrorMessage } from "../../i18n/resolve-api-error-message";
 
 type TransactionGroup = {
@@ -211,7 +212,7 @@ export default function TransactionsScreen() {
     const exchangeRate = await resolveExchangeRateForAccount(payload.accountId);
 
     if (exchangeRate === null && accountCurrencyCode !== baseCurrencyCode) {
-      Alert.alert(t("transactions.errors.genericTitle"), t("transactions.errors.exchangeRateForTransaction"));
+      showErrorToast(t("transactions.errors.genericTitle"), t("transactions.errors.exchangeRateForTransaction"));
       return null;
     }
 
@@ -391,9 +392,10 @@ export default function TransactionsScreen() {
       }
 
       await addNewTransaction(toCreate);
+      showSuccessToast(t("transactions.success.transactionCreatedTitle"), t("transactions.success.transactionCreatedMessage"));
     } catch (createError) {
       const message = resolveApiErrorMessage(createError, t, "transactions.errors.createTransactionFailed");
-      Alert.alert(t("transactions.errors.genericTitle"), message);
+      showErrorToast(t("transactions.errors.genericTitle"), message);
       throw createError;
     }
   }
@@ -406,9 +408,10 @@ export default function TransactionsScreen() {
       }
 
       await addNewTransaction(toCreate);
+      showSuccessToast(t("transactions.success.transactionCreatedTitle"), t("transactions.success.transactionCreatedMessage"));
     } catch (createError) {
       const message = resolveApiErrorMessage(createError, t, "transactions.errors.createTransactionFailed");
-      Alert.alert(t("transactions.errors.genericTitle"), message);
+      showErrorToast(t("transactions.errors.genericTitle"), message);
       throw createError;
     }
   }
@@ -418,7 +421,7 @@ export default function TransactionsScreen() {
       const normalizedInitialBalance = Number(payload.initialBalance);
 
       if (!Number.isFinite(normalizedInitialBalance)) {
-        Alert.alert(t("transactions.errors.genericTitle"), t("transactions.errors.invalidInitialBalance"));
+        showErrorToast(t("transactions.errors.genericTitle"), t("transactions.errors.invalidInitialBalance"));
         return;
       }
 
@@ -430,7 +433,7 @@ export default function TransactionsScreen() {
         const resolvedRate = await getExchangeRateForCurrencies(accountCurrencyCode, userBaseCurrencyCode);
 
         if (resolvedRate === null) {
-          Alert.alert(t("transactions.errors.genericTitle"), t("transactions.errors.exchangeRateForAccount"));
+          showErrorToast(t("transactions.errors.genericTitle"), t("transactions.errors.exchangeRateForAccount"));
           return;
         }
 
@@ -445,22 +448,23 @@ export default function TransactionsScreen() {
       });
       await loadAccounts();
       setSelectedAccountValue(ALL_ACCOUNTS_VALUE);
+      showSuccessToast(t("transactions.success.accountCreatedTitle"), t("transactions.success.accountCreatedMessage"));
     } catch (createError) {
       const message = resolveApiErrorMessage(createError, t, "transactions.errors.createAccountFailed");
-      Alert.alert(t("transactions.errors.genericTitle"), message);
+      showErrorToast(t("transactions.errors.genericTitle"), message);
     }
   }
 
   async function handleCreateCategory(payload: CreateCategoryDTO) {
     try {
       await createCategory(payload);
-      Alert.alert(
+      showSuccessToast(
         t("transactions.success.categoryCreatedTitle"),
         t("transactions.success.categoryCreatedMessage", { name: payload.name }),
       );
     } catch (createError) {
       const message = resolveApiErrorMessage(createError, t, "transactions.errors.createCategoryFailed");
-      Alert.alert(t("transactions.errors.genericTitle"), message);
+      showErrorToast(t("transactions.errors.genericTitle"), message);
     }
   }
 
@@ -476,9 +480,10 @@ export default function TransactionsScreen() {
           onPress: async () => {
             try {
               await deleteTransactionById(transactionId);
+              showSuccessToast(t("transactions.success.transactionDeletedTitle"), t("transactions.success.transactionDeletedMessage"));
             } catch (deleteError) {
               const message = resolveApiErrorMessage(deleteError, t, "transactions.errors.deleteTransactionFailed");
-              Alert.alert(t("transactions.errors.genericTitle"), message);
+              showErrorToast(t("transactions.errors.genericTitle"), message);
             }
           },
         },

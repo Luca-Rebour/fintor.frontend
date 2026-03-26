@@ -1,9 +1,10 @@
 import { APP_COLORS } from "../../constants/colors";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Alert, Pressable, ScrollView, Text, View } from "react-native";
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "expo-router";
 import { resolveApiErrorMessage } from "../../i18n/resolve-api-error-message";
+import { showErrorToast, showSuccessToast } from "../../components/shared/toast";
 
 import { CreateGoalModal } from "../../components/goals/CreateGoalModal";
 import { GoalTargetCard } from "../../components/goals/GoalTargetCard";
@@ -51,9 +52,10 @@ export default function GoalsScreen() {
 			const createdGoal = await createGoal(payload);
 			setGoalsData((previous) => [createdGoal, ...previous]);
 			setIsCreateModalVisible(false);
+			showSuccessToast(t("goals.success.targetCreatedTitle"), t("goals.success.targetCreatedMessage", { title: payload.title }));
 		} catch (createError) {
 			const message = resolveApiErrorMessage(createError, t, "goals.errors.failedToCreateTarget");
-			Alert.alert(t("goals.errors.genericTitle"), message);
+			showErrorToast(t("goals.errors.genericTitle"), message);
 		} finally {
 			setIsCreatingTarget(false);
 		}

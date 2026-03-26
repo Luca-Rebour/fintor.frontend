@@ -6,6 +6,7 @@ import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-cont
 import { View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
+import Toast from "react-native-toast-message";
 import "../i18n";
 import "../global.css";
 
@@ -41,6 +42,7 @@ function LayoutWithInsets() {
     >
       <StatusBar style="light" translucent backgroundColor="transparent" />
       <Stack screenOptions={{ headerShown: false }} />
+      <Toast bottomOffset={insets.bottom + 12} />
     </View>
   );
 }

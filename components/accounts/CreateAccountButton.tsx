@@ -1,12 +1,12 @@
 import { Pressable, Text, View } from "react-native";
 import { AppIcon } from "../shared/AppIcon";
 
-type ConnectBankAccountButtonProps = {
+type CreateAccountButtonProps = {
   label: string;
   onPress?: () => void;
 };
 
-export function ConnectBankAccountButton({ label, onPress }: ConnectBankAccountButtonProps) {
+export function CreateAccountButton({ label, onPress }: CreateAccountButtonProps) {
   return (
     <Pressable onPress={onPress} className="mt-2 rounded-2xl border border-dashed border-app-border bg-app-surface px-4 py-4">
       <View className="flex-row items-center justify-center gap-2">

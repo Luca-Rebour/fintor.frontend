@@ -49,14 +49,14 @@ export function AccountListCard({
       <View className="flex-row items-center justify-between">
         <View>
           <Text className="text-[10px] font-semibold tracking-widest text-app-textMuted">{totalBalanceLabel}</Text>
-          <Text className="mt-1 text-2xl font-bold text-white" numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
+          <Text className="mt-1 text-xl font-bold text-white" numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
             {totalBalance}
           </Text>
         </View>
 
         <View className="items-end">
           <Text className="text-[10px] font-semibold tracking-widest text-app-textMuted">{availableLabel}</Text>
-          <Text className="mt-1 text-2xl font-bold text-app-accentBlue" numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
+          <Text className="mt-1 text-xl font-bold text-app-accentBlue" numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
             {availableBalance}
           </Text>
         </View>

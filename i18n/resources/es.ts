@@ -148,6 +148,10 @@ const es = {
   },
   goals: {
     title: "Metas financieras",
+    success: {
+      targetCreatedTitle: "Meta creada",
+      targetCreatedMessage: "La meta \"{{title}}\" fue creada correctamente.",
+    },
     errors: {
       failedToLoad: "No se pudieron cargar las metas",
       failedToCreateTarget: "No se pudo crear el objetivo",
@@ -215,6 +219,10 @@ const es = {
     addAccountButton: "Agregar cuenta",
     totalBalanceLabel: "BALANCE TOTAL",
     availableLabel: "DISPONIBLE",
+    success: {
+      accountCreatedTitle: "Cuenta creada",
+      accountCreatedMessage: "La cuenta se creo correctamente.",
+    },
     errors: {
       invalidInitialBalance: "El saldo inicial no es válido.",
       exchangeRateUnavailable: "No se pudo obtener el tipo de cambio para crear la cuenta.",
@@ -224,6 +232,16 @@ const es = {
   },
   recurring: {
     title: "Recurrentes",
+    success: {
+      confirmedTitle: "Recurrente confirmada",
+      confirmedMessage: "La transaccion recurrente fue confirmada.",
+      rescheduledTitle: "Recurrente reprogramada",
+      rescheduledMessage: "La transaccion recurrente fue reprogramada.",
+      cancelledTitle: "Recurrente cancelada",
+      cancelledMessage: "La transaccion recurrente fue cancelada.",
+      deletedTitle: "Recurrente eliminada",
+      deletedMessage: "La transaccion recurrente fue eliminada.",
+    },
     labels: {
       pending: "PENDIENTES",
       rescheduled: "REPROGRAMADAS",
@@ -279,6 +297,14 @@ const es = {
   },
   recurringAdmin: {
     title: "Gestionar recurrentes",
+    success: {
+      createdTitle: "Recurrente creada",
+      createdMessage: "La transaccion recurrente fue creada.",
+      updatedTitle: "Recurrente actualizada",
+      updatedMessage: "La transaccion recurrente fue actualizada.",
+      deletedTitle: "Recurrente eliminada",
+      deletedMessage: "La transaccion recurrente fue eliminada.",
+    },
     labels: {
       upcomingThisMonth: "PRÓXIMAS ESTE MES",
     },
@@ -358,6 +384,10 @@ const es = {
     actions: {
       create: "Crear categoría",
       delete: "Eliminar",
+    },
+    success: {
+      categoryDeletedTitle: "Categoria eliminada",
+      categoryDeletedMessage: "La categoria se elimino correctamente.",
     },
     errors: {
       genericTitle: "Error",
@@ -445,6 +475,12 @@ const es = {
     success: {
       categoryCreatedTitle: "Categoría creada",
       categoryCreatedMessage: "La categoría \"{{name}}\" fue creada correctamente.",
+      transactionCreatedTitle: "Transaccion creada",
+      transactionCreatedMessage: "La transaccion fue creada correctamente.",
+      accountCreatedTitle: "Cuenta creada",
+      accountCreatedMessage: "La cuenta fue creada correctamente.",
+      transactionDeletedTitle: "Transaccion eliminada",
+      transactionDeletedMessage: "La transaccion fue eliminada correctamente.",
     },
     errors: {
       genericTitle: "Error",

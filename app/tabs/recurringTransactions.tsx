@@ -32,6 +32,7 @@ import {
 import { RecurringPendingApprovalApiDTO, RecurringTransactionApiDTO, RecurringTransactionsData } from "../../types/recurring";
 import { PendingTransactionStatus } from "../../types/enums/pendingTransactionStatus";
 import { TransactionType } from "../../types/enums/transactionType";
+import { showErrorToast, showSuccessToast } from "../../components/shared/toast";
 import { resolveApiErrorMessage } from "../../i18n/resolve-api-error-message";
 
 function resolveTransactionType(value: unknown): TransactionType | null {
@@ -149,9 +150,10 @@ export default function RecurringTransactionsScreen() {
 			setIsSubmittingAction(true);
 			await confirmPendingRecurringApproval(approval.id, approval.currencyCode);
 			await loadRecurringTransactions(false);
+			showSuccessToast(t("recurring.success.confirmedTitle"), t("recurring.success.confirmedMessage"));
 		} catch (actionError) {
 			const message = resolveApiErrorMessage(actionError, t, "recurring.errors.couldNotConfirm");
-			Alert.alert(t("recurring.errors.genericTitle"), message);
+			showErrorToast(t("recurring.errors.genericTitle"), message);
 		} finally {
 			setIsSubmittingAction(false);
 		}
@@ -178,7 +180,7 @@ export default function RecurringTransactionsScreen() {
 			const selectedDateStart = getStartOfDay(rescheduleDate);
 
 			if (selectedDateStart < minimumRescheduleDate) {
-				Alert.alert(t("recurring.errors.invalidDateTitle"), t("recurring.errors.invalidDateMessage"));
+				showErrorToast(t("recurring.errors.invalidDateTitle"), t("recurring.errors.invalidDateMessage"));
 				return;
 			}
 
@@ -189,9 +191,10 @@ export default function RecurringTransactionsScreen() {
 			);
 			await loadRecurringTransactions(false);
 			setRescheduleApproval(null);
+			showSuccessToast(t("recurring.success.rescheduledTitle"), t("recurring.success.rescheduledMessage"));
 		} catch (actionError) {
 			const message = resolveApiErrorMessage(actionError, t, "recurring.errors.couldNotReschedule");
-			Alert.alert(t("recurring.errors.genericTitle"), message);
+			showErrorToast(t("recurring.errors.genericTitle"), message);
 		} finally {
 			setIsSubmittingAction(false);
 		}
@@ -238,9 +241,10 @@ export default function RecurringTransactionsScreen() {
 							setIsSubmittingAction(true);
 							await cancelPendingRecurringApproval(approval.id);
 							await loadRecurringTransactions(false);
+							showSuccessToast(t("recurring.success.cancelledTitle"), t("recurring.success.cancelledMessage"));
 						} catch (actionError) {
 							const message = resolveApiErrorMessage(actionError, t, "recurring.errors.couldNotCancel");
-							Alert.alert(t("recurring.errors.genericTitle"), message);
+							showErrorToast(t("recurring.errors.genericTitle"), message);
 						} finally {
 							setIsSubmittingAction(false);
 						}
@@ -268,9 +272,10 @@ export default function RecurringTransactionsScreen() {
 							setIsSubmittingAction(true);
 							await deleteRecurringTransaction(recurringTransaction.id);
 							await loadRecurringTransactions(false);
+							showSuccessToast(t("recurring.success.deletedTitle"), t("recurring.success.deletedMessage"));
 						} catch (actionError) {
 							const message = resolveApiErrorMessage(actionError, t, "recurring.errors.couldNotDelete");
-							Alert.alert(t("recurring.errors.genericTitle"), message);
+							showErrorToast(t("recurring.errors.genericTitle"), message);
 						} finally {
 							setIsSubmittingAction(false);
 						}
